@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+
+# bb validates these prebuilt bundles for managed installs.
+!dist/
+!dist/**
