@@ -187,11 +187,12 @@ describe("Tuple Call app", () => {
       },
     );
 
-    await slot.findByText("Your personal room");
+    await slot.findByRole("heading", { name: "Personal room" });
+    await slot.findByText("Your room");
     await slot.findByText("Alice Jones & Bob Smith");
     await slot.findByText("A concise summary of the recorded call.");
     expect(slot.queryByRole("button", { name: "Refresh" })).toBeNull();
-    fireEvent.click(slot.getByRole("button", { name: /Your personal room/ }));
+    fireEvent.click(slot.getByRole("button", { name: /Your room/ }));
     await waitFor(() => expect(slot.inspection.rpcCalls.some((call) => call.method === "joinTuple")).toBe(true));
     expect(writeText).toHaveBeenCalledWith("https://staging.tuple.app/c/demo-room");
     fireEvent.click(slot.getByRole("button", { name: /Morgan Lee & Casey Chen/ }));

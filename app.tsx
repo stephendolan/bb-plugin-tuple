@@ -189,27 +189,26 @@ function TupleLaunchpad({
       ) : null}
 
       {personalRoom ? (
-        <button
-          type="button"
-          className="group flex w-full items-center gap-3 rounded-xl bg-indigo-500/8 p-3 text-left ring-1 ring-inset ring-indigo-500/15 hover:bg-indigo-500/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          disabled={joining !== null}
-          onClick={() => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl)}
-        >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/12 text-indigo-400" aria-hidden="true">
-            <Icon name="GridView" className="size-4" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-medium">Your personal room</span>
-            <span className="block text-sm text-muted-foreground">
-              Enter and copy link
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium text-muted-foreground">Personal room</h3>
+          <button
+            type="button"
+            className="group flex w-full min-w-0 items-center gap-3 pt-1 pb-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            disabled={joining !== null}
+            onClick={() => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl)}
+          >
+            <Icon name="GridView" className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-medium">Your room</span>
+              <span className="block text-xs text-muted-foreground">Enter and copy link</span>
             </span>
-          </span>
-          {joining === `room:${personalRoom.slug}` ? (
-            <Icon name="Spinner" className="size-4 animate-spin text-muted-foreground" aria-hidden="true" />
-          ) : (
-            <Icon name="ChevronRight" className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-          )}
-        </button>
+            {joining === `room:${personalRoom.slug}` ? (
+              <Icon name="Spinner" className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
+            ) : (
+              <Icon name="ChevronRight" className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       ) : null}
 
       {launchpad?.calls.length ? (

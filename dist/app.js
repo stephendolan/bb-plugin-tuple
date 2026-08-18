@@ -3977,23 +3977,26 @@ function TupleLaunchpad({
         /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4", "aria-hidden": "true" })
       ] })
     ] }) : null,
-    personalRoom ? /* @__PURE__ */ jsxs(
-      "button",
-      {
-        type: "button",
-        className: "group flex w-full items-center gap-3 rounded-xl bg-indigo-500/8 p-3 text-left ring-1 ring-inset ring-indigo-500/15 hover:bg-indigo-500/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        disabled: joining !== null,
-        onClick: () => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
-        children: [
-          /* @__PURE__ */ jsx("span", { className: "flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/12 text-indigo-400", "aria-hidden": "true", children: /* @__PURE__ */ jsx(Icon, { name: "GridView", className: "size-4" }) }),
-          /* @__PURE__ */ jsxs("span", { className: "min-w-0 flex-1", children: [
-            /* @__PURE__ */ jsx("span", { className: "block font-medium", children: "Your personal room" }),
-            /* @__PURE__ */ jsx("span", { className: "block text-sm text-muted-foreground", children: "Enter and copy link" })
-          ] }),
-          joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5", "aria-hidden": "true" })
-        ]
-      }
-    ) : null,
+    personalRoom ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Personal room" }),
+      /* @__PURE__ */ jsxs(
+        "button",
+        {
+          type: "button",
+          className: "group flex w-full min-w-0 items-center gap-3 pt-1 pb-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          disabled: joining !== null,
+          onClick: () => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
+          children: [
+            /* @__PURE__ */ jsx(Icon, { name: "GridView", className: "size-4 shrink-0 text-muted-foreground", "aria-hidden": "true" }),
+            /* @__PURE__ */ jsxs("span", { className: "min-w-0 flex-1", children: [
+              /* @__PURE__ */ jsx("span", { className: "block text-sm font-medium", children: "Your room" }),
+              /* @__PURE__ */ jsx("span", { className: "block text-xs text-muted-foreground", children: "Enter and copy link" })
+            ] }),
+            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5", "aria-hidden": "true" })
+          ]
+        }
+      )
+    ] }) : null,
     launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
       /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Happening now" }),
       /* @__PURE__ */ jsx("div", { className: "divide-y divide-foreground/8", children: launchpad.calls.map((call) => {
