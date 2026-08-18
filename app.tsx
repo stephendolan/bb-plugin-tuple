@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 
-const tupleIconUrl = "/api/v1/plugins/tuple/assets/logo";
+const tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
 
 function useCallState() {
   const rpc = useRpc<typeof rpcContract>();
@@ -47,26 +47,25 @@ function useCallState() {
   return { state, loading, refresh, startTranscription, rpc };
 }
 
-function TupleAppIcon({
-  state,
-  size = "large",
-  showStatus = true,
-}: {
-  state: CallState | null;
-  size?: "small" | "large";
-  showStatus?: boolean;
-}) {
+function TupleStatusIcon({ state }: { state: CallState | null }) {
+  const mask = `url("${tupleCompactIconUrl}")`;
   return (
-    <span className="relative shrink-0" aria-hidden="true">
-      <img
-        src={tupleIconUrl}
-        alt=""
-        className={size === "large" ? "size-9" : "size-5"}
+    <span className="relative flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
+      <span
+        className="size-4 bg-current"
+        style={{
+          maskImage: mask,
+          maskPosition: "center",
+          maskRepeat: "no-repeat",
+          maskSize: "contain",
+          WebkitMaskImage: mask,
+          WebkitMaskPosition: "center",
+          WebkitMaskRepeat: "no-repeat",
+          WebkitMaskSize: "contain",
+        }}
       />
-      {showStatus && state?.inCall ? (
-        <span
-          className="absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background"
-        />
+      {state?.inCall ? (
+        <span className="absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" />
       ) : null}
     </span>
   );
@@ -421,8 +420,8 @@ function CallOverview({
       className={quiet ? "space-y-3" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}
       aria-live="polite"
     >
-      <div className="flex min-w-0 items-start gap-3">
-        <TupleAppIcon state={state} />
+      <div className="flex min-w-0 items-start gap-2.5">
+        <TupleStatusIcon state={state} />
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <h2 className="text-balance font-semibold">{title}</h2>
@@ -695,14 +694,18 @@ function NavCallThread() {
 }
 
 function ComposerTupleAction() {
-  const { state, rpc } = useCallState();
+  const { state, rpc, startTranscription } = useCallState();
   const composer = useComposer();
   const { values } = useSettings();
   const [loading, setLoading] = useState(false);
 
-  async function addContext() {
+  async function runAction() {
     setLoading(true);
     try {
+      if (!state?.call?.transcribing) {
+        await startTranscription();
+        return;
+      }
       const minutes = Number(values?.defaultMinutes ?? "5");
       const snapshot = await rpc.call("getSnapshot", { minutes });
       composer.updateText((current) => `${current}${current ? "\n\n" : ""}${snapshot.promptContext}`);
@@ -715,21 +718,25 @@ function ComposerTupleAction() {
     }
   }
 
-  const label = `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft`;
+  if (!state?.inCall) return null;
+
+  const label = state.call?.transcribing
+    ? `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft`
+    : "Start Tuple transcription";
   return (
     <button
       type="button"
       className="relative flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
-      disabled={loading || !state?.call?.transcribing}
+      disabled={loading}
       aria-label={label}
       title={label}
-      onClick={() => void addContext()}
+      onClick={() => void runAction()}
     >
       <span className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden" aria-hidden="true" />
       {loading ? (
         <Icon name="Spinner" className="size-4 shrink-0 animate-spin" aria-hidden="true" />
       ) : (
-        <TupleAppIcon state={state} size="small" />
+        <TupleStatusIcon state={state} />
       )}
     </button>
   );

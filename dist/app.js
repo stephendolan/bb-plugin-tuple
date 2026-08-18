@@ -139,7 +139,7 @@ var {
   useSonner
 } = mod3;
 
-// node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
 var __defProp2 = Object.defineProperty;
 var __name = (target, value) => __defProp2(target, "name", { value, configurable: true });
 function setRef(ref, value) {
@@ -180,7 +180,7 @@ function useComposedRefs(...refs) {
 }
 __name(useComposedRefs, "useComposedRefs");
 
-// node_modules/@radix-ui/react-slot/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-slot/dist/index.mjs
 var __defProp3 = Object.defineProperty;
 var __name2 = (target, value) => __defProp3(target, "name", { value, configurable: true });
 // @__NO_SIDE_EFFECTS__
@@ -316,7 +316,7 @@ var createSlottableError = /* @__PURE__ */ __name2((ownerName) => {
 }, "createSlottableError");
 var use2 = react_exports[" use ".trim().toString()];
 
-// node_modules/clsx/dist/clsx.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/clsx/dist/clsx.mjs
 function r(e) {
   var t, f, n = "";
   if ("string" == typeof e || "number" == typeof e) n += e;
@@ -331,7 +331,7 @@ function clsx() {
   return n;
 }
 
-// node_modules/class-variance-authority/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/class-variance-authority/dist/index.mjs
 var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
 var cx = clsx;
 var cva = (base, config) => (props) => {
@@ -373,7 +373,7 @@ var cva = (base, config) => (props) => {
   return cx(base, getVariantClassNames, getCompoundVariantClassNames, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
 };
 
-// node_modules/tailwind-merge/dist/bundle-mjs.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var concatArrays = (array1, array2) => {
   const combinedArray = new Array(array1.length + array2.length);
   for (let i = 0; i < array1.length; i++) {
@@ -3627,12 +3627,12 @@ var getDefaultConfig = () => {
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 
-// lib/utils.ts
+// Repos/@tuple/bb-plugin-tuple/lib/utils.ts
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// components/ui/motion.ts
+// Repos/@tuple/bb-plugin-tuple/components/ui/motion.ts
 var CONTROL_HOVER_TRANSITION = "transition-colors duration-150 hover:duration-0";
 
 // bb-plugin-runtime-shim:react/jsx-runtime
@@ -3647,7 +3647,7 @@ var {
   jsxs
 } = mod4;
 
-// components/ui/button.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/button.tsx
 var buttonVariants = cva(
   `inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ${CONTROL_HOVER_TRANSITION} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
@@ -3688,7 +3688,7 @@ var Button = forwardRef(
 );
 Button.displayName = "Button";
 
-// node_modules/@hugeicons/core-free-icons/dist/esm/index.js
+// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/core-free-icons/dist/esm/index.js
 var ArrowLeft01Icon = [
   ["path", { d: "M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }]
 ];
@@ -3730,7 +3730,7 @@ var SentIcon = [
   ["path", { d: "M11.4999 12.5L14.9999 9", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
 ];
 
-// node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
+// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
 var defaultAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
   width: 24,
@@ -3781,7 +3781,7 @@ var HugeiconsIcon = forwardRef(({ color = "currentColor", size = 24, strokeWidth
 });
 HugeiconsIcon.displayName = "HugeiconsIcon";
 
-// components/ui/icon.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/icon.tsx
 var ICON_MAP = {
   BubbleChatQuestion: BubbleChatQuestionIcon,
   ChevronLeft: ArrowLeft01Icon,
@@ -3812,14 +3812,14 @@ function Icon({
   );
 }
 
-// components/ui/coarse-pointer-sizing.ts
+// Repos/@tuple/bb-plugin-tuple/components/ui/coarse-pointer-sizing.ts
 var COARSE_POINTER_TEXT_BASE_CLASS = "text-sm max-md:pointer-coarse:text-base";
 var HEADER_ICON_BUTTON_BOX_CLASS = "h-[28px] w-[28px] rounded-md p-0 max-md:pointer-coarse:h-[36px] max-md:pointer-coarse:w-[36px]";
 var COARSE_POINTER_HEADER_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[16px] max-md:pointer-coarse:[&_svg]:size-[20px]`;
 var COARSE_POINTER_HEADER_REDUCED_GLYPH_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[13px] max-md:pointer-coarse:[&_svg]:size-[16px]`;
 var COARSE_POINTER_INPUT_HEIGHT_CLASS = "h-9 max-md:pointer-coarse:h-10";
 
-// components/ui/input.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/input.tsx
 var Input = forwardRef(
   ({ className, type, ...props }, ref) => {
     return /* @__PURE__ */ jsx(
@@ -3841,8 +3841,8 @@ var Input = forwardRef(
 );
 Input.displayName = "Input";
 
-// app.tsx
-var tupleIconUrl = "/api/v1/plugins/tuple/assets/logo";
+// Repos/@tuple/bb-plugin-tuple/app.tsx
+var tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
 function useCallState() {
   const rpc = useRpc();
   const [state, setState] = useState(null);
@@ -3868,26 +3868,26 @@ function useCallState() {
   useRealtime("call-state", (next) => setState(next));
   return { state, loading, refresh, startTranscription, rpc };
 }
-function TupleAppIcon({
-  state,
-  size = "large",
-  showStatus = true
-}) {
-  return /* @__PURE__ */ jsxs("span", { className: "relative shrink-0", "aria-hidden": "true", children: [
+function TupleStatusIcon({ state }) {
+  const mask = `url("${tupleCompactIconUrl}")`;
+  return /* @__PURE__ */ jsxs("span", { className: "relative flex size-5 shrink-0 items-center justify-center", "aria-hidden": "true", children: [
     /* @__PURE__ */ jsx(
-      "img",
-      {
-        src: tupleIconUrl,
-        alt: "",
-        className: size === "large" ? "size-9" : "size-5"
-      }
-    ),
-    showStatus && state?.inCall ? /* @__PURE__ */ jsx(
       "span",
       {
-        className: "absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background"
+        className: "size-4 bg-current",
+        style: {
+          maskImage: mask,
+          maskPosition: "center",
+          maskRepeat: "no-repeat",
+          maskSize: "contain",
+          WebkitMaskImage: mask,
+          WebkitMaskPosition: "center",
+          WebkitMaskRepeat: "no-repeat",
+          WebkitMaskSize: "contain"
+        }
       }
-    ) : null
+    ),
+    state?.inCall ? /* @__PURE__ */ jsx("span", { className: "absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" }) : null
   ] });
 }
 function useTupleLaunchpad(enabled) {
@@ -4144,8 +4144,8 @@ function CallOverview({
       className: quiet ? "space-y-3" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8",
       "aria-live": "polite",
       children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-3", children: [
-          /* @__PURE__ */ jsx(TupleAppIcon, { state }),
+        /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-2.5", children: [
+          /* @__PURE__ */ jsx(TupleStatusIcon, { state }),
           /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
             /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-center gap-2", children: [
               /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: title }),
@@ -4391,13 +4391,17 @@ function NavCallThread() {
   return /* @__PURE__ */ jsx(NewCallThread, { projectId });
 }
 function ComposerTupleAction() {
-  const { state, rpc } = useCallState();
+  const { state, rpc, startTranscription } = useCallState();
   const composer = useComposer();
   const { values } = useSettings();
   const [loading, setLoading] = useState(false);
-  async function addContext() {
+  async function runAction() {
     setLoading(true);
     try {
+      if (!state?.call?.transcribing) {
+        await startTranscription();
+        return;
+      }
       const minutes = Number(values?.defaultMinutes ?? "5");
       const snapshot = await rpc.call("getSnapshot", { minutes });
       composer.updateText((current) => `${current}${current ? "\n\n" : ""}${snapshot.promptContext}`);
@@ -4409,19 +4413,20 @@ function ComposerTupleAction() {
       setLoading(false);
     }
   }
-  const label = `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft`;
+  if (!state?.inCall) return null;
+  const label = state.call?.transcribing ? `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft` : "Start Tuple transcription";
   return /* @__PURE__ */ jsxs(
     "button",
     {
       type: "button",
       className: "relative flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50",
-      disabled: loading || !state?.call?.transcribing,
+      disabled: loading,
       "aria-label": label,
       title: label,
-      onClick: () => void addContext(),
+      onClick: () => void runAction(),
       children: [
         /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-        loading ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(TupleAppIcon, { state, size: "small" })
+        loading ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(TupleStatusIcon, { state })
       ]
     }
   );

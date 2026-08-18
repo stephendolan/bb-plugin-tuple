@@ -305,6 +305,9 @@
     .gap-2 {
       gap: calc(var(--spacing) * 2);
     }
+    .gap-2\.5 {
+      gap: calc(var(--spacing) * 2.5);
+    }
     .gap-3 {
       gap: calc(var(--spacing) * 3);
     }
@@ -419,6 +422,9 @@
     }
     .bg-amber-400 {
       background-color: var(--color-amber-400);
+    }
+    .bg-current {
+      background-color: currentcolor;
     }
     .bg-destructive {
       background-color: var(--destructive);

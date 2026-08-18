@@ -23,6 +23,85 @@ const liveState = {
 };
 
 describe("Tuple Call app", () => {
+  it("shows the composer action only during a live Tuple call", async () => {
+    const app = await loadPluginApp(() => import("./app"));
+    const action = app.composerCustomizations[0]!.actions![0]!;
+    const idle = renderSlot(
+      action,
+      {},
+      {
+        settings: { environment: "staging", defaultMinutes: "5" },
+        rpc: {
+          getState: () => ({ ...liveState, inCall: false, call: null }),
+        },
+      },
+    );
+
+    await waitFor(() => expect(idle.inspection.rpcCalls).toHaveLength(1));
+    expect(idle.queryByRole("button")).toBeNull();
+    idle.lifecycle.unmount();
+
+    const live = renderSlot(
+      action,
+      {},
+      {
+        settings: { environment: "staging", defaultMinutes: "5" },
+        composer: { text: "Existing task" },
+        rpc: {
+          getState: () => liveState,
+          getSnapshot: () => ({
+            callId: "call-1",
+            minutes: 5,
+            capturedAt: "2026-08-18T20:00:00.000Z",
+            segmentCount: 1,
+            transcript: "[04:00 PM] User 42: ship it",
+            promptContext: "bounded context",
+            truncated: false,
+          }),
+        },
+      },
+    );
+
+    fireEvent.click(
+      await live.findByRole("button", {
+        name: "Add the last 5 minutes of this Tuple call to the draft",
+      }),
+    );
+    await waitFor(() => expect(live.inspection.composer.text).toBe("Existing task\n\nbounded context"));
+    expect(live.inspection.composer.focusCount).toBe(1);
+    expect(live.container.querySelector('[style*="mask-image"]')).toBeTruthy();
+    live.lifecycle.unmount();
+  });
+
+  it("starts transcription when the live composer action needs it", async () => {
+    const app = await loadPluginApp(() => import("./app"));
+    const action = app.composerCustomizations[0]!.actions![0]!;
+    const slot = renderSlot(
+      action,
+      {},
+      {
+        settings: { environment: "staging", defaultMinutes: "5" },
+        rpc: {
+          getState: () => ({
+            ...liveState,
+            call: { ...liveState.call, transcribing: false },
+          }),
+          startTranscription: () => liveState,
+        },
+      },
+    );
+
+    fireEvent.click(await slot.findByRole("button", { name: "Start Tuple transcription" }));
+    await slot.findByRole("button", {
+      name: "Add the last 5 minutes of this Tuple call to the draft",
+    });
+    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual([
+      "getState",
+      "startTranscription",
+    ]);
+    slot.lifecycle.unmount();
+  });
+
   it("registers the intended BB surfaces and captures a reviewed snapshot", async () => {
     const app = await loadPluginApp(() => import("./app"));
     expect(app.navPanels).toHaveLength(1);
