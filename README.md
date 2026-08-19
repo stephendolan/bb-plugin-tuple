@@ -4,7 +4,7 @@ Bring the Tuple conversation you choose into the bb task you choose.
 
 The plugin keeps call context explicit: it never streams a live transcript into
 every agent turn. You choose a call window, review it, and send the agent a
-compact reference that retrieves that exact window on demand.
+compact reference to the relevant Tuple CLI guide and exact call or window.
 
 ## What it adds
 
@@ -17,9 +17,9 @@ compact reference that retrieves that exact window on demand.
 - A compact editor shortcut that opens Tuple when idle and adds recent call
   context by reference when live.
 - A per-task panel for sending the last 1–30 minutes of a call with a purpose.
-- Live and recorded call handoff by Tuple call ID, so transcript content is
-  retrieved only when the receiving agent needs it.
-- A `tuple_call_context` agent tool and `bb tuple-call` CLI command.
+- Live and recorded call handoff by Tuple call ID. The receiving agent follows
+  Tuple's version-matched `live-call` or `history` guide and uses the CLI directly.
+- A `bb tuple-call` CLI command for status and recent transcript context.
 
 ## Requirements
 
