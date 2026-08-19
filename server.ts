@@ -262,7 +262,7 @@ export function parseTranscript(output: string) {
 }
 
 export function liveCallReferencePrompt(callId: string, since: string, until: string, command: string, task?: string) {
-  const taskBlock = task ? `\n\nTask from the user:\n${task}` : "\n\nWhat I want you to do:\n";
+  const taskBlock = `\n\nRename this thread to match the purpose below, then complete it:\n${task?.trim() ?? ""}`;
   return [
     `Use the Tuple call ${callId} from ${since} through ${until} as context for this task.`,
     `Retrieve exactly that window with the tuple_call_context tool using callId: "${callId}", since: "${since}", and until: "${until}". Do not ask me to paste or copy the transcript.`,
@@ -273,7 +273,7 @@ export function liveCallReferencePrompt(callId: string, since: string, until: st
 }
 
 export function recordingReferencePrompt(callId: string, command: string, task?: string) {
-  const taskBlock = task ? `\n\nTask from the user:\n${task}` : "\n\nWhat I want you to do:\n";
+  const taskBlock = `\n\nRename this thread to match the purpose below, then complete it:\n${task?.trim() ?? ""}`;
   return [
     `Use the stored Tuple call with ID ${callId} as context for this task.`,
     `Retrieve it with the tuple_call_context tool using callId: "${callId}". Do not ask me to paste or copy the transcript.`,

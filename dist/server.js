@@ -14701,10 +14701,10 @@ function parseTranscript(output) {
   return lines;
 }
 function liveCallReferencePrompt(callId, since, until, command, task) {
-  const taskBlock = task ? `
+  const taskBlock = `
 
-Task from the user:
-${task}` : "\n\nWhat I want you to do:\n";
+Rename this thread to match the purpose below, then complete it:
+${task?.trim() ?? ""}`;
   return [
     `Use the Tuple call ${callId} from ${since} through ${until} as context for this task.`,
     `Retrieve exactly that window with the tuple_call_context tool using callId: "${callId}", since: "${since}", and until: "${until}". Do not ask me to paste or copy the transcript.`,
@@ -14714,10 +14714,10 @@ ${task}` : "\n\nWhat I want you to do:\n";
   ].join("\n");
 }
 function recordingReferencePrompt(callId, command, task) {
-  const taskBlock = task ? `
+  const taskBlock = `
 
-Task from the user:
-${task}` : "\n\nWhat I want you to do:\n";
+Rename this thread to match the purpose below, then complete it:
+${task?.trim() ?? ""}`;
   return [
     `Use the stored Tuple call with ID ${callId} as context for this task.`,
     `Retrieve it with the tuple_call_context tool using callId: "${callId}". Do not ask me to paste or copy the transcript.`,

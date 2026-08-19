@@ -31,12 +31,19 @@ describe("parseTranscript", () => {
 
   it("references a stored call without embedding transcript content", () => {
     const prompt = recordingReferencePrompt("call-123", "tuple-staging", "Find the decisions");
+    expect(prompt.indexOf("Use the stored Tuple call")).toBeLessThan(prompt.indexOf("Rename this thread"));
+    expect(prompt.indexOf("Rename this thread")).toBeLessThan(prompt.indexOf("Find the decisions"));
     expect(prompt).toContain("call-123");
     expect(prompt).toContain("tuple_call_context");
     expect(prompt).toContain("tuple-staging agent guide history");
     expect(prompt).toContain("canonical, version-matched workflow guide");
     expect(prompt).toContain("Find the decisions");
     expect(prompt).not.toContain("BEGIN UNTRUSTED TUPLE TRANSCRIPT");
+  });
+
+  it("leaves the purpose prompt at the end for the new-thread composer", () => {
+    const prompt = recordingReferencePrompt("call-123", "tuple-staging");
+    expect(prompt).toMatch(/Rename this thread to match the purpose below, then complete it:\n$/);
   });
 
   it("references an exact live-call window without embedding its transcript", () => {
@@ -47,6 +54,8 @@ describe("parseTranscript", () => {
       "tuple-staging",
       "Summarize the decision",
     );
+    expect(prompt.indexOf("Use the Tuple call")).toBeLessThan(prompt.indexOf("Rename this thread"));
+    expect(prompt.indexOf("Rename this thread")).toBeLessThan(prompt.indexOf("Summarize the decision"));
     expect(prompt).toContain('callId: "call-123"');
     expect(prompt).toContain('since: "2026-08-19T01:50:00.000Z"');
     expect(prompt).toContain('until: "2026-08-19T01:55:00.000Z"');

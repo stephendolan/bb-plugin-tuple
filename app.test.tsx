@@ -148,6 +148,7 @@ describe("Tuple Call app", () => {
             promptContext: "bounded context",
             truncated: false,
           }),
+          createThread: () => ({ threadId: "new-thread-1" }),
         },
       },
     );
@@ -157,9 +158,18 @@ describe("Tuple Call app", () => {
     fireEvent.click(await slot.findByRole("button", { name: "Use last 5 min" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
     expect(slot.getByTestId("bb-new-thread-composer").getAttribute("data-default-project-id")).toBe("");
+    const composer = slot.getByTestId("bb-new-thread-composer-input");
+    expect((composer as HTMLTextAreaElement).value).toBe("bounded context");
+    fireEvent.change(composer, { target: { value: "bounded context\nSpike the notification" } });
+    fireEvent.click(slot.getByTestId("bb-new-thread-composer-submit"));
+    await waitFor(() => expect(slot.inspection.rpcCalls.some((call) => call.method === "createThread")).toBe(true));
+    const createRequest = slot.inspection.rpcCalls.find((call) => call.method === "createThread")?.input.request;
+    expect(createRequest.input).toEqual([
+      { type: "text", text: "bounded context\nSpike the notification", mentions: [] },
+    ]);
     await slot.findByRole("heading", { name: "Recent calls" });
     await slot.findByText("Earlier launch review");
-    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "getSnapshot"]);
+    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "getSnapshot", "createThread"]);
     slot.lifecycle.unmount();
   });
 
