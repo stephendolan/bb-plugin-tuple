@@ -3988,7 +3988,7 @@ function ThreadCallPanelView({
       }
     ) : /* @__PURE__ */ jsxs("form", { className: "space-y-3", onSubmit: submit, children: [
       /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsx("label", { className: "text-base font-medium sm:text-sm", htmlFor: inputId, children: copy.label }),
+        /* @__PURE__ */ jsx("label", { className: PANEL_SECTION_HEADING_CLASS, htmlFor: inputId, children: copy.label }),
         /* @__PURE__ */ jsx(
           Input,
           {
@@ -4289,7 +4289,7 @@ function StoredCallSelectionView({
     ] }),
     destination === "current-thread" ? /* @__PURE__ */ jsxs("form", { className: "space-y-3", onSubmit: submit, children: [
       /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsx("label", { className: "text-base font-medium sm:text-sm", htmlFor: inputId, children: "Ask the current thread to" }),
+        /* @__PURE__ */ jsx("label", { className: PANEL_SECTION_HEADING_CLASS, htmlFor: inputId, children: "Ask the current thread to" }),
         /* @__PURE__ */ jsx(
           Input,
           {
@@ -4307,9 +4307,9 @@ function StoredCallSelectionView({
         sending ? "Sending\u2026" : "Send recorded call"
       ] })
     ] }) : /* @__PURE__ */ jsxs("section", { className: "space-y-3", children: [
-      /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsx("h2", { className: "font-semibold text-balance", children: "Start a new thread" }),
-        /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-base text-pretty sm:text-sm", children: "The new thread will read this recording directly from Tuple." })
+      /* @__PURE__ */ jsxs("div", { className: "space-y-0.5", children: [
+        /* @__PURE__ */ jsx("h2", { className: PANEL_SECTION_HEADING_CLASS, children: "New thread" }),
+        /* @__PURE__ */ jsx("p", { className: "text-muted-foreground px-3 text-base text-pretty sm:text-sm", children: "The new thread will read this recording directly from Tuple." })
       ] }),
       newThreadComposer
     ] })
@@ -4396,9 +4396,9 @@ function NewCallThreadView({
         ] })
       ] }),
       /* @__PURE__ */ jsxs("section", { className: "space-y-3", children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("h2", { className: "font-semibold text-balance", children: "Start a new thread" }),
-          /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-base text-pretty sm:text-sm", children: "Add a task for the thread, then choose how it should run." })
+        /* @__PURE__ */ jsxs("div", { className: "space-y-0.5", children: [
+          /* @__PURE__ */ jsx("h2", { className: PANEL_SECTION_HEADING_CLASS, children: "New thread" }),
+          /* @__PURE__ */ jsx("p", { className: "text-muted-foreground px-3 text-base text-pretty sm:text-sm", children: "Add a task for the thread, then choose how it should run." })
         ] }),
         newThreadComposer
       ] })

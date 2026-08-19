@@ -3,7 +3,7 @@ import type { CallState } from "../server";
 import { Button } from "./ui/button";
 import { Icon } from "./ui/icon";
 import { Input } from "./ui/input";
-import { PANEL_SURFACE_CLASS } from "./ui/panel-styles";
+import { PANEL_SECTION_HEADING_CLASS, PANEL_SURFACE_CLASS } from "./ui/panel-styles";
 
 function callDescription(state: CallState | null) {
   const call = state?.call;
@@ -179,7 +179,7 @@ export function ThreadCallPanelView({
       ) : (
         <form className="space-y-3" onSubmit={submit}>
           <div className="space-y-2">
-            <label className="text-base font-medium sm:text-sm" htmlFor={inputId}>{copy.label}</label>
+            <label className={PANEL_SECTION_HEADING_CLASS} htmlFor={inputId}>{copy.label}</label>
             <Input
               id={inputId}
               name="tuple-task"

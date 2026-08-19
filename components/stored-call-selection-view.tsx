@@ -76,7 +76,7 @@ export function StoredCallSelectionView({
       {destination === "current-thread" ? (
         <form className="space-y-3" onSubmit={submit}>
           <div className="space-y-2">
-            <label className="text-base font-medium sm:text-sm" htmlFor={inputId}>Ask the current thread to</label>
+            <label className={PANEL_SECTION_HEADING_CLASS} htmlFor={inputId}>Ask the current thread to</label>
             <Input
               id={inputId}
               name="tuple-recording-task"
@@ -93,9 +93,9 @@ export function StoredCallSelectionView({
         </form>
       ) : (
         <section className="space-y-3">
-          <div>
-            <h2 className="font-semibold text-balance">Start a new thread</h2>
-            <p className="text-muted-foreground text-base text-pretty sm:text-sm">
+          <div className="space-y-0.5">
+            <h2 className={PANEL_SECTION_HEADING_CLASS}>New thread</h2>
+            <p className="text-muted-foreground px-3 text-base text-pretty sm:text-sm">
               The new thread will read this recording directly from Tuple.
             </p>
           </div>

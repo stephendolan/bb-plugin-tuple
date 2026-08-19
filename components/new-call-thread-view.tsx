@@ -97,9 +97,9 @@ export function NewCallThreadView({
           </section>
 
           <section className="space-y-3">
-            <div>
-              <h2 className="font-semibold text-balance">Start a new thread</h2>
-              <p className="text-muted-foreground text-base text-pretty sm:text-sm">
+            <div className="space-y-0.5">
+              <h2 className={PANEL_SECTION_HEADING_CLASS}>New thread</h2>
+              <p className="text-muted-foreground px-3 text-base text-pretty sm:text-sm">
                 Add a task for the thread, then choose how it should run.
               </p>
             </div>
