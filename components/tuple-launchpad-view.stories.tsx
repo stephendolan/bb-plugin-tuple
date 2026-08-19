@@ -1,4 +1,6 @@
 import type { Launchpad } from "../server";
+import { PreviewMatrix } from "./preview-gallery";
+import { storyToday } from "./story-date";
 import { TupleLaunchpadView } from "./tuple-launchpad-view";
 
 export default {
@@ -6,7 +8,7 @@ export default {
 };
 
 const noop = () => {};
-const now = "2026-08-18";
+const now = storyToday();
 
 const richLaunchpad: Launchpad = {
   personalRoom: {
@@ -115,45 +117,93 @@ const scenarios = [
   error?: string;
 }>;
 
-const widths = [280, 360, 480, 600] as const;
-
 export function StateMatrix() {
   return (
-    <main className="tuple-gallery" data-bb-plugin="tuple" data-testid="launchpad-matrix">
-      <header className="tuple-gallery-header">
-        <h1>Tuple out-of-call state matrix</h1>
-        <p>The room launcher, active calls, and recording history rendered together at every supported drawer width.</p>
-      </header>
-      <div className="tuple-gallery-grid">
-        <div />
-        {widths.map((width) => <div className="tuple-gallery-axis" key={width}>{width}px</div>)}
-        {scenarios.map((scenario) => (
-          <div className="tuple-gallery-row" key={scenario.label}>
-            <div className="tuple-gallery-state">{scenario.label}</div>
-            {widths.map((width) => (
-              <section
-                key={width}
-                className="tuple-gallery-panel tuple-gallery-panel-auto"
-                data-panel
-                data-state={scenario.label}
-                data-width={width}
-                style={{ width }}
-              >
-                <TupleLaunchpadView
-                  stateLoading={false}
-                  launchpad={scenario.launchpad}
-                  loading={scenario.loading ?? false}
-                  error={scenario.error ?? null}
-                  joining={scenario.joining ?? null}
-                  onRetry={noop}
-                  onJoin={noop}
-                  onSelectRecording={noop}
-                />
-              </section>
-            ))}
-          </div>
-        ))}
-      </div>
-    </main>
+    <PreviewMatrix
+      testId="launchpad-matrix"
+      title="Tuple out-of-call state matrix"
+      description="The room launcher, active calls, and recording history rendered together at every supported drawer width."
+      scenarios={scenarios}
+      autoHeight
+      render={(scenario) => (
+        <TupleLaunchpadView
+          stateLoading={false}
+          launchpad={scenario.launchpad}
+          loading={scenario.loading ?? false}
+          error={scenario.error ?? null}
+          joining={scenario.joining ?? null}
+          historyQuery=""
+          historySearchResults={null}
+          historySearchLoading={false}
+          historySearchError={null}
+          onRetry={noop}
+          onRetryHistorySearch={noop}
+          onHistoryQueryChange={noop}
+          onJoin={noop}
+          onSelectRecording={noop}
+        />
+      )}
+    />
+  );
+}
+
+const matchingCalls: Launchpad["history"] = [
+  {
+    ...richLaunchpad.history[0],
+    matchKind: "spoken",
+    matchSnippet: "We should [[demo]] the smaller launch first, then open it to the rest of the team.",
+  },
+  {
+    ...richLaunchpad.history[3],
+    matchKind: "content",
+    matchSnippet: "Tuple launch [[demo]] checklist — owners, timing, and rollout notes",
+  },
+  {
+    ...richLaunchpad.history[4],
+    title: "Demo planning",
+  },
+];
+
+const searchScenarios = [
+  { label: "Matching calls", query: "demo", results: matchingCalls },
+  { label: "Searching", query: "demo", results: null, loading: true },
+  { label: "Keep typing", query: "ai", results: [] },
+  { label: "No matches", query: "demo", results: [] },
+  { label: "Search unavailable", query: "demo", results: null, error: "Tuple search unavailable" },
+] satisfies Array<{
+  label: string;
+  query: string;
+  results: Launchpad["history"] | null;
+  loading?: boolean;
+  error?: string;
+}>;
+
+export function SearchStates() {
+  return (
+    <PreviewMatrix
+      testId="launchpad-search-matrix"
+      title="Tuple call search state matrix"
+      description="Full-history call search with matching excerpts, progress, empty results, and recovery."
+      scenarios={searchScenarios}
+      autoHeight
+      render={(scenario) => (
+        <TupleLaunchpadView
+          stateLoading={false}
+          launchpad={{ ...richLaunchpad, personalRoom: null, calls: [] }}
+          loading={false}
+          error={null}
+          joining={null}
+          historyQuery={scenario.query}
+          historySearchResults={scenario.results}
+          historySearchLoading={scenario.loading ?? false}
+          historySearchError={scenario.error ?? null}
+          onRetry={noop}
+          onRetryHistorySearch={noop}
+          onHistoryQueryChange={noop}
+          onJoin={noop}
+          onSelectRecording={noop}
+        />
+      )}
+    />
   );
 }

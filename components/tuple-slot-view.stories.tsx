@@ -1,4 +1,5 @@
 import type { CallState } from "../server";
+import { PreviewGallery, PreviewPanel } from "./preview-gallery";
 import { TupleComposerActionButton, TupleSidebarAccessory } from "./tuple-slot-view";
 
 export default {
@@ -35,16 +36,16 @@ const states = [
 
 export function StateMatrix() {
   return (
-    <main className="tuple-gallery" data-bb-plugin="tuple" data-testid="compact-slot-matrix">
-      <header className="tuple-gallery-header">
-        <h1>Tuple compact slot states</h1>
-        <p>The composer action and sidebar accessory in every visible call state.</p>
-      </header>
+    <PreviewGallery
+      testId="compact-slot-matrix"
+      title="Tuple compact slot states"
+      description="The composer action and sidebar accessory in every visible call state."
+    >
       <div className="tuple-copy-options">
         {states.map(({ label, state, loading }) => (
           <section className="tuple-copy-option" key={label}>
             <h2>{label}</h2>
-            <div className="tuple-gallery-panel flex min-h-0 items-center justify-between" data-panel style={{ width: 280 }}>
+            <PreviewPanel width={280} className="flex min-h-0 items-center justify-between">
               <div className="flex items-center gap-3">
                 <TupleComposerActionButton
                   state={state}
@@ -56,10 +57,10 @@ export function StateMatrix() {
                 <span className="text-muted-foreground text-sm">Composer</span>
               </div>
               <TupleSidebarAccessory state={state} />
-            </div>
+            </PreviewPanel>
           </section>
         ))}
       </div>
-    </main>
+    </PreviewGallery>
   );
 }

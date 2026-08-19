@@ -14563,6 +14563,17 @@ var transcriptSnapshotSchema = external_exports.object({
   promptContext: external_exports.string(),
   truncated: external_exports.boolean()
 });
+var storedCallSchema = external_exports.object({
+  callId: external_exports.string(),
+  title: external_exports.string().nullable(),
+  summary: external_exports.string().nullable(),
+  startedAt: external_exports.string(),
+  endedAt: external_exports.string().nullable(),
+  participants: external_exports.array(external_exports.string()),
+  promptContext: external_exports.string(),
+  matchSnippet: external_exports.string().optional(),
+  matchKind: external_exports.enum(["spoken", "content"]).optional()
+});
 var launchpadSchema = external_exports.object({
   personalRoom: external_exports.object({
     slug: external_exports.string(),
@@ -14579,17 +14590,7 @@ var launchpadSchema = external_exports.object({
       joinTarget: external_exports.string().nullable()
     })
   ),
-  history: external_exports.array(
-    external_exports.object({
-      callId: external_exports.string(),
-      title: external_exports.string().nullable(),
-      summary: external_exports.string().nullable(),
-      startedAt: external_exports.string(),
-      endedAt: external_exports.string().nullable(),
-      participants: external_exports.array(external_exports.string()),
-      promptContext: external_exports.string()
-    })
-  )
+  history: external_exports.array(storedCallSchema)
 });
 var newThreadRequestSchema = external_exports.custom(
   (value) => typeof value === "object" && value !== null,
@@ -14598,6 +14599,11 @@ var newThreadRequestSchema = external_exports.custom(
 var rpcContract = defineRpcContract({
   getState: { input: external_exports.null(), output: callStateSchema },
   getLaunchpad: { input: external_exports.null(), output: launchpadSchema },
+  getRecentCalls: { input: external_exports.null(), output: external_exports.array(storedCallSchema) },
+  searchHistory: {
+    input: external_exports.object({ query: external_exports.string().trim().min(1).max(500) }),
+    output: external_exports.array(storedCallSchema)
+  },
   joinTuple: {
     input: external_exports.object({ target: external_exports.string().trim().min(1), switchCurrent: external_exports.boolean().default(false) }),
     output: external_exports.object({ ok: external_exports.literal(true) })
@@ -14720,6 +14726,23 @@ ${task}` : "\n\nWhat I want you to do:\n";
     taskBlock
   ].join("\n");
 }
+function searchTerms(query) {
+  return query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+}
+function storedCallMatchesQuery(call, query) {
+  const terms = searchTerms(query);
+  if (!terms.length) return true;
+  const words = [
+    call.title ?? "",
+    ...(call.participants ?? []).flatMap((participant) => [participant.full_name ?? "", participant.email ?? ""])
+  ].flatMap((value) => value.toLocaleLowerCase().split(/\s+/)).filter(Boolean);
+  return terms.every((term) => words.some((word) => word.startsWith(term)));
+}
+function transcriptSearchQuery(query) {
+  const terms = searchTerms(query).filter((term) => term.length >= 3);
+  if (!terms.length) return null;
+  return terms.map((term) => `"${term.replaceAll('"', '""')}"`).join(" ");
+}
 async function plugin(bb) {
   const settings = bb.settings.define({
     cliCommand: {
@@ -14752,12 +14775,29 @@ async function plugin(bb) {
     if (!command) throw new Error("Configure a Tuple CLI command.");
     return command;
   }
-  async function runTuple(command, args) {
+  async function runTuple(command, args, options) {
     const { stdout } = await execFileAsync(command, ["--format", "json", ...args], {
-      timeout: 15e3,
-      maxBuffer: 2 * 1024 * 1024
+      timeout: options?.timeout ?? 15e3,
+      maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024
     });
     return stdout;
+  }
+  function storedCall(call, command, match) {
+    if (!call.call_id || !call.started_at) return null;
+    const matchSnippet = match?.snippet?.trim();
+    return {
+      callId: call.call_id,
+      title: call.title?.trim() || null,
+      summary: call.summary?.trim() || null,
+      startedAt: call.started_at,
+      endedAt: call.ended_at ?? null,
+      participants: (call.participants ?? []).map(
+        (participant) => participant.full_name?.trim() || participant.email?.trim() || "Tuple user"
+      ),
+      promptContext: recordingReferencePrompt(call.call_id, command),
+      ...matchSnippet ? { matchSnippet } : {},
+      ...match?.kind ? { matchKind: match.kind } : {}
+    };
   }
   async function applyRawState(environment, command, raw) {
     currentState = normalizeState(environment, raw);
@@ -14835,20 +14875,38 @@ async function plugin(bb) {
         };
       }),
       history: history.flatMap((call) => {
-        if (!call.call_id || !call.started_at) return [];
-        return [{
-          callId: call.call_id,
-          title: call.title?.trim() || null,
-          summary: call.summary?.trim() || null,
-          startedAt: call.started_at,
-          endedAt: call.ended_at ?? null,
-          participants: (call.participants ?? []).map(
-            (participant) => participant.full_name?.trim() || participant.email?.trim() || "Tuple user"
-          ),
-          promptContext: recordingReferencePrompt(call.call_id, command)
-        }];
+        const normalized = storedCall(call, command);
+        return normalized ? [normalized] : [];
       })
     };
+  }
+  async function getRecentCalls() {
+    const command = await getCliCommand();
+    const history = JSON.parse(
+      await runTuple(command, ["transcription", "list", "--limit", "8"])
+    );
+    return history.flatMap((call) => {
+      const normalized = storedCall(call, command);
+      return normalized ? [normalized] : [];
+    });
+  }
+  async function searchHistory(query) {
+    const command = await getCliCommand();
+    const contentQuery = transcriptSearchQuery(query);
+    const [historyOutput, searchOutput] = await Promise.all([
+      runTuple(command, ["transcription", "list", "--limit", "-1"], { timeout: 3e4, maxBuffer: 16 * 1024 * 1024 }),
+      contentQuery ? runTuple(command, ["transcription", "search", contentQuery, "--limit", "100"], { timeout: 3e4, maxBuffer: 4 * 1024 * 1024 }) : Promise.resolve("[]")
+    ]);
+    const history = JSON.parse(historyOutput);
+    const hits = JSON.parse(searchOutput);
+    const firstHitByCall = /* @__PURE__ */ new Map();
+    for (const hit of hits) {
+      if (hit.call_id && !firstHitByCall.has(hit.call_id)) firstHitByCall.set(hit.call_id, hit);
+    }
+    return history.filter((call) => storedCallMatchesQuery(call, query) || Boolean(call.call_id && firstHitByCall.has(call.call_id))).flatMap((call) => {
+      const normalized = storedCall(call, command, call.call_id ? firstHitByCall.get(call.call_id) : void 0);
+      return normalized ? [normalized] : [];
+    });
   }
   async function followState(command, signal) {
     const environment = cliEnvironment(command);
@@ -14934,6 +14992,8 @@ async function plugin(bb) {
   bb.rpc.register(rpcContract, {
     getState: () => refreshState(),
     getLaunchpad: () => getLaunchpad(),
+    getRecentCalls: () => getRecentCalls(),
+    searchHistory: ({ query }) => searchHistory(query),
     joinTuple: async ({ target, switchCurrent }) => {
       const command = await getCliCommand();
       const state = await refreshState();
@@ -15076,6 +15136,8 @@ export {
   normalizeState,
   parseTranscript,
   recordingReferencePrompt,
-  rpcContract
+  rpcContract,
+  storedCallMatchesQuery,
+  transcriptSearchQuery
 };
 //# sourceMappingURL=server.js.map

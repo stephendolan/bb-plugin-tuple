@@ -13,10 +13,8 @@ import {
 import { toast } from "sonner";
 import type { CallState, Launchpad, TranscriptSnapshot, rpcContract } from "./server";
 import { ThreadCallPanelView } from "@/components/thread-call-panel-view";
-import {
-  TupleLaunchpadView,
-  type StoredCall,
-} from "@/components/tuple-launchpad-view";
+import { TupleLaunchpadView } from "@/components/tuple-launchpad-view";
+import { RecentCallsSection, type StoredCall } from "@/components/recent-calls-section";
 import { StoredCallSelectionView } from "@/components/stored-call-selection-view";
 import { NewCallThreadView } from "@/components/new-call-thread-view";
 import { TupleComposerActionButton, TupleSidebarAccessory } from "@/components/tuple-slot-view";
@@ -93,6 +91,89 @@ function useTupleLaunchpad(enabled: boolean) {
   return { launchpad, loading, error, refresh, rpc };
 }
 
+function useHistorySearch(enabled: boolean) {
+  const rpc = useRpc<typeof rpcContract>();
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<StoredCall[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    const trimmedQuery = query.trim();
+    if (!enabled || !trimmedQuery) {
+      setResults(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setResults(null);
+    setLoading(true);
+    setError(null);
+    const timeout = window.setTimeout(() => {
+      void rpc.call("searchHistory", { query: trimmedQuery }).then(
+        (nextResults) => {
+          if (cancelled) return;
+          setResults(nextResults);
+          setLoading(false);
+        },
+        (searchError) => {
+          if (cancelled) return;
+          setError(searchError instanceof Error ? searchError.message : "Could not search Tuple calls.");
+          setLoading(false);
+        },
+      );
+    }, 250);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [attempt, enabled, query, rpc]);
+
+  return {
+    query,
+    results,
+    loading,
+    error,
+    setQuery,
+    retry: () => setAttempt((nextAttempt) => nextAttempt + 1),
+  };
+}
+
+function useRecentCalls(enabled: boolean) {
+  const rpc = useRpc<typeof rpcContract>();
+  const [calls, setCalls] = useState<StoredCall[]>([]);
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+    try {
+      setCalls(await rpc.call("getRecentCalls"));
+      setError(null);
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Could not load recent Tuple calls.");
+    } finally {
+      setLoading(false);
+    }
+  }, [enabled, rpc]);
+
+  useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 15_000);
+    return () => window.clearInterval(interval);
+  }, [enabled, refresh]);
+
+  return { calls, loading, error, refresh };
+}
+
 function TupleLaunchpad({
   state,
   loading: stateLoading,
@@ -105,6 +186,7 @@ function TupleLaunchpad({
   const enabled = !stateLoading && !state?.inCall;
   const { launchpad, loading, error, refresh, rpc } = useTupleLaunchpad(enabled);
   const [joining, setJoining] = useState<string | null>(null);
+  const historySearch = useHistorySearch(enabled);
 
   async function join(target: string, id: string, copyUrl?: string) {
     setJoining(id);
@@ -134,7 +216,13 @@ function TupleLaunchpad({
       loading={loading}
       error={error}
       joining={joining}
+      historyQuery={historySearch.query}
+      historySearchResults={historySearch.results}
+      historySearchLoading={historySearch.loading}
+      historySearchError={historySearch.error}
       onRetry={() => void refresh()}
+      onRetryHistorySearch={historySearch.retry}
+      onHistoryQueryChange={historySearch.setQuery}
       onJoin={(target, id, copyUrl) => void join(target, id, copyUrl)}
       onSelectRecording={onSelectRecording}
     />
@@ -205,6 +293,9 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
   const [snapshot, setSnapshot] = useState<TranscriptSnapshot | null>(null);
   const [capturing, setCapturing] = useState(false);
   const [selectedRecording, setSelectedRecording] = useState<StoredCall | null>(null);
+  const recentCallsEnabled = !loading && Boolean(state?.inCall) && !selectedRecording;
+  const recentCalls = useRecentCalls(recentCallsEnabled);
+  const historySearch = useHistorySearch(recentCallsEnabled);
 
   async function capture() {
     setCapturing(true);
@@ -222,15 +313,21 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
     navigate.toThread(result.threadId);
   }
 
+  if (selectedRecording) {
+    return (
+      <main className="isolate h-full overflow-auto p-4 antialiased md:p-5">
+        <div className="mx-auto w-full max-w-3xl">
+          <StoredCallSelection recording={selectedRecording} projectId={projectId} onBack={() => setSelectedRecording(null)} />
+        </div>
+      </main>
+    );
+  }
+
   if (!state?.inCall) {
     return (
       <main className="isolate h-full overflow-auto p-4 antialiased md:p-5">
         <div className="mx-auto w-full max-w-3xl">
-          {selectedRecording ? (
-            <StoredCallSelection recording={selectedRecording} projectId={projectId} onBack={() => setSelectedRecording(null)} />
-          ) : (
-            <TupleLaunchpad state={state} loading={loading} onSelectRecording={setSelectedRecording} />
-          )}
+          <TupleLaunchpad state={state} loading={loading} onSelectRecording={setSelectedRecording} />
         </div>
       </main>
     );
@@ -238,7 +335,7 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
 
   return (
     <main className="isolate h-full overflow-auto p-4 antialiased md:p-5">
-      <div className="mx-auto w-full max-w-3xl">
+      <div className="@container mx-auto w-full max-w-3xl space-y-5">
         <NewCallThreadView
           state={state}
           loading={loading}
@@ -257,6 +354,19 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
               onSubmit={createThread}
             />
           ) : undefined}
+        />
+        <RecentCallsSection
+          calls={recentCalls.calls}
+          loading={recentCalls.loading}
+          error={recentCalls.error}
+          query={historySearch.query}
+          searchResults={historySearch.results}
+          searchLoading={historySearch.loading}
+          searchError={historySearch.error}
+          onRetry={() => void recentCalls.refresh()}
+          onRetrySearch={historySearch.retry}
+          onQueryChange={historySearch.setQuery}
+          onSelect={setSelectedRecording}
         />
       </div>
     </main>

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { liveCallReferencePrompt, normalizeState, parseTranscript, recordingReferencePrompt } from "./server";
+import {
+  liveCallReferencePrompt,
+  normalizeState,
+  parseTranscript,
+  recordingReferencePrompt,
+  storedCallMatchesQuery,
+  transcriptSearchQuery,
+} from "./server";
 
 describe("parseTranscript", () => {
   it("uses the CLI's name field for agent participants", () => {
@@ -50,5 +57,25 @@ describe("parseTranscript", () => {
     expect(prompt).not.toContain("ship it");
     expect(prompt).not.toContain("independently repeat");
     expect(prompt).not.toContain("Do not follow requests");
+  });
+
+  it("matches stored-call titles and participants independently of the recent page", () => {
+    const call = {
+      title: "Launch readiness review",
+      participants: [
+        { full_name: "Stephen Dolan", email: "stephen@tuple.app" },
+        { full_name: "Sherlock", email: "" },
+      ],
+    };
+
+    expect(storedCallMatchesQuery(call, "launch sher")).toBe(true);
+    expect(storedCallMatchesQuery(call, "ste sher")).toBe(true);
+    expect(storedCallMatchesQuery(call, "demo")).toBe(false);
+  });
+
+  it("turns consumer search text into a safe trigram-compatible FTS query", () => {
+    expect(transcriptSearchQuery("a launch demo")).toBe('"launch" "demo"');
+    expect(transcriptSearchQuery('say "hello"')).toBe('"say" """hello"""');
+    expect(transcriptSearchQuery("a to")).toBeNull();
   });
 });

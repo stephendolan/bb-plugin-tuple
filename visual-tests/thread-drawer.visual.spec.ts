@@ -39,10 +39,18 @@ test("out-of-call state matrix", async ({ page }) => {
     const heights = await page
       .locator(`[data-state="Full launchpad"][data-width="${width}"] [data-history-row]`)
       .evaluateAll((rows: HTMLElement[]) => rows.map((row) => row.getBoundingClientRect().height));
-    expect(new Set(heights).size, `recent call rows at ${width}px should have equal height`).toBe(1);
+    expect(new Set(heights).size, `recent call rows at ${width}px should have equal height: ${heights.join(", ")}`).toBe(1);
   }
   await page.locator('[data-state="Full launchpad"][data-width="360"] button').first().hover();
   await expect(matrix).toHaveScreenshot("out-of-call-state-matrix.png");
+});
+
+test("call search state matrix", async ({ page }) => {
+  await page.goto("/?story=tuple--out-of-call--search-states&mode=preview");
+  const matrix = page.getByTestId("launchpad-search-matrix");
+  await expect(matrix).toBeVisible();
+  await expectNoPanelOverflow(page);
+  await expect(matrix).toHaveScreenshot("call-search-state-matrix.png");
 });
 
 test("recorded call state matrix", async ({ page }) => {
@@ -59,6 +67,14 @@ test("new thread from call state matrix", async ({ page }) => {
   await expect(matrix).toBeVisible();
   await expectNoPanelOverflow(page);
   await expect(matrix).toHaveScreenshot("new-call-thread-state-matrix.png");
+});
+
+test("live call keeps recent calls within reach", async ({ page }) => {
+  await page.goto("/?story=tuple--new-thread-from-call--with-recent-calls&mode=preview");
+  const matrix = page.getByTestId("live-call-history-matrix");
+  await expect(matrix).toBeVisible();
+  await expectNoPanelOverflow(page);
+  await expect(matrix).toHaveScreenshot("live-call-history-matrix.png");
 });
 
 test("compact slot state matrix", async ({ page }) => {

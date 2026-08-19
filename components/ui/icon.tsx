@@ -8,7 +8,9 @@ import {
   GridViewIcon,
   Link01Icon,
   Mic02Icon,
+  Cancel01Icon,
   Refresh01Icon,
+  Search01Icon,
   SentIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
@@ -16,6 +18,7 @@ import { cn } from "../../lib/utils";
 
 const ICON_MAP = {
   BubbleChatQuestion: BubbleChatQuestionIcon,
+  Cancel: Cancel01Icon,
   ChevronLeft: ArrowLeft01Icon,
   ChevronRight: ArrowRight01Icon,
   Clock: Clock01Icon,
@@ -24,6 +27,7 @@ const ICON_MAP = {
   Link: Link01Icon,
   Mic: Mic02Icon,
   RotateCcw: Refresh01Icon,
+  Search: Search01Icon,
   Sent: SentIcon,
   Spinner: DashedLineCircleIcon,
 } as const satisfies Record<string, IconSvgElement>;

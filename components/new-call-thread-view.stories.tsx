@@ -1,5 +1,8 @@
 import type { CallState, TranscriptSnapshot } from "../server";
 import { NewCallThreadView } from "./new-call-thread-view";
+import { PreviewMatrix } from "./preview-gallery";
+import { RecentCallsSection, type StoredCall } from "./recent-calls-section";
+import { storyTodayAt } from "./story-date";
 import { PANEL_SURFACE_CLASS } from "./ui/panel-styles";
 
 export default {
@@ -48,51 +51,91 @@ const scenarios = [
   { label: "Trimmed capture", state: liveCall, snapshot: { ...snapshot, truncated: true }, capturing: false },
 ];
 
-const widths = [280, 360, 480, 600] as const;
+const recentCalls: StoredCall[] = [
+  {
+    callId: "earlier-call-1",
+    title: "Launch readiness review",
+    summary: "Chose the smaller launch and assigned the remaining customer follow-ups.",
+    startedAt: storyTodayAt("09:15:00.000"),
+    endedAt: storyTodayAt("09:40:00.000"),
+    participants: ["Demo host", "Example teammate"],
+    promptContext: "Use earlier call one.",
+  },
+  {
+    callId: "earlier-call-2",
+    title: "Agent workflow rehearsal",
+    summary: "Tested the agent handoff and screen-sharing workflow.",
+    startedAt: storyTodayAt("08:30:00.000"),
+    endedAt: storyTodayAt("08:42:00.000"),
+    participants: ["Demo host", "Test agent"],
+    promptContext: "Use earlier call two.",
+  },
+];
 
 export function StateMatrix() {
   return (
-    <main className="tuple-gallery" data-bb-plugin="tuple" data-testid="new-call-thread-matrix">
-      <header className="tuple-gallery-header">
-        <h1>Tuple new-thread capture state matrix</h1>
-        <p>The live call-to-thread flow before, during, and after bounded transcript capture.</p>
-      </header>
-      <div className="tuple-gallery-grid">
-        <div />
-        {widths.map((width) => <div className="tuple-gallery-axis" key={width}>{width}px</div>)}
-        {scenarios.map((scenario) => (
-          <div className="tuple-gallery-row" key={scenario.label}>
-            <div className="tuple-gallery-state">{scenario.label}</div>
-            {widths.map((width) => (
-              <section
-                key={width}
-                className="tuple-gallery-panel tuple-gallery-panel-auto"
-                data-panel
-                data-state={scenario.label}
-                data-width={width}
-                style={{ width }}
-              >
-                <NewCallThreadView
-                  state={scenario.state}
-                  loading={false}
-                  minutes={5}
-                  snapshot={scenario.snapshot}
-                  capturing={scenario.capturing}
-                  onRetry={noop}
-                  onCopyJoinLink={noop}
-                  onStartTranscription={noop}
-                  onCapture={noop}
-                  newThreadComposer={
-                    <div className={`${PANEL_SURFACE_CLASS} p-3 text-sm text-muted-foreground`}>
-                      BB new-thread composer slot
-                    </div>
-                  }
-                />
-              </section>
-            ))}
-          </div>
-        ))}
-      </div>
-    </main>
+    <PreviewMatrix
+      testId="new-call-thread-matrix"
+      title="Tuple new-thread capture state matrix"
+      description="The live call-to-thread flow before, during, and after bounded transcript capture."
+      scenarios={scenarios}
+      autoHeight
+      render={(scenario) => (
+        <NewCallThreadView
+          state={scenario.state}
+          loading={false}
+          minutes={5}
+          snapshot={scenario.snapshot}
+          capturing={scenario.capturing}
+          onRetry={noop}
+          onCopyJoinLink={noop}
+          onStartTranscription={noop}
+          onCapture={noop}
+          newThreadComposer={
+            <div className={`${PANEL_SURFACE_CLASS} p-3 text-sm text-muted-foreground`}>
+              BB new-thread composer slot
+            </div>
+          }
+        />
+      )}
+    />
+  );
+}
+
+export function WithRecentCalls() {
+  return (
+    <PreviewMatrix
+      testId="live-call-history-matrix"
+      title="Tuple live call with history"
+      description="The current call remains primary while earlier recordings stay directly available below it."
+      scenarios={[{ label: "Current + history" }]}
+      autoHeight
+      render={() => (
+        <div className="@container space-y-5">
+          <NewCallThreadView
+            state={liveCall}
+            loading={false}
+            minutes={5}
+            snapshot={null}
+            capturing={false}
+            onRetry={noop}
+            onCopyJoinLink={noop}
+            onStartTranscription={noop}
+            onCapture={noop}
+          />
+          <RecentCallsSection
+            calls={recentCalls}
+            query=""
+            searchResults={null}
+            searchLoading={false}
+            searchError={null}
+            onRetry={noop}
+            onRetrySearch={noop}
+            onQueryChange={noop}
+            onSelect={noop}
+          />
+        </div>
+      )}
+    />
   );
 }

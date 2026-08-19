@@ -3700,6 +3700,9 @@ var BubbleChatQuestionIcon = [
   ["path", { d: "M9.5 9.5C9.5 8.11929 10.6193 7 12 7C13.3807 7 14.5 8.11929 14.5 9.5C14.5 10.3569 14.0689 11.1131 13.4117 11.5636C12.7283 12.0319 12 12.6716 12 13.5", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }],
   ["path", { d: "M12.125 16.75H12M12.25 16.75C12.25 16.8881 12.1381 17 12 17C11.8619 17 11.75 16.8881 11.75 16.75C11.75 16.6119 11.8619 16.5 12 16.5C12.1381 16.5 12.25 16.6119 12.25 16.75Z", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "2" }]
 ];
+var Cancel01Icon = [
+  ["path", { d: "M18 6L6.00081 17.9992M17.9992 18L6 6.00085", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }]
+];
 var Clock01Icon = [
   ["circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "1.5", key: "0" }],
   ["path", { d: "M12 8V12L14 14", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
@@ -3728,6 +3731,10 @@ var Mic02Icon = [
 var Refresh01Icon = [
   ["path", { d: "M20.4879 15C19.2524 18.4956 15.9187 21 12 21C7.02943 21 3 16.9706 3 12C3 7.02943 7.02943 3 12 3C15.7292 3 18.9286 5.26806 20.2941 8.5", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }],
   ["path", { d: "M15 9H18C19.4142 9 20.1213 9 20.5607 8.56066C21 8.12132 21 7.41421 21 6V3", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
+];
+var Search01Icon = [
+  ["path", { d: "M17 17L21 21", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }],
+  ["path", { d: "M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
 ];
 var SentIcon = [
   ["path", { d: "M21.0477 3.05293C18.8697 0.707363 2.48648 6.4532 2.50001 8.551C2.51535 10.9299 8.89809 11.6617 10.6672 12.1581C11.7311 12.4565 12.016 12.7625 12.2613 13.8781C13.3723 18.9305 13.9301 21.4435 15.2014 21.4996C17.2278 21.5892 23.1733 5.342 21.0477 3.05293Z", stroke: "currentColor", strokeWidth: "1.5", key: "0" }],
@@ -3788,6 +3795,7 @@ HugeiconsIcon.displayName = "HugeiconsIcon";
 // components/ui/icon.tsx
 var ICON_MAP = {
   BubbleChatQuestion: BubbleChatQuestionIcon,
+  Cancel: Cancel01Icon,
   ChevronLeft: ArrowLeft01Icon,
   ChevronRight: ArrowRight01Icon,
   Clock: Clock01Icon,
@@ -3796,6 +3804,7 @@ var ICON_MAP = {
   Link: Link01Icon,
   Mic: Mic02Icon,
   RotateCcw: Refresh01Icon,
+  Search: Search01Icon,
   Sent: SentIcon,
   Spinner: DashedLineCircleIcon
 };
@@ -4008,10 +4017,7 @@ function ThreadCallPanelView({
   ] });
 }
 
-// components/tuple-launchpad-view.tsx
-function initials(name) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
-}
+// components/recent-calls-section.tsx
 function storedCallTitle(call) {
   return call.title || call.participants.join(" & ") || "Recorded Tuple call";
 }
@@ -4025,13 +4031,141 @@ function storedCallTime(call) {
   const minutes = Math.max(1, Math.round((new Date(call.endedAt).getTime() - started.getTime()) / 6e4));
   return `${date} \xB7 ${time} \xB7 ${minutes} min`;
 }
+function renderMatchSnippet(snippet) {
+  return snippet.split(/\[\[(.*?)\]\]/).map(
+    (part, index) => index % 2 === 1 ? /* @__PURE__ */ jsx("mark", { className: "rounded-sm bg-amber-300/45 text-inherit dark:bg-amber-400/35", children: part }, index) : part
+  );
+}
+function RecentCallsSection({
+  calls,
+  loading = false,
+  error = null,
+  query,
+  searchResults,
+  searchLoading,
+  searchError,
+  className,
+  onRetry,
+  onRetrySearch,
+  onQueryChange,
+  onSelect
+}) {
+  const searching = query.trim().length > 0;
+  const canSearchCallContent = query.trim().split(/\s+/).some((term) => term.length >= 3);
+  const visibleCalls = searching ? searchResults ?? [] : calls;
+  if (!loading && !error && !calls.length) return null;
+  return /* @__PURE__ */ jsxs("section", { className: cn(PANEL_SECTION_CLASS, className), children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-baseline justify-between gap-3", children: [
+      /* @__PURE__ */ jsx("h2", { className: PANEL_SECTION_HEADING_CLASS, children: "Recent calls" }),
+      searching && searchResults && !searchLoading && !searchError ? /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground shrink-0 text-[0.6875rem] tabular-nums opacity-70", role: "status", children: [
+        searchResults.length,
+        " ",
+        searchResults.length === 1 ? "match" : "matches"
+      ] }) : null
+    ] }),
+    !loading && !error ? /* @__PURE__ */ jsxs("form", { role: "search", className: "relative", onSubmit: (event) => event.preventDefault(), children: [
+      /* @__PURE__ */ jsx(Icon, { name: "Search", className: "text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 h-lh shrink-0 -translate-y-1/2", "aria-hidden": "true" }),
+      /* @__PURE__ */ jsx(
+        Input,
+        {
+          name: "tuple-call-search",
+          type: "search",
+          "aria-label": "Search recent Tuple calls",
+          value: query,
+          placeholder: "Search titles, people, transcripts, and shared content\u2026",
+          className: "h-9 pr-9 pl-9 text-base sm:text-sm [&::-webkit-search-cancel-button]:hidden",
+          onChange: (event) => onQueryChange(event.target.value)
+        }
+      ),
+      searchLoading ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 h-lh shrink-0 -translate-y-1/2 animate-spin", "aria-hidden": "true" }) : searching ? /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          className: "text-muted-foreground focus-visible:outline-ring hover:text-foreground absolute top-1/2 right-1.5 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md focus-visible:outline-2",
+          "aria-label": "Clear call search",
+          onClick: () => onQueryChange(""),
+          children: /* @__PURE__ */ jsx(Icon, { name: "Cancel", className: "size-4 shrink-0", "aria-hidden": "true" })
+        }
+      ) : null
+    ] }) : null,
+    /* @__PURE__ */ jsx("div", { className: PANEL_CLIPPED_SURFACE_CLASS, "aria-busy": loading || searchLoading, children: error ? /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-3 px-3 py-3", role: "alert", children: [
+      /* @__PURE__ */ jsx("p", { className: "text-destructive min-w-0 flex-1 text-sm text-pretty", children: "Could not load recent Tuple calls." }),
+      /* @__PURE__ */ jsx(Button, { type: "button", size: "sm", variant: "secondary", onClick: onRetry, children: "Retry" })
+    ] }) : loading ? /* @__PURE__ */ jsxs("div", { className: "text-muted-foreground flex items-center gap-2 px-3 py-3 text-sm", role: "status", children: [
+      /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 h-lh shrink-0 animate-spin", "aria-hidden": "true" }),
+      /* @__PURE__ */ jsx("span", { children: "Loading recent calls\u2026" })
+    ] }) : searchError ? /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-3 px-3 py-3", role: "alert", children: [
+      /* @__PURE__ */ jsx("p", { className: "text-destructive min-w-0 flex-1 text-sm text-pretty", children: "Could not search Tuple calls." }),
+      /* @__PURE__ */ jsx(Button, { type: "button", size: "sm", variant: "secondary", onClick: onRetrySearch, children: "Retry" })
+    ] }) : searching && searchLoading && !searchResults ? /* @__PURE__ */ jsxs("div", { className: "text-muted-foreground flex items-center gap-2 px-3 py-3 text-sm", role: "status", children: [
+      /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 h-lh shrink-0 animate-spin", "aria-hidden": "true" }),
+      /* @__PURE__ */ jsx("span", { children: "Searching all calls\u2026" })
+    ] }) : searching && !visibleCalls.length && !canSearchCallContent ? /* @__PURE__ */ jsx("p", { className: "text-muted-foreground px-3 py-3 text-sm text-pretty", role: "status", children: "Keep typing to search transcripts and shared content." }) : searching && !visibleCalls.length ? /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground px-3 py-3 text-sm text-pretty", role: "status", children: [
+      "No calls match \u201C",
+      query.trim(),
+      "\u201D."
+    ] }) : visibleCalls.map((call) => /* @__PURE__ */ jsxs(
+      "button",
+      {
+        type: "button",
+        "data-history-row": true,
+        className: "active:bg-muted/60 after:bg-foreground/6 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2",
+        onClick: () => onSelect(call),
+        children: [
+          /* @__PURE__ */ jsxs("span", { className: "block min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
+            /* @__PURE__ */ jsx("span", { className: "min-w-0 truncate text-sm font-medium", children: storedCallTitle(call) }),
+            /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "text-muted-foreground hidden min-w-0 truncate text-left text-[0.6875rem] tabular-nums opacity-70 @min-[26rem]:block",
+                title: storedCallTime(call),
+                children: storedCallTime(call)
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: `text-muted-foreground mt-0.5 min-w-0 truncate text-xs @min-[26rem]:col-start-1 @min-[26rem]:row-start-2 ${call.matchSnippet ? "hidden" : "block"}`,
+                title: call.matchSnippet ? void 0 : call.summary ?? void 0,
+                "aria-hidden": call.matchSnippet || call.summary ? void 0 : true,
+                children: call.summary || "\xA0"
+              }
+            ),
+            /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground mt-0.5 hidden min-w-0 truncate text-left text-[0.6875rem] opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block", children: [
+              call.participants.length,
+              " ",
+              call.participants.length === 1 ? "participant" : "participants"
+            ] })
+          ] }),
+          call.matchSnippet ? /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground mt-1.5 line-clamp-2 border-l border-foreground/12 pl-2 text-sm/5 text-pretty", children: [
+            /* @__PURE__ */ jsx("span", { className: "text-foreground/70 font-medium", children: call.matchKind === "content" ? "Shared screen: " : "Transcript: " }),
+            renderMatchSnippet(call.matchSnippet)
+          ] }) : null,
+          /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
+        ]
+      },
+      call.callId
+    )) })
+  ] });
+}
+
+// components/tuple-launchpad-view.tsx
+function initials(name) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+}
 function TupleLaunchpadView({
   stateLoading,
   launchpad,
   loading,
   error,
   joining,
+  historyQuery,
+  historySearchResults,
+  historySearchLoading,
+  historySearchError,
   onRetry,
+  onRetryHistorySearch,
+  onHistoryQueryChange,
   onJoin,
   onSelectRecording
 }) {
@@ -4090,40 +4224,20 @@ function TupleLaunchpadView({
         ] }, call.id);
       }) })
     ] }) : null,
-    launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: PANEL_SECTION_CLASS, children: [
-      /* @__PURE__ */ jsx("h3", { className: PANEL_SECTION_HEADING_CLASS, children: "Recent calls" }),
-      /* @__PURE__ */ jsx("div", { className: PANEL_CLIPPED_SURFACE_CLASS, children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
-        "button",
-        {
-          type: "button",
-          "data-history-row": true,
-          className: "active:bg-muted/60 after:bg-foreground/6 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2",
-          onClick: () => onSelectRecording(call),
-          children: [
-            /* @__PURE__ */ jsxs("span", { className: "block min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
-              /* @__PURE__ */ jsx("span", { className: "min-w-0 truncate text-sm font-medium", children: storedCallTitle(call) }),
-              /* @__PURE__ */ jsx("span", { className: "text-muted-foreground hidden text-left text-[0.6875rem] tabular-nums opacity-70 @min-[26rem]:block", children: storedCallTime(call) }),
-              /* @__PURE__ */ jsx(
-                "span",
-                {
-                  className: "text-muted-foreground mt-0.5 block min-w-0 truncate text-xs @min-[26rem]:col-start-1 @min-[26rem]:row-start-2",
-                  title: call.summary ?? void 0,
-                  "aria-hidden": call.summary ? void 0 : true,
-                  children: call.summary || "\xA0"
-                }
-              ),
-              /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground mt-0.5 hidden text-left text-[0.6875rem] opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block", children: [
-                call.participants.length,
-                " ",
-                call.participants.length === 1 ? "participant" : "participants"
-              ] })
-            ] }),
-            /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
-          ]
-        },
-        call.callId
-      )) })
-    ] }) : null,
+    /* @__PURE__ */ jsx(
+      RecentCallsSection,
+      {
+        calls: launchpad?.history ?? [],
+        query: historyQuery,
+        searchResults: historySearchResults,
+        searchLoading: historySearchLoading,
+        searchError: historySearchError,
+        onRetry,
+        onRetrySearch: onRetryHistorySearch,
+        onQueryChange: onHistoryQueryChange,
+        onSelect: onSelectRecording
+      }
+    ),
     !error && launchpad && !personalRoom && !launchpad.calls.length && !launchpad.history.length ? /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-sm", children: "No Tuple rooms or calls yet." }) : null
   ] });
 }
@@ -4415,6 +4529,81 @@ function useTupleLaunchpad(enabled) {
   }, [enabled, refresh]);
   return { launchpad, loading, error, refresh, rpc };
 }
+function useHistorySearch(enabled) {
+  const rpc = useRpc();
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    const trimmedQuery = query.trim();
+    if (!enabled || !trimmedQuery) {
+      setResults(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    let cancelled = false;
+    setResults(null);
+    setLoading(true);
+    setError(null);
+    const timeout = window.setTimeout(() => {
+      void rpc.call("searchHistory", { query: trimmedQuery }).then(
+        (nextResults) => {
+          if (cancelled) return;
+          setResults(nextResults);
+          setLoading(false);
+        },
+        (searchError) => {
+          if (cancelled) return;
+          setError(searchError instanceof Error ? searchError.message : "Could not search Tuple calls.");
+          setLoading(false);
+        }
+      );
+    }, 250);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [attempt, enabled, query, rpc]);
+  return {
+    query,
+    results,
+    loading,
+    error,
+    setQuery,
+    retry: () => setAttempt((nextAttempt) => nextAttempt + 1)
+  };
+}
+function useRecentCalls(enabled) {
+  const rpc = useRpc();
+  const [calls, setCalls] = useState([]);
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState(null);
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+    try {
+      setCalls(await rpc.call("getRecentCalls"));
+      setError(null);
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "Could not load recent Tuple calls.");
+    } finally {
+      setLoading(false);
+    }
+  }, [enabled, rpc]);
+  useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 15e3);
+    return () => window.clearInterval(interval);
+  }, [enabled, refresh]);
+  return { calls, loading, error, refresh };
+}
 function TupleLaunchpad({
   state,
   loading: stateLoading,
@@ -4423,6 +4612,7 @@ function TupleLaunchpad({
   const enabled = !stateLoading && !state?.inCall;
   const { launchpad, loading, error, refresh, rpc } = useTupleLaunchpad(enabled);
   const [joining, setJoining] = useState(null);
+  const historySearch = useHistorySearch(enabled);
   async function join(target, id, copyUrl) {
     setJoining(id);
     try {
@@ -4451,7 +4641,13 @@ function TupleLaunchpad({
       loading,
       error,
       joining,
+      historyQuery: historySearch.query,
+      historySearchResults: historySearch.results,
+      historySearchLoading: historySearch.loading,
+      historySearchError: historySearch.error,
       onRetry: () => void refresh(),
+      onRetryHistorySearch: historySearch.retry,
+      onHistoryQueryChange: historySearch.setQuery,
       onJoin: (target, id, copyUrl) => void join(target, id, copyUrl),
       onSelectRecording
     }
@@ -4514,6 +4710,9 @@ function NewCallThread({ projectId }) {
   const [snapshot, setSnapshot] = useState(null);
   const [capturing, setCapturing] = useState(false);
   const [selectedRecording, setSelectedRecording] = useState(null);
+  const recentCallsEnabled = !loading && Boolean(state?.inCall) && !selectedRecording;
+  const recentCalls = useRecentCalls(recentCallsEnabled);
+  const historySearch = useHistorySearch(recentCallsEnabled);
   async function capture() {
     setCapturing(true);
     try {
@@ -4528,32 +4727,53 @@ function NewCallThread({ projectId }) {
     const result = await rpc.call("createThread", { request });
     navigate.toThread(result.threadId);
   }
-  if (!state?.inCall) {
-    return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: selectedRecording ? /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, projectId, onBack: () => setSelectedRecording(null) }) : /* @__PURE__ */ jsx(TupleLaunchpad, { state, loading, onSelectRecording: setSelectedRecording }) }) });
+  if (selectedRecording) {
+    return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, projectId, onBack: () => setSelectedRecording(null) }) }) });
   }
-  return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(
-    NewCallThreadView,
-    {
-      state,
-      loading,
-      minutes,
-      snapshot,
-      capturing,
-      onRetry: () => void refresh(),
-      onCopyJoinLink: () => void copyCallJoinLink(state),
-      onStartTranscription: () => void startTranscription(),
-      onCapture: () => void capture(),
-      newThreadComposer: snapshot ? /* @__PURE__ */ jsx(
-        experimental_NewThreadComposer,
-        {
-          defaultProjectId: projectId ?? void 0,
-          initialPrompt: snapshot.promptContext,
-          draftKey: `tuple-call-${snapshot.callId}-${snapshot.capturedAt}`,
-          onSubmit: createThread
-        }
-      ) : void 0
-    }
-  ) }) });
+  if (!state?.inCall) {
+    return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(TupleLaunchpad, { state, loading, onSelectRecording: setSelectedRecording }) }) });
+  }
+  return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsxs("div", { className: "@container mx-auto w-full max-w-3xl space-y-5", children: [
+    /* @__PURE__ */ jsx(
+      NewCallThreadView,
+      {
+        state,
+        loading,
+        minutes,
+        snapshot,
+        capturing,
+        onRetry: () => void refresh(),
+        onCopyJoinLink: () => void copyCallJoinLink(state),
+        onStartTranscription: () => void startTranscription(),
+        onCapture: () => void capture(),
+        newThreadComposer: snapshot ? /* @__PURE__ */ jsx(
+          experimental_NewThreadComposer,
+          {
+            defaultProjectId: projectId ?? void 0,
+            initialPrompt: snapshot.promptContext,
+            draftKey: `tuple-call-${snapshot.callId}-${snapshot.capturedAt}`,
+            onSubmit: createThread
+          }
+        ) : void 0
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      RecentCallsSection,
+      {
+        calls: recentCalls.calls,
+        loading: recentCalls.loading,
+        error: recentCalls.error,
+        query: historySearch.query,
+        searchResults: historySearch.results,
+        searchLoading: historySearch.loading,
+        searchError: historySearch.error,
+        onRetry: () => void recentCalls.refresh(),
+        onRetrySearch: historySearch.retry,
+        onQueryChange: historySearch.setQuery,
+        onSelect: setSelectedRecording
+      }
+    )
+  ] }) });
 }
 function ThreadCallPanel({ threadId }) {
   const { state, loading, refresh, startTranscription, rpc } = useCallState();

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { StoredCallSelectionView } from "./stored-call-selection-view";
-import type { StoredCall } from "./tuple-launchpad-view";
+import type { StoredCall } from "./recent-calls-section";
+import { PreviewMatrix } from "./preview-gallery";
+import { storyTodayAt } from "./story-date";
 import { PANEL_SURFACE_CLASS } from "./ui/panel-styles";
 
 export default {
@@ -13,8 +15,8 @@ const recordedCall: StoredCall = {
   callId: "recording-example",
   title: "Launch readiness review",
   summary: "Reviewed the rollout, chose the smaller launch, and assigned the remaining customer follow-ups.",
-  startedAt: "2026-08-18T20:15:00.000Z",
-  endedAt: "2026-08-18T20:20:00.000Z",
+  startedAt: storyTodayAt("16:15:00.000"),
+  endedAt: storyTodayAt("16:20:00.000"),
   participants: ["Demo host", "Example teammate"],
   promptContext: "Use synthetic stored call recording-example.",
 };
@@ -70,36 +72,17 @@ const scenarios = [
   { label: "New thread", destination: "new-thread" as const },
 ];
 
-const widths = [280, 360, 480, 600] as const;
-
 export function StateMatrix() {
   return (
-    <main className="tuple-gallery" data-bb-plugin="tuple" data-testid="recorded-call-matrix">
-      <header className="tuple-gallery-header">
-        <h1>Tuple recorded-call state matrix</h1>
-        <p>A selected historical call rendered for both destinations, with missing-content and submission states.</p>
-      </header>
-      <div className="tuple-gallery-grid">
-        <div />
-        {widths.map((width) => <div className="tuple-gallery-axis" key={width}>{width}px</div>)}
-        {scenarios.map((scenario, scenarioIndex) => (
-          <div className="tuple-gallery-row" key={scenario.label}>
-            <div className="tuple-gallery-state">{scenario.label}</div>
-            {widths.map((width) => (
-              <section
-                key={width}
-                className="tuple-gallery-panel tuple-gallery-panel-auto"
-                data-panel
-                data-state={scenario.label}
-                data-width={width}
-                style={{ width }}
-              >
-                <Preview {...scenario} instance={`${scenarioIndex}-${width}`} />
-              </section>
-            ))}
-          </div>
-        ))}
-      </div>
-    </main>
+    <PreviewMatrix
+      testId="recorded-call-matrix"
+      title="Tuple recorded-call state matrix"
+      description="A selected historical call rendered for both destinations, with missing-content and submission states."
+      scenarios={scenarios}
+      autoHeight
+      render={(scenario, width, scenarioIndex) => (
+        <Preview {...scenario} instance={`${scenarioIndex}-${width}`} />
+      )}
+    />
   );
 }

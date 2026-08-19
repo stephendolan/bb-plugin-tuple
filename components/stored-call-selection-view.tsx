@@ -1,6 +1,6 @@
 import type { FormEvent, ReactNode } from "react";
-import type { StoredCall } from "./tuple-launchpad-view";
-import { storedCallTime, storedCallTitle } from "./tuple-launchpad-view";
+import type { StoredCall } from "./recent-calls-section";
+import { storedCallTime, storedCallTitle } from "./recent-calls-section";
 import { Button } from "./ui/button";
 import { Icon } from "./ui/icon";
 import { Input } from "./ui/input";

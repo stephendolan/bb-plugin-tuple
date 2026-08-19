@@ -5,6 +5,7 @@ import {
   currentThreadCallComposerCopy,
   type ThreadCallComposerCopy,
 } from "./thread-call-panel-view";
+import { PreviewGallery, PreviewMatrix, PreviewPanel } from "./preview-gallery";
 
 export default {
   title: "Tuple/Thread drawer",
@@ -87,42 +88,22 @@ const scenarios = [
   sending?: boolean;
 }>;
 
-const widths = [280, 360, 480, 600] as const;
-
 export function StateMatrix() {
   return (
-    <main className="tuple-gallery" data-bb-plugin="tuple" data-testid="state-matrix">
-      <header className="tuple-gallery-header">
-        <h1>Tuple thread drawer state matrix</h1>
-        <p>Production components rendered at the drawer widths most likely to expose wrapping, clipping, and hierarchy defects.</p>
-      </header>
-      <div className="tuple-gallery-grid">
-        <div />
-        {widths.map((width) => <div className="tuple-gallery-axis" key={width}>{width}px</div>)}
-        {scenarios.map((scenario, scenarioIndex) => (
-          <div className="tuple-gallery-row" key={scenario.label}>
-            <div className="tuple-gallery-state">{scenario.label}</div>
-            {widths.map((width) => (
-              <section
-                key={width}
-                className="tuple-gallery-panel"
-                data-panel
-                data-state={scenario.label}
-                data-width={width}
-                style={{ width }}
-              >
-                <Preview
-                  state={scenario.state}
-                  initialTask={scenario.initialTask}
-                  sending={scenario.sending}
-                  instance={`${scenarioIndex}-${width}`}
-                />
-              </section>
-            ))}
-          </div>
-        ))}
-      </div>
-    </main>
+    <PreviewMatrix
+      testId="state-matrix"
+      title="Tuple thread drawer state matrix"
+      description="Production components rendered at the drawer widths most likely to expose wrapping, clipping, and hierarchy defects."
+      scenarios={scenarios}
+      render={(scenario, width, scenarioIndex) => (
+        <Preview
+          state={scenario.state}
+          initialTask={scenario.initialTask}
+          sending={scenario.sending}
+          instance={`${scenarioIndex}-${width}`}
+        />
+      )}
+    />
   );
 }
 
@@ -148,21 +129,21 @@ const copyOptions: Array<{ label: string; copy: ThreadCallComposerCopy }> = [
 
 export function ComposerCopy() {
   return (
-    <main className="tuple-gallery" data-bb-plugin="tuple" data-testid="composer-copy">
-      <header className="tuple-gallery-header">
-        <h1>Composer copy options</h1>
-        <p>Each option uses the exact production form component; only the words change.</p>
-      </header>
+    <PreviewGallery
+      testId="composer-copy"
+      title="Composer copy options"
+      description="Each option uses the exact production form component; only the words change."
+    >
       <div className="tuple-copy-options">
         {copyOptions.map((option, index) => (
           <section className="tuple-copy-option" key={option.label}>
             <h2>{option.label}</h2>
-            <div className="tuple-gallery-panel" data-panel style={{ width: 360 }}>
+            <PreviewPanel width={360}>
               <Preview state={liveCall} copy={option.copy} instance={`copy-${index}`} />
-            </div>
+            </PreviewPanel>
           </section>
         ))}
       </div>
-    </main>
+    </PreviewGallery>
   );
 }

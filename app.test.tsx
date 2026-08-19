@@ -22,6 +22,16 @@ const liveState = {
   updatedAt: "2026-08-18T20:00:00.000Z",
 };
 
+const recentStoredCall = {
+  callId: "recording-1",
+  title: "Earlier launch review",
+  summary: "Reviewed the rollout and assigned the remaining follow-ups.",
+  startedAt: "2026-08-18T18:00:00.000Z",
+  endedAt: "2026-08-18T18:20:00.000Z",
+  participants: ["Morgan Lee", "Casey Chen"],
+  promptContext: "Use stored Tuple call recording-1",
+};
+
 describe("Tuple Call app", () => {
   it("opens the Tuple thread panel when idle and adds call context when live", async () => {
     const app = await loadPluginApp(() => import("./app"));
@@ -55,6 +65,7 @@ describe("Tuple Call app", () => {
         composer: { text: "Existing task" },
         rpc: {
           getState: () => liveState,
+          getRecentCalls: () => [recentStoredCall],
           getSnapshot: () => ({
             callId: "call-1",
             minutes: 5,
@@ -125,6 +136,7 @@ describe("Tuple Call app", () => {
         settings: { environment: "staging", defaultMinutes: "5" },
         rpc: {
           getState: () => liveState,
+          getRecentCalls: () => [recentStoredCall],
           getSnapshot: () => ({
             callId: "call-1",
             minutes: 5,
@@ -144,7 +156,44 @@ describe("Tuple Call app", () => {
     await slot.findByText("Transcribing · Personal room · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Use last 5 min" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
-    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getSnapshot"]);
+    await slot.findByRole("heading", { name: "Recent calls" });
+    await slot.findByText("Earlier launch review");
+    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "getSnapshot"]);
+    slot.lifecycle.unmount();
+  });
+
+  it("searches for an earlier call from the live-call page and returns to the current call", async () => {
+    const app = await loadPluginApp(() => import("./app"));
+    const olderStoredCall = {
+      ...recentStoredCall,
+      callId: "recording-2",
+      title: "Older architecture review",
+      matchKind: "spoken" as const,
+      matchSnippet: "The [[architecture]] should keep call history available.",
+    };
+    const slot = renderSlot(
+      app.navPanels[0]!,
+      { subPath: "" },
+      {
+        context: { projectId: "project-1", threadId: null },
+        settings: { cliCommand: "tuple-staging", defaultMinutes: "5" },
+        rpc: {
+          getState: () => liveState,
+          getRecentCalls: () => [recentStoredCall],
+          searchHistory: () => [olderStoredCall],
+        },
+      },
+    );
+
+    await slot.findByText("Current call");
+    fireEvent.change(await slot.findByRole("searchbox", { name: "Search recent Tuple calls" }), {
+      target: { value: "architecture" },
+    });
+    fireEvent.click(await slot.findByRole("button", { name: /Older architecture review/ }));
+    await slot.findByText("The new thread will read this recording directly from Tuple.");
+    fireEvent.click(await slot.findByRole("button", { name: "Recent calls" }));
+    await slot.findByText("Current call");
+    await slot.findByText("Older architecture review");
     slot.lifecycle.unmount();
   });
 
@@ -233,6 +282,54 @@ describe("Tuple Call app", () => {
     slot.lifecycle.unmount();
   });
 
+  it("searches beyond the recent-call page and previews the matching excerpt", async () => {
+    const app = await loadPluginApp(() => import("./app"));
+    const slot = renderSlot(
+      app.navPanels[0]!,
+      { subPath: "" },
+      {
+        context: { projectId: "project-1", threadId: null },
+        settings: { cliCommand: "tuple-staging", defaultMinutes: "5" },
+        rpc: {
+          getState: () => ({ ...liveState, inCall: false, call: null }),
+          getLaunchpad: () => ({
+            personalRoom: null,
+            calls: [],
+            history: [{
+              callId: "recent-call",
+              title: "Today",
+              summary: null,
+              startedAt: "2026-08-19T14:00:00.000Z",
+              endedAt: "2026-08-19T14:05:00.000Z",
+              participants: ["Stephen Dolan"],
+              promptContext: "Recent call",
+            }],
+          }),
+          searchHistory: ({ query }: { query: string }) => [{
+            callId: "older-call",
+            title: "Launch planning",
+            summary: null,
+            startedAt: "2026-07-10T14:00:00.000Z",
+            endedAt: "2026-07-10T14:25:00.000Z",
+            participants: ["Stephen Dolan", "Sherlock"],
+            promptContext: "Older call",
+            matchKind: "spoken" as const,
+            matchSnippet: `The [[${query}]] should include every locally recorded call.`,
+          }],
+        },
+      },
+    );
+
+    fireEvent.change(await slot.findByRole("searchbox", { name: "Search recent Tuple calls" }), {
+      target: { value: "launch" },
+    });
+    await slot.findByText("Launch planning");
+    await slot.findByText("launch", { selector: "mark" });
+    expect(slot.queryByText("Today")).toBeNull();
+    expect(slot.inspection.rpcCalls.some((call) => call.method === "searchHistory" && call.input.query === "launch")).toBe(true);
+    slot.lifecycle.unmount();
+  });
+
   it("offers transcription as the recovery action when a call is live but not recording", async () => {
     const app = await loadPluginApp(() => import("./app"));
     const transcriptionOff = {
@@ -247,6 +344,7 @@ describe("Tuple Call app", () => {
         settings: { environment: "staging", defaultMinutes: "5" },
         rpc: {
           getState: () => transcriptionOff,
+          getRecentCalls: () => [],
           startTranscription: () => liveState,
         },
       },
@@ -255,7 +353,7 @@ describe("Tuple Call app", () => {
     await slot.findByText("Transcription is off · Personal room · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
     await slot.findByText("Transcribing · Personal room · Staging");
-    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "startTranscription"]);
+    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "startTranscription"]);
     slot.lifecycle.unmount();
   });
 

@@ -1,6 +1,7 @@
 import type { Launchpad } from "../server";
 import { Button } from "./ui/button";
 import { Icon } from "./ui/icon";
+import { RecentCallsSection, type StoredCall } from "./recent-calls-section";
 import {
   PANEL_CLIPPED_SURFACE_CLASS,
   PANEL_SECTION_CLASS,
@@ -17,32 +18,19 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export type StoredCall = Launchpad["history"][number];
-
-export function storedCallTitle(call: StoredCall) {
-  return call.title || call.participants.join(" & ") || "Recorded Tuple call";
-}
-
-export function storedCallTime(call: StoredCall) {
-  const started = new Date(call.startedAt);
-  const today = new Date();
-  const isToday = started.toDateString() === today.toDateString();
-  const date = isToday
-    ? "Today"
-    : started.toLocaleDateString([], { month: "short", day: "numeric" });
-  const time = started.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  if (!call.endedAt) return `${date} · ${time}`;
-  const minutes = Math.max(1, Math.round((new Date(call.endedAt).getTime() - started.getTime()) / 60_000));
-  return `${date} · ${time} · ${minutes} min`;
-}
-
 export interface TupleLaunchpadViewProps {
   stateLoading: boolean;
   launchpad: Launchpad | null;
   loading: boolean;
   error: string | null;
   joining: string | null;
+  historyQuery: string;
+  historySearchResults: StoredCall[] | null;
+  historySearchLoading: boolean;
+  historySearchError: string | null;
   onRetry: () => void;
+  onRetryHistorySearch: () => void;
+  onHistoryQueryChange: (query: string) => void;
   onJoin: (target: string, id: string, copyUrl?: string) => void;
   onSelectRecording: (recording: StoredCall) => void;
 }
@@ -53,7 +41,13 @@ export function TupleLaunchpadView({
   loading,
   error,
   joining,
+  historyQuery,
+  historySearchResults,
+  historySearchLoading,
+  historySearchError,
   onRetry,
+  onRetryHistorySearch,
+  onHistoryQueryChange,
   onJoin,
   onSelectRecording,
 }: TupleLaunchpadViewProps) {
@@ -142,42 +136,17 @@ export function TupleLaunchpadView({
         </div>
       ) : null}
 
-      {launchpad?.history.length ? (
-        <div className={PANEL_SECTION_CLASS}>
-          <h3 className={PANEL_SECTION_HEADING_CLASS}>Recent calls</h3>
-          <div className={PANEL_CLIPPED_SURFACE_CLASS}>
-            {launchpad.history.map((call) => (
-              <button
-                key={call.callId}
-                type="button"
-                data-history-row
-                className="active:bg-muted/60 after:bg-foreground/6 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2"
-                onClick={() => onSelectRecording(call)}
-              >
-                <span className="block min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3">
-                  <span className="min-w-0 truncate text-sm font-medium">{storedCallTitle(call)}</span>
-                  <span className="text-muted-foreground hidden text-left text-[0.6875rem] tabular-nums opacity-70 @min-[26rem]:block">
-                    {storedCallTime(call)}
-                  </span>
-                  <span
-                    className="text-muted-foreground mt-0.5 block min-w-0 truncate text-xs @min-[26rem]:col-start-1 @min-[26rem]:row-start-2"
-                    title={call.summary ?? undefined}
-                    aria-hidden={call.summary ? undefined : true}
-                  >
-                    {call.summary || "\u00a0"}
-                  </span>
-                  <span className="text-muted-foreground mt-0.5 hidden text-left text-[0.6875rem] opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block">
-                    {call.participants.length} {call.participants.length === 1 ? "participant" : "participants"}
-                  </span>
-                </span>
-                <span className={`mt-0.5 block truncate text-[0.6875rem] text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`}>
-                  {storedCallTime(call)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <RecentCallsSection
+        calls={launchpad?.history ?? []}
+        query={historyQuery}
+        searchResults={historySearchResults}
+        searchLoading={historySearchLoading}
+        searchError={historySearchError}
+        onRetry={onRetry}
+        onRetrySearch={onRetryHistorySearch}
+        onQueryChange={onHistoryQueryChange}
+        onSelect={onSelectRecording}
+      />
 
       {!error && launchpad && !personalRoom && !launchpad.calls.length && !launchpad.history.length ? (
         <p className="text-muted-foreground text-sm">No Tuple rooms or calls yet.</p>

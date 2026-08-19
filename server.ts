@@ -40,6 +40,17 @@ const transcriptSnapshotSchema = z.object({
   promptContext: z.string(),
   truncated: z.boolean(),
 });
+const storedCallSchema = z.object({
+  callId: z.string(),
+  title: z.string().nullable(),
+  summary: z.string().nullable(),
+  startedAt: z.string(),
+  endedAt: z.string().nullable(),
+  participants: z.array(z.string()),
+  promptContext: z.string(),
+  matchSnippet: z.string().optional(),
+  matchKind: z.enum(["spoken", "content"]).optional(),
+});
 const launchpadSchema = z.object({
   personalRoom: z
     .object({
@@ -58,17 +69,7 @@ const launchpadSchema = z.object({
       joinTarget: z.string().nullable(),
     }),
   ),
-  history: z.array(
-    z.object({
-      callId: z.string(),
-      title: z.string().nullable(),
-      summary: z.string().nullable(),
-      startedAt: z.string(),
-      endedAt: z.string().nullable(),
-      participants: z.array(z.string()),
-      promptContext: z.string(),
-    }),
-  ),
+  history: z.array(storedCallSchema),
 });
 const newThreadRequestSchema = z.custom<NewThreadRequest>(
   (value) => typeof value === "object" && value !== null,
@@ -78,6 +79,11 @@ const newThreadRequestSchema = z.custom<NewThreadRequest>(
 export const rpcContract = defineRpcContract({
   getState: { input: z.null(), output: callStateSchema },
   getLaunchpad: { input: z.null(), output: launchpadSchema },
+  getRecentCalls: { input: z.null(), output: z.array(storedCallSchema) },
+  searchHistory: {
+    input: z.object({ query: z.string().trim().min(1).max(500) }),
+    output: z.array(storedCallSchema),
+  },
   joinTuple: {
     input: z.object({ target: z.string().trim().min(1), switchCurrent: z.boolean().default(false) }),
     output: z.object({ ok: z.literal(true) }),
@@ -161,6 +167,12 @@ type RawStoredCall = {
   started_at?: string;
   ended_at?: string;
   participants?: Array<{ full_name?: string; email?: string }>;
+};
+
+type RawStoredCallSearchHit = {
+  kind?: "spoken" | "content";
+  call_id?: string;
+  snippet?: string;
 };
 
 type RoomInfo = {
@@ -271,6 +283,28 @@ export function recordingReferencePrompt(callId: string, command: string, task?:
   ].join("\n");
 }
 
+function searchTerms(query: string) {
+  return query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+}
+
+export function storedCallMatchesQuery(call: RawStoredCall, query: string) {
+  const terms = searchTerms(query);
+  if (!terms.length) return true;
+  const words = [
+    call.title ?? "",
+    ...(call.participants ?? []).flatMap((participant) => [participant.full_name ?? "", participant.email ?? ""]),
+  ]
+    .flatMap((value) => value.toLocaleLowerCase().split(/\s+/))
+    .filter(Boolean);
+  return terms.every((term) => words.some((word) => word.startsWith(term)));
+}
+
+export function transcriptSearchQuery(query: string) {
+  const terms = searchTerms(query).filter((term) => term.length >= 3);
+  if (!terms.length) return null;
+  return terms.map((term) => `"${term.replaceAll('"', '""')}"`).join(" ");
+}
+
 export default async function plugin(bb: BbPluginApi) {
   const settings = bb.settings.define({
     cliCommand: {
@@ -306,12 +340,30 @@ export default async function plugin(bb: BbPluginApi) {
     return command;
   }
 
-  async function runTuple(command: string, args: string[]) {
+  async function runTuple(command: string, args: string[], options?: { timeout?: number; maxBuffer?: number }) {
     const { stdout } = await execFileAsync(command, ["--format", "json", ...args], {
-      timeout: 15_000,
-      maxBuffer: 2 * 1024 * 1024,
+      timeout: options?.timeout ?? 15_000,
+      maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024,
     });
     return stdout;
+  }
+
+  function storedCall(call: RawStoredCall, command: string, match?: RawStoredCallSearchHit) {
+    if (!call.call_id || !call.started_at) return null;
+    const matchSnippet = match?.snippet?.trim();
+    return {
+      callId: call.call_id,
+      title: call.title?.trim() || null,
+      summary: call.summary?.trim() || null,
+      startedAt: call.started_at,
+      endedAt: call.ended_at ?? null,
+      participants: (call.participants ?? []).map((participant) =>
+        participant.full_name?.trim() || participant.email?.trim() || "Tuple user",
+      ),
+      promptContext: recordingReferencePrompt(call.call_id, command),
+      ...(matchSnippet ? { matchSnippet } : {}),
+      ...(match?.kind ? { matchKind: match.kind } : {}),
+    };
   }
 
   async function applyRawState(environment: Environment, command: string, raw: RawState): Promise<CallState> {
@@ -400,20 +452,44 @@ export default async function plugin(bb: BbPluginApi) {
           };
         }),
       history: history.flatMap((call) => {
-        if (!call.call_id || !call.started_at) return [];
-        return [{
-          callId: call.call_id,
-          title: call.title?.trim() || null,
-          summary: call.summary?.trim() || null,
-          startedAt: call.started_at,
-          endedAt: call.ended_at ?? null,
-          participants: (call.participants ?? []).map((participant) =>
-            participant.full_name?.trim() || participant.email?.trim() || "Tuple user",
-          ),
-          promptContext: recordingReferencePrompt(call.call_id, command),
-        }];
+        const normalized = storedCall(call, command);
+        return normalized ? [normalized] : [];
       }),
     };
+  }
+
+  async function getRecentCalls() {
+    const command = await getCliCommand();
+    const history = JSON.parse(
+      await runTuple(command, ["transcription", "list", "--limit", "8"]),
+    ) as RawStoredCall[];
+    return history.flatMap((call) => {
+      const normalized = storedCall(call, command);
+      return normalized ? [normalized] : [];
+    });
+  }
+
+  async function searchHistory(query: string) {
+    const command = await getCliCommand();
+    const contentQuery = transcriptSearchQuery(query);
+    const [historyOutput, searchOutput] = await Promise.all([
+      runTuple(command, ["transcription", "list", "--limit", "-1"], { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 }),
+      contentQuery
+        ? runTuple(command, ["transcription", "search", contentQuery, "--limit", "100"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 })
+        : Promise.resolve("[]"),
+    ]);
+    const history = JSON.parse(historyOutput) as RawStoredCall[];
+    const hits = JSON.parse(searchOutput) as RawStoredCallSearchHit[];
+    const firstHitByCall = new Map<string, RawStoredCallSearchHit>();
+    for (const hit of hits) {
+      if (hit.call_id && !firstHitByCall.has(hit.call_id)) firstHitByCall.set(hit.call_id, hit);
+    }
+    return history
+      .filter((call) => storedCallMatchesQuery(call, query) || Boolean(call.call_id && firstHitByCall.has(call.call_id)))
+      .flatMap((call) => {
+        const normalized = storedCall(call, command, call.call_id ? firstHitByCall.get(call.call_id) : undefined);
+        return normalized ? [normalized] : [];
+      });
   }
 
   async function followState(command: string, signal: AbortSignal) {
@@ -504,6 +580,8 @@ export default async function plugin(bb: BbPluginApi) {
   bb.rpc.register(rpcContract, {
     getState: () => refreshState(),
     getLaunchpad: () => getLaunchpad(),
+    getRecentCalls: () => getRecentCalls(),
+    searchHistory: ({ query }) => searchHistory(query),
     joinTuple: async ({ target, switchCurrent }) => {
       const command = await getCliCommand();
       const state = await refreshState();
