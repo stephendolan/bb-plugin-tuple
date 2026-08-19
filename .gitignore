@@ -1,6 +1,9 @@
 node_modules/
 .DS_Store
 *.log
+.ladle-build/
+playwright-report/
+test-results/
 
 # bb validates these prebuilt bundles for managed installs.
 !dist/

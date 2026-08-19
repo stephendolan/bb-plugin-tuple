@@ -1,0 +1,160 @@
+:root {
+  color-scheme: light;
+  --canvas: oklch(100% 0 0);
+  --ink: oklch(32.11% 0 0);
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --primary: oklch(27% 0 0);
+  --primary-foreground: oklch(100% 0 0);
+  --muted: color-mix(in oklch, var(--ink) 11%, var(--canvas));
+  --muted-foreground: oklch(44% 0 0);
+  --secondary: color-mix(in oklch, var(--ink) 8%, var(--canvas));
+  --secondary-foreground: var(--ink);
+  --accent: color-mix(in oklch, var(--ink) 8%, var(--canvas));
+  --border: color-mix(in oklch, var(--ink) 14%, var(--canvas));
+  --input: color-mix(in oklch, var(--ink) 29.5%, var(--canvas));
+  --ring: var(--primary);
+  --destructive: oklch(45% 0.19 25.8625);
+  --destructive-foreground: oklch(100% 0 0);
+  --state-hover: color-mix(in oklab, var(--ink) 5.9%, transparent);
+  --state-active: color-mix(in oklab, var(--ink) 11.8%, transparent);
+  --radius: 0.5rem;
+  --font-sans: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --canvas: oklch(19.5% 0 0);
+  --ink: oklch(81% 0 0);
+  --primary: oklch(82% 0 0);
+  --primary-foreground: oklch(21.78% 0 0);
+  --muted: color-mix(in oklch, var(--ink) 16%, var(--canvas));
+  --muted-foreground: oklch(78% 0 0);
+  --secondary: color-mix(in oklch, var(--ink) 13%, var(--canvas));
+  --accent: color-mix(in oklch, var(--ink) 13%, var(--canvas));
+  --border: color-mix(in oklch, var(--ink) 19.4%, var(--canvas));
+  --input: color-mix(in oklch, var(--ink) 32.6%, var(--canvas));
+  --destructive: oklch(56% 0.19 22.1703);
+  --state-hover: color-mix(in oklab, var(--ink) 13.8%, transparent);
+  --state-active: color-mix(in oklab, var(--ink) 22.5%, transparent);
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+@layer theme {
+  button,
+  input {
+    margin: 0;
+    color: inherit;
+    font: inherit;
+  }
+
+  button {
+    appearance: none;
+    border: 0;
+    background-color: transparent;
+    background-image: none;
+    padding: 0;
+  }
+}
+
+html,
+body,
+#root,
+.tuple-ladle-root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+.ladle-main {
+  padding: 0;
+}
+
+.tuple-gallery {
+  min-width: max-content;
+  padding: 24px;
+}
+
+.tuple-gallery-header {
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.tuple-gallery-header h1 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.tuple-gallery-header p,
+.tuple-gallery-axis,
+.tuple-gallery-state {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+.tuple-gallery-header p {
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
+.tuple-gallery-grid {
+  display: grid;
+  grid-template-columns: 132px 280px 360px 480px;
+  gap: 16px;
+  align-items: start;
+}
+
+.tuple-gallery-axis {
+  align-self: end;
+  padding: 0 12px 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tuple-gallery-state {
+  padding-top: 16px;
+  font-weight: 500;
+}
+
+.tuple-gallery-row {
+  display: contents;
+}
+
+.tuple-gallery-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 178px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background);
+  padding: 16px;
+}
+
+.tuple-gallery-panel-auto {
+  min-height: 0;
+}
+
+.tuple-copy-options {
+  display: grid;
+  grid-template-columns: repeat(3, 360px);
+  gap: 16px;
+}
+
+.tuple-copy-option h2 {
+  margin: 0 0 8px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-weight: 500;
+}

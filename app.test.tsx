@@ -158,10 +158,11 @@ describe("Tuple Call app", () => {
     );
 
     await slot.findByText("Current call");
-    await slot.findByText("Transcribing · Personal room · Staging");
-    await slot.findByRole("button", { name: "Copy link" });
-    await slot.findByLabelText("Purpose");
-    await slot.findByRole("button", { name: "Send 5 min to current thread" });
+    await slot.findByText("Transcribing · Personal room");
+    const copyLink = await slot.findByRole("button", { name: "Copy link" });
+    expect(copyLink.querySelector('[data-icon="Link"]')).toBeTruthy();
+    await slot.findByLabelText("Ask the current thread to");
+    await slot.findByRole("button", { name: "Send 5 min of transcript" });
     expect(slot.queryByText("Your Tuple call is live")).toBeNull();
     slot.lifecycle.unmount();
   });
@@ -251,6 +252,36 @@ describe("Tuple Call app", () => {
     fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
     await slot.findByText("Transcribing · Personal room · Staging");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "startTranscription"]);
+    slot.lifecycle.unmount();
+  });
+
+  it("reduces the idle-transcription thread drawer to one recovery action", async () => {
+    const app = await loadPluginApp(() => import("./app"));
+    const transcriptionOff = {
+      ...liveState,
+      call: { ...liveState.call, transcribing: false },
+    };
+    const slot = renderSlot(
+      app.threadPanelActions[0]!,
+      { threadId: "thread-1", params: null },
+      {
+        settings: { environment: "staging", defaultMinutes: "5" },
+        rpc: {
+          getState: () => transcriptionOff,
+          startTranscription: () => liveState,
+        },
+      },
+    );
+
+    await slot.findByText("Transcription is off · Personal room");
+    expect(slot.queryByLabelText("Ask the current thread to")).toBeNull();
+    expect(slot.queryByRole("button", { name: "Send 5 min of transcript" })).toBeNull();
+    fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
+    await slot.findByLabelText("Ask the current thread to");
+    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual([
+      "getState",
+      "startTranscription",
+    ]);
     slot.lifecycle.unmount();
   });
 });

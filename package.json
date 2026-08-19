@@ -1,11 +1,15 @@
 {
   "name": "bb-plugin-tuple",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Bring live and recorded Tuple calls into bb as explicit, bounded context.",
   "type": "module",
   "scripts": {
     "build": "bb plugin build",
+    "storybook": "npm run build && ladle serve",
+    "storybook:build": "npm run build && ladle build --outDir .ladle-build",
     "test": "vitest run",
+    "test:visual": "npm run storybook:build && playwright test",
+    "test:visual:update": "npm run storybook:build && playwright test --update-snapshots",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm test && npm run build"
   },
@@ -50,6 +54,8 @@
   },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.6",
+    "@ladle/react": "^5.1.1",
+    "@playwright/test": "^1.62.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@types/better-sqlite3": "^7.6.12",

@@ -15,8 +15,26 @@ import type { CallState, Launchpad, TranscriptSnapshot, rpcContract } from "./se
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
+import { CallOverview, ThreadCallPanelView } from "@/components/thread-call-panel-view";
+import {
+  TupleLaunchpadView,
+  storedCallTime,
+  storedCallTitle,
+  type StoredCall,
+} from "@/components/tuple-launchpad-view";
 
 const tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
+
+async function copyCallJoinLink(state: CallState | null) {
+  const joinUrl = state?.call?.joinUrl;
+  if (!joinUrl) return;
+  try {
+    await navigator.clipboard.writeText(joinUrl);
+    toast.success("Join link copied.");
+  } catch {
+    toast.error("Could not copy the join link.");
+  }
+}
 
 function useCallState() {
   const rpc = useRpc<typeof rpcContract>();
@@ -103,35 +121,6 @@ function useTupleLaunchpad(enabled: boolean) {
   return { launchpad, loading, error, refresh, rpc };
 }
 
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
-
-type StoredCall = Launchpad["history"][number];
-
-function storedCallTitle(call: StoredCall) {
-  return call.title || call.participants.join(" & ") || "Recorded Tuple call";
-}
-
-function storedCallTime(call: StoredCall) {
-  const started = new Date(call.startedAt);
-  const today = new Date();
-  const isToday = started.toDateString() === today.toDateString();
-  const date = isToday
-    ? "Today"
-    : started.toLocaleDateString([], { month: "short", day: "numeric" });
-  const time = started.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  if (!call.endedAt) return `${date} · ${time}`;
-  const minutes = Math.max(1, Math.round((new Date(call.endedAt).getTime() - started.getTime()) / 60_000));
-  return `${date} · ${time} · ${minutes} min`;
-}
-
 function TupleLaunchpad({
   state,
   loading: stateLoading,
@@ -144,7 +133,6 @@ function TupleLaunchpad({
   const enabled = !stateLoading && !state?.inCall;
   const { launchpad, loading, error, refresh, rpc } = useTupleLaunchpad(enabled);
   const [joining, setJoining] = useState<string | null>(null);
-  const personalRoom = launchpad?.personalRoom;
 
   async function join(target: string, id: string, copyUrl?: string) {
     setJoining(id);
@@ -167,121 +155,17 @@ function TupleLaunchpad({
     }
   }
 
-  if (stateLoading || loading) {
-    return (
-      <div className="flex items-center gap-3 py-2 text-sm text-muted-foreground" aria-live="polite">
-        <Icon name="Spinner" className="size-4 animate-spin" aria-hidden="true" />
-        <span>Loading rooms and calls…</span>
-      </div>
-    );
-  }
-
   return (
-    <section className="space-y-5" aria-live="polite">
-      {error ? (
-        <div className="flex items-center gap-2 text-sm text-destructive">
-          <span className="min-w-0 flex-1">{error}</span>
-          <Button type="button" size="icon" variant="ghost" className="relative size-8 shrink-0" aria-label="Retry loading rooms and calls" onClick={() => void refresh()}>
-            <span className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden" aria-hidden="true" />
-            <Icon name="RotateCcw" className="size-4" aria-hidden="true" />
-          </Button>
-        </div>
-      ) : null}
-
-      {personalRoom ? (
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Personal room</h3>
-          <div className="-mx-2">
-            <button
-              type="button"
-              className="active:bg-muted/60 focus-visible:outline-ring group hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-md p-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait disabled:hover:bg-transparent"
-              disabled={joining !== null}
-              onClick={() => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl)}
-            >
-              <Icon name="GridView" className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium">Your room</span>
-                <span className="block text-xs text-muted-foreground">Enter and copy link</span>
-              </span>
-              {joining === `room:${personalRoom.slug}` ? (
-                <Icon name="Spinner" className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
-              ) : (
-                <Icon name="ChevronRight" className="group-hover:text-foreground text-muted-foreground size-4 shrink-0" aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </div>
-      ) : null}
-
-      {launchpad?.calls.length ? (
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Happening now</h3>
-          <div className="divide-y divide-foreground/8">
-            {launchpad.calls.map((call) => {
-              const visibleParticipants = call.participants.slice(0, 3);
-              const title = call.room?.name || call.participants.join(" & ") || "Tuple call";
-              const people = call.participants.length + call.unknownParticipants;
-              const joinTarget = call.joinTarget;
-              return (
-                <div key={call.id} className="flex min-w-0 items-center gap-3 py-3 first:pt-1">
-                  <div className="flex shrink-0 -space-x-1.5" aria-hidden="true">
-                    {(visibleParticipants.length ? visibleParticipants : ["Tuple"]).map((participant, index) => (
-                      <span key={`${participant}-${index}`} className="flex size-7 items-center justify-center rounded-full bg-muted text-[0.625rem] font-semibold ring-2 ring-background">
-                        {initials(participant)}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">{title}</div>
-                    <div className="truncate text-xs text-muted-foreground">
-                      {call.room?.name && call.participants.length ? call.participants.join(", ") : `${people || call.capacity} in the call`}
-                    </div>
-                  </div>
-                  {call.joinable && joinTarget ? (
-                    <Button type="button" size="sm" variant="secondary" disabled={joining !== null} onClick={() => void join(joinTarget, `call:${call.id}`)}>
-                      {joining === `call:${call.id}` ? <Icon name="Spinner" className="size-4 animate-spin" aria-hidden="true" /> : null}
-                      Join
-                    </Button>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">Full</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : launchpad ? (
-        <p className="text-sm text-muted-foreground">No other calls happening right now.</p>
-      ) : null}
-
-      {launchpad?.history.length ? (
-        <div className="space-y-2 border-t border-foreground/8 pt-5">
-          <h3 className="text-sm font-medium text-muted-foreground">Recent calls</h3>
-          <div className="-mx-2 divide-y divide-foreground/8">
-            {launchpad.history.map((call) => (
-              <button
-                key={call.callId}
-                type="button"
-                className="active:bg-muted/60 focus-visible:outline-ring group hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-md px-2 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
-                onClick={() => onSelectRecording(call)}
-              >
-                <Icon name="Clock" className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">{storedCallTitle(call)}</span>
-                  {call.summary ? (
-                    <span className="block truncate text-xs text-muted-foreground" title={call.summary}>{call.summary}</span>
-                  ) : null}
-                  <span className={`block truncate text-xs text-muted-foreground ${call.summary ? "opacity-75" : ""}`}>
-                    {storedCallTime(call)}
-                  </span>
-                </span>
-                <Icon name="ChevronRight" className="group-hover:text-foreground text-muted-foreground size-4 shrink-0" aria-hidden="true" />
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
-    </section>
+    <TupleLaunchpadView
+      stateLoading={stateLoading}
+      launchpad={launchpad}
+      loading={loading}
+      error={error}
+      joining={joining}
+      onRetry={() => void refresh()}
+      onJoin={(target, id, copyUrl) => void join(target, id, copyUrl)}
+      onSelectRecording={onSelectRecording}
+    />
   );
 }
 
@@ -361,120 +245,6 @@ function StoredCallSelection({
           onSubmit={createThread}
         />
       )}
-    </section>
-  );
-}
-
-function callDescription(state: CallState | null) {
-  const call = state?.call;
-  if (!call) return "Tuple is ready when your next call starts.";
-  const participantCount = call.participants.length;
-  let company: string;
-  if (participantCount === 0) {
-    company = call.roomKind === "personal"
-      ? "Personal room"
-      : call.roomName
-        ? call.roomName
-        : "Solo call";
-  } else if (participantCount === 1) {
-    company = `With ${call.participants[0]}`;
-  } else {
-    company = `With ${participantCount} others`;
-  }
-  return `${call.transcribing ? "Transcribing" : "Transcription is off"} · ${company}`;
-}
-
-function CallOverview({
-  state,
-  loading,
-  onRetry,
-  onStartTranscription,
-  quiet = false,
-}: {
-  state: CallState | null;
-  loading: boolean;
-  onRetry: () => void;
-  onStartTranscription?: () => void;
-  quiet?: boolean;
-}) {
-  const title = loading
-    ? "Connecting to Tuple"
-    : state?.error
-      ? "Tuple is unavailable"
-      : state?.inCall
-        ? "Current call"
-        : "No active Tuple call";
-
-  async function copyJoinLink() {
-    const joinUrl = state?.call?.joinUrl;
-    if (!joinUrl) return;
-    try {
-      await navigator.clipboard.writeText(joinUrl);
-      toast.success("Join link copied.");
-    } catch {
-      toast.error("Could not copy the join link.");
-    }
-  }
-
-  return (
-    <section
-      className={quiet ? undefined : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}
-      aria-live="polite"
-    >
-      <div className="flex min-w-0 flex-wrap items-start gap-2.5">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-balance font-semibold">{title}</h2>
-          <div className="flex min-w-0 items-center gap-1.5 text-base text-muted-foreground sm:text-sm">
-            {state?.inCall ? (
-              <span
-                className={`size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`}
-                aria-hidden="true"
-              />
-            ) : null}
-            <p className="min-w-0 text-pretty">
-              {state?.error ?? callDescription(state)}
-              {!state?.error && state?.environment && state.environment !== "prod"
-                ? ` · ${state.environment === "staging" ? "Staging" : "Development"}`
-                : ""}
-            </p>
-          </div>
-        </div>
-        {state?.error ? (
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="relative size-8 shrink-0"
-            aria-label="Retry Tuple connection"
-            onClick={onRetry}
-          >
-            <span className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden" aria-hidden="true" />
-            <Icon name="RotateCcw" className="size-4 shrink-0" aria-hidden="true" />
-          </Button>
-        ) : null}
-        {state?.call ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
-            {state.call.joinUrl ? (
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="pl-1.5 pr-2.5"
-                onClick={() => void copyJoinLink()}
-              >
-                <Icon name="Copy" className="size-4 shrink-0" aria-hidden="true" />
-                Copy link
-              </Button>
-            ) : null}
-            {!state.call.transcribing && onStartTranscription ? (
-              <Button type="button" size="sm" className="pl-1.5 pr-2.5" onClick={onStartTranscription}>
-                <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
-                Start transcription
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
     </section>
   );
 }
@@ -564,6 +334,7 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
           state={state}
           loading={loading}
           onRetry={() => void refresh()}
+          onCopyJoinLink={() => void copyCallJoinLink(state)}
           onStartTranscription={() => void startTranscription()}
         />
         {!snapshot ? (
@@ -643,42 +414,18 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
   }
 
   return (
-    <div className="isolate space-y-6 antialiased">
-      <CallOverview
-        state={state}
-        loading={loading}
-        onRetry={() => void refresh()}
-        onStartTranscription={() => void startTranscription()}
-        quiet
-      />
-      <form
-        className="space-y-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void send();
-        }}
-      >
-        <div className="space-y-2">
-          <label className="text-base font-medium sm:text-sm" htmlFor="tuple-task">Purpose</label>
-          <Input
-            id="tuple-task"
-            name="tuple-task"
-            type="text"
-            value={task}
-            onChange={(event) => setTask(event.target.value)}
-            placeholder="Summarize decisions and suggest next steps"
-          />
-        </div>
-        <Button
-          type="submit"
-          className="w-full pl-2 pr-3"
-          disabled={!task.trim() || !state?.call?.transcribing || sending}
-        >
-          <Icon name={sending ? "Spinner" : "Sent"} className={`size-4 shrink-0 ${sending ? "animate-spin" : ""}`} aria-hidden="true" />
-          {sending ? "Sending…" : `Send ${minutes} min to current thread`}
-        </Button>
-      </form>
-    </div>
+    <ThreadCallPanelView
+      state={state}
+      loading={loading}
+      minutes={minutes}
+      task={task}
+      sending={sending}
+      onTaskChange={setTask}
+      onSend={() => void send()}
+      onRetry={() => void refresh()}
+      onCopyJoinLink={() => void copyCallJoinLink(state)}
+      onStartTranscription={() => void startTranscription()}
+    />
   );
 }
 

@@ -139,7 +139,7 @@ var {
   useSonner
 } = mod3;
 
-// node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
 var __defProp2 = Object.defineProperty;
 var __name = (target, value) => __defProp2(target, "name", { value, configurable: true });
 function setRef(ref, value) {
@@ -180,7 +180,7 @@ function useComposedRefs(...refs) {
 }
 __name(useComposedRefs, "useComposedRefs");
 
-// node_modules/@radix-ui/react-slot/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-slot/dist/index.mjs
 var __defProp3 = Object.defineProperty;
 var __name2 = (target, value) => __defProp3(target, "name", { value, configurable: true });
 // @__NO_SIDE_EFFECTS__
@@ -316,7 +316,7 @@ var createSlottableError = /* @__PURE__ */ __name2((ownerName) => {
 }, "createSlottableError");
 var use2 = react_exports[" use ".trim().toString()];
 
-// node_modules/clsx/dist/clsx.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/clsx/dist/clsx.mjs
 function r(e) {
   var t, f, n = "";
   if ("string" == typeof e || "number" == typeof e) n += e;
@@ -331,7 +331,7 @@ function clsx() {
   return n;
 }
 
-// node_modules/class-variance-authority/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/class-variance-authority/dist/index.mjs
 var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
 var cx = clsx;
 var cva = (base, config) => (props) => {
@@ -373,7 +373,7 @@ var cva = (base, config) => (props) => {
   return cx(base, getVariantClassNames, getCompoundVariantClassNames, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
 };
 
-// node_modules/tailwind-merge/dist/bundle-mjs.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var concatArrays = (array1, array2) => {
   const combinedArray = new Array(array1.length + array2.length);
   for (let i = 0; i < array1.length; i++) {
@@ -3627,12 +3627,12 @@ var getDefaultConfig = () => {
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 
-// lib/utils.ts
+// Repos/@tuple/bb-plugin-tuple/lib/utils.ts
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// components/ui/motion.ts
+// Repos/@tuple/bb-plugin-tuple/components/ui/motion.ts
 var CONTROL_HOVER_TRANSITION = "transition-colors duration-150 hover:duration-0";
 
 // bb-plugin-runtime-shim:react/jsx-runtime
@@ -3647,7 +3647,7 @@ var {
   jsxs
 } = mod4;
 
-// components/ui/button.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/button.tsx
 var buttonVariants = cva(
   `inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ${CONTROL_HOVER_TRANSITION} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
@@ -3688,7 +3688,7 @@ var Button = forwardRef(
 );
 Button.displayName = "Button";
 
-// node_modules/@hugeicons/core-free-icons/dist/esm/index.js
+// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/core-free-icons/dist/esm/index.js
 var ArrowLeft01Icon = [
   ["path", { d: "M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }]
 ];
@@ -3717,6 +3717,10 @@ var GridViewIcon = [
   ["path", { d: "M3.88884 20.6629C4.39329 21 5.09552 21 6.49998 21C7.90445 21 8.60668 21 9.11113 20.6629C9.32951 20.517 9.51701 20.3295 9.66292 20.1111C9.99998 19.6067 9.99998 18.9045 9.99998 17.5C9.99998 16.0955 9.99998 15.3933 9.66292 14.8889C9.51701 14.6705 9.32951 14.483 9.11113 14.3371C8.60668 14 7.90445 14 6.49998 14C5.09552 14 4.39329 14 3.88884 14.3371C3.67046 14.483 3.48296 14.6705 3.33705 14.8889C2.99998 15.3933 2.99998 16.0955 2.99998 17.5C2.99998 18.9045 2.99998 19.6067 3.33705 20.1111C3.48296 20.3295 3.67046 20.517 3.88884 20.6629Z", stroke: "currentColor", strokeLinejoin: "round", strokeWidth: "1.5", key: "2" }],
   ["path", { d: "M14.8888 20.6629C15.3933 21 16.0955 21 17.5 21C18.9044 21 19.6067 21 20.1111 20.6629C20.3295 20.517 20.517 20.3295 20.6629 20.1111C21 19.6067 21 18.9045 21 17.5C21 16.0955 21 15.3933 20.6629 14.8889C20.517 14.6705 20.3295 14.483 20.1111 14.3371C19.6067 14 18.9044 14 17.5 14C16.0955 14 15.3933 14 14.8888 14.3371C14.6705 14.483 14.483 14.6705 14.337 14.8889C14 15.3933 14 16.0955 14 17.5C14 18.9045 14 19.6067 14.337 20.1111C14.483 20.3295 14.6705 20.517 14.8888 20.6629Z", stroke: "currentColor", strokeLinejoin: "round", strokeWidth: "1.5", key: "3" }]
 ];
+var Link01Icon = [
+  ["path", { d: "M9.14339 10.691L9.35031 10.4841C11.329 8.50532 14.5372 8.50532 16.5159 10.4841C18.4947 12.4628 18.4947 15.671 16.5159 17.6497L13.6497 20.5159C11.671 22.4947 8.46279 22.4947 6.48405 20.5159C4.50532 18.5372 4.50532 15.329 6.48405 13.3503L6.9484 12.886", stroke: "currentColor", strokeLinecap: "round", strokeWidth: "1.5", key: "0" }],
+  ["path", { d: "M17.0516 11.114L17.5159 10.6497C19.4947 8.67095 19.4947 5.46279 17.5159 3.48405C15.5372 1.50532 12.329 1.50532 10.3503 3.48405L7.48405 6.35031C5.50532 8.32904 5.50532 11.5372 7.48405 13.5159C9.46279 15.4947 12.671 15.4947 14.6497 13.5159L14.8566 13.309", stroke: "currentColor", strokeLinecap: "round", strokeWidth: "1.5", key: "1" }]
+];
 var Mic02Icon = [
   ["path", { d: "M17 7V11C17 13.7614 14.7614 16 12 16C9.23858 16 7 13.7614 7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7Z", stroke: "currentColor", strokeWidth: "1.5", key: "0" }],
   ["path", { d: "M20 11C20 15.4183 16.4183 19 12 19M12 19C7.58172 19 4 15.4183 4 11M12 19V22M12 22H15M12 22H9", stroke: "currentColor", strokeLinecap: "round", strokeWidth: "1.5", key: "1" }]
@@ -3730,7 +3734,7 @@ var SentIcon = [
   ["path", { d: "M11.4999 12.5L14.9999 9", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
 ];
 
-// node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
+// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
 var defaultAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
   width: 24,
@@ -3781,7 +3785,7 @@ var HugeiconsIcon = forwardRef(({ color = "currentColor", size = 24, strokeWidth
 });
 HugeiconsIcon.displayName = "HugeiconsIcon";
 
-// components/ui/icon.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/icon.tsx
 var ICON_MAP = {
   BubbleChatQuestion: BubbleChatQuestionIcon,
   ChevronLeft: ArrowLeft01Icon,
@@ -3789,6 +3793,7 @@ var ICON_MAP = {
   Clock: Clock01Icon,
   Copy: Copy01Icon,
   GridView: GridViewIcon,
+  Link: Link01Icon,
   Mic: Mic02Icon,
   RotateCcw: Refresh01Icon,
   Sent: SentIcon,
@@ -3812,14 +3817,14 @@ function Icon({
   );
 }
 
-// components/ui/coarse-pointer-sizing.ts
+// Repos/@tuple/bb-plugin-tuple/components/ui/coarse-pointer-sizing.ts
 var COARSE_POINTER_TEXT_BASE_CLASS = "text-sm max-md:pointer-coarse:text-base";
 var HEADER_ICON_BUTTON_BOX_CLASS = "h-[28px] w-[28px] rounded-md p-0 max-md:pointer-coarse:h-[36px] max-md:pointer-coarse:w-[36px]";
 var COARSE_POINTER_HEADER_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[16px] max-md:pointer-coarse:[&_svg]:size-[20px]`;
 var COARSE_POINTER_HEADER_REDUCED_GLYPH_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[13px] max-md:pointer-coarse:[&_svg]:size-[16px]`;
 var COARSE_POINTER_INPUT_HEIGHT_CLASS = "h-9 max-md:pointer-coarse:h-10";
 
-// components/ui/input.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/input.tsx
 var Input = forwardRef(
   ({ className, type, ...props }, ref) => {
     return /* @__PURE__ */ jsx(
@@ -3841,8 +3846,277 @@ var Input = forwardRef(
 );
 Input.displayName = "Input";
 
-// app.tsx
+// Repos/@tuple/bb-plugin-tuple/components/thread-call-panel-view.tsx
+function callDescription(state) {
+  const call = state?.call;
+  if (!call) return "Tuple is ready when your next call starts.";
+  const participantCount = call.participants.length;
+  let company;
+  if (participantCount === 0) {
+    company = call.roomKind === "personal" ? "Personal room" : call.roomName ? call.roomName : "Solo call";
+  } else if (participantCount === 1) {
+    company = `With ${call.participants[0]}`;
+  } else {
+    company = `With ${participantCount} others`;
+  }
+  return `${call.transcribing ? "Transcribing" : "Transcription is off"} \xB7 ${company}`;
+}
+function CallOverview({
+  state,
+  loading,
+  onRetry,
+  onCopyJoinLink,
+  onStartTranscription,
+  quiet = false
+}) {
+  const title = loading ? "Connecting to Tuple" : state?.error ? "Tuple is unavailable" : state?.inCall ? "Current call" : "No active Tuple call";
+  return /* @__PURE__ */ jsx(
+    "section",
+    {
+      className: `@container ${quiet ? "" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}`,
+      "aria-live": "polite",
+      children: /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-start gap-2.5", children: [
+          /* @__PURE__ */ jsx("h2", { className: "min-w-0 flex-1 text-balance font-semibold", children: title }),
+          state?.error ? /* @__PURE__ */ jsxs(
+            Button,
+            {
+              type: "button",
+              size: "icon",
+              variant: "ghost",
+              className: "relative size-8 shrink-0",
+              "aria-label": "Retry Tuple connection",
+              onClick: onRetry,
+              children: [
+                /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
+                /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4 shrink-0", "aria-hidden": "true" })
+              ]
+            }
+          ) : null,
+          state?.call ? /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 flex-wrap items-center gap-2", children: [
+            state.call.joinUrl ? /* @__PURE__ */ jsxs(
+              Button,
+              {
+                type: "button",
+                size: "sm",
+                variant: "ghost",
+                className: "px-2 @min-[17rem]:pl-1.5 @min-[17rem]:pr-2.5",
+                "aria-label": "Copy link",
+                onClick: onCopyJoinLink,
+                children: [
+                  /* @__PURE__ */ jsx(Icon, { name: "Link", className: "size-4 shrink-0", "aria-hidden": "true" }),
+                  /* @__PURE__ */ jsx("span", { className: "sr-only @min-[17rem]:not-sr-only", children: "Copy link" })
+                ]
+              }
+            ) : null,
+            !quiet && !state.call.transcribing && onStartTranscription ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", className: "pl-1.5 pr-2.5", onClick: onStartTranscription, children: [
+              /* @__PURE__ */ jsx(Icon, { name: "Mic", className: "size-4 shrink-0", "aria-hidden": "true" }),
+              "Start transcription"
+            ] }) : null
+          ] }) : null
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-1.5 text-base text-muted-foreground sm:text-sm", children: [
+          state?.inCall ? /* @__PURE__ */ jsx("span", { className: "flex h-lh shrink-0 items-center", "aria-hidden": "true", children: /* @__PURE__ */ jsx("span", { className: `size-1.5 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}` }) }) : null,
+          /* @__PURE__ */ jsxs("p", { className: "min-w-0 text-pretty", children: [
+            state?.error ?? callDescription(state),
+            !quiet && !state?.error && state?.environment && state.environment !== "prod" ? ` \xB7 ${state.environment === "staging" ? "Staging" : "Development"}` : ""
+          ] })
+        ] })
+      ] })
+    }
+  );
+}
+var currentThreadCallComposerCopy = {
+  label: "Ask the current thread to",
+  placeholder: "Summarize decisions and suggest next steps",
+  action: "Send {minutes} min of transcript"
+};
+function ThreadCallPanelView({
+  state,
+  loading = false,
+  inputId = "tuple-task",
+  minutes,
+  task,
+  sending,
+  copy = currentThreadCallComposerCopy,
+  onTaskChange,
+  onSend,
+  onRetry,
+  onCopyJoinLink,
+  onStartTranscription
+}) {
+  function submit(event) {
+    event.preventDefault();
+    onSend();
+  }
+  return /* @__PURE__ */ jsxs("div", { className: "isolate space-y-6 antialiased", children: [
+    /* @__PURE__ */ jsx(
+      CallOverview,
+      {
+        state,
+        loading,
+        onRetry,
+        onCopyJoinLink,
+        quiet: true
+      }
+    ),
+    !state.call?.transcribing ? /* @__PURE__ */ jsxs(
+      Button,
+      {
+        type: "button",
+        className: "w-full pl-2 pr-3",
+        onClick: onStartTranscription,
+        children: [
+          /* @__PURE__ */ jsx(Icon, { name: "Mic", className: "size-4 shrink-0", "aria-hidden": "true" }),
+          "Start transcription"
+        ]
+      }
+    ) : /* @__PURE__ */ jsxs("form", { className: "space-y-3", onSubmit: submit, children: [
+      /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsx("label", { className: "text-base font-medium sm:text-sm", htmlFor: inputId, children: copy.label }),
+        /* @__PURE__ */ jsx(
+          Input,
+          {
+            id: inputId,
+            name: "tuple-task",
+            type: "text",
+            value: task,
+            onChange: (event) => onTaskChange(event.target.value),
+            placeholder: copy.placeholder
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxs(
+        Button,
+        {
+          type: "submit",
+          className: "w-full pl-2 pr-3",
+          disabled: !task.trim() || sending,
+          children: [
+            /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 shrink-0 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
+            sending ? "Sending\u2026" : copy.action.replace("{minutes}", String(minutes))
+          ]
+        }
+      )
+    ] })
+  ] });
+}
+
+// Repos/@tuple/bb-plugin-tuple/components/tuple-launchpad-view.tsx
+function initials(name) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+}
+function storedCallTitle(call) {
+  return call.title || call.participants.join(" & ") || "Recorded Tuple call";
+}
+function storedCallTime(call) {
+  const started = new Date(call.startedAt);
+  const today = /* @__PURE__ */ new Date();
+  const isToday = started.toDateString() === today.toDateString();
+  const date = isToday ? "Today" : started.toLocaleDateString([], { month: "short", day: "numeric" });
+  const time = started.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  if (!call.endedAt) return `${date} \xB7 ${time}`;
+  const minutes = Math.max(1, Math.round((new Date(call.endedAt).getTime() - started.getTime()) / 6e4));
+  return `${date} \xB7 ${time} \xB7 ${minutes} min`;
+}
+function TupleLaunchpadView({
+  stateLoading,
+  launchpad,
+  loading,
+  error,
+  joining,
+  onRetry,
+  onJoin,
+  onSelectRecording
+}) {
+  const personalRoom = launchpad?.personalRoom;
+  if (stateLoading || loading) {
+    return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 py-2 text-sm text-muted-foreground", "aria-live": "polite", children: [
+      /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin", "aria-hidden": "true" }),
+      /* @__PURE__ */ jsx("span", { children: "Loading rooms and calls\u2026" })
+    ] });
+  }
+  return /* @__PURE__ */ jsxs("section", { className: "space-y-6", "aria-live": "polite", children: [
+    error ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm text-destructive", children: [
+      /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1", children: error }),
+      /* @__PURE__ */ jsxs(Button, { type: "button", size: "icon", variant: "ghost", className: "relative size-8 shrink-0", "aria-label": "Retry loading rooms and calls", onClick: onRetry, children: [
+        /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
+        /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4", "aria-hidden": "true" })
+      ] })
+    ] }) : null,
+    personalRoom ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Personal room" }),
+      /* @__PURE__ */ jsx("div", { className: "-mx-2", children: /* @__PURE__ */ jsxs(
+        "button",
+        {
+          type: "button",
+          className: "active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-start gap-3 rounded-md p-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait disabled:hover:bg-transparent",
+          disabled: joining !== null,
+          onClick: () => onJoin(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
+          children: [
+            /* @__PURE__ */ jsx(Icon, { name: "GridView", className: "size-4 h-lh shrink-0 text-muted-foreground", "aria-hidden": "true" }),
+            /* @__PURE__ */ jsxs("span", { className: "min-w-0 flex-1", children: [
+              /* @__PURE__ */ jsx("span", { className: "block text-sm font-medium", children: "Your room" }),
+              /* @__PURE__ */ jsx("span", { className: "block text-xs text-muted-foreground", children: "Enter and copy link" })
+            ] }),
+            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 h-lh shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : null
+          ]
+        }
+      ) })
+    ] }) : null,
+    launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Happening now" }),
+      /* @__PURE__ */ jsx("div", { className: "space-y-1", children: launchpad.calls.map((call) => {
+        const visibleParticipants = call.participants.slice(0, 3);
+        const title = call.room?.name || call.participants.join(" & ") || "Tuple call";
+        const people = call.participants.length + call.unknownParticipants;
+        const joinTarget = call.joinTarget;
+        return /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-3 py-1", children: [
+          /* @__PURE__ */ jsx("div", { className: "flex shrink-0 -space-x-1.5", "aria-hidden": "true", children: (visibleParticipants.length ? visibleParticipants : ["Tuple"]).map((participant, index) => /* @__PURE__ */ jsx("span", { className: "flex size-7 items-center justify-center rounded-full bg-muted text-[0.625rem] font-semibold ring-2 ring-background", children: initials(participant) }, `${participant}-${index}`)) }),
+          /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
+            /* @__PURE__ */ jsx("div", { className: "truncate text-sm font-medium", children: title }),
+            /* @__PURE__ */ jsx("div", { className: "truncate text-xs text-muted-foreground", children: call.room?.name && call.participants.length ? call.participants.join(", ") : `${people || call.capacity} in the call` })
+          ] }),
+          call.joinable && joinTarget ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", variant: "secondary", disabled: joining !== null, onClick: () => onJoin(joinTarget, `call:${call.id}`), children: [
+            joining === `call:${call.id}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin", "aria-hidden": "true" }) : null,
+            "Join"
+          ] }) : /* @__PURE__ */ jsx("span", { className: "text-xs text-muted-foreground", children: "Full" })
+        ] }, call.id);
+      }) })
+    ] }) : null,
+    launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Recent calls" }),
+      /* @__PURE__ */ jsx("div", { className: "-mx-2 space-y-0.5", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
+        "button",
+        {
+          type: "button",
+          className: "active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 w-full min-w-0 cursor-pointer rounded-md px-2 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2",
+          onClick: () => onSelectRecording(call),
+          children: [
+            /* @__PURE__ */ jsx("span", { className: "block truncate text-sm font-medium", children: storedCallTitle(call) }),
+            call.summary ? /* @__PURE__ */ jsx("span", { className: "block truncate text-xs text-muted-foreground", title: call.summary, children: call.summary }) : null,
+            /* @__PURE__ */ jsx("span", { className: `block truncate text-xs text-muted-foreground ${call.summary ? "opacity-75" : ""}`, children: storedCallTime(call) })
+          ]
+        },
+        call.callId
+      )) })
+    ] }) : null,
+    !error && launchpad && !personalRoom && !launchpad.calls.length && !launchpad.history.length ? /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground", children: "No Tuple rooms or calls yet." }) : null
+  ] });
+}
+
+// Repos/@tuple/bb-plugin-tuple/app.tsx
 var tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
+async function copyCallJoinLink(state) {
+  const joinUrl = state?.call?.joinUrl;
+  if (!joinUrl) return;
+  try {
+    await navigator.clipboard.writeText(joinUrl);
+    toast.success("Join link copied.");
+  } catch {
+    toast.error("Could not copy the join link.");
+  }
+}
 function useCallState() {
   const rpc = useRpc();
   const [state, setState] = useState(null);
@@ -3918,22 +4192,6 @@ function useTupleLaunchpad(enabled) {
   }, [enabled, refresh]);
   return { launchpad, loading, error, refresh, rpc };
 }
-function initials(name) {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
-}
-function storedCallTitle(call) {
-  return call.title || call.participants.join(" & ") || "Recorded Tuple call";
-}
-function storedCallTime(call) {
-  const started = new Date(call.startedAt);
-  const today = /* @__PURE__ */ new Date();
-  const isToday = started.toDateString() === today.toDateString();
-  const date = isToday ? "Today" : started.toLocaleDateString([], { month: "short", day: "numeric" });
-  const time = started.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  if (!call.endedAt) return `${date} \xB7 ${time}`;
-  const minutes = Math.max(1, Math.round((new Date(call.endedAt).getTime() - started.getTime()) / 6e4));
-  return `${date} \xB7 ${time} \xB7 ${minutes} min`;
-}
 function TupleLaunchpad({
   state,
   loading: stateLoading,
@@ -3942,7 +4200,6 @@ function TupleLaunchpad({
   const enabled = !stateLoading && !state?.inCall;
   const { launchpad, loading, error, refresh, rpc } = useTupleLaunchpad(enabled);
   const [joining, setJoining] = useState(null);
-  const personalRoom = launchpad?.personalRoom;
   async function join(target, id, copyUrl) {
     setJoining(id);
     try {
@@ -3963,82 +4220,19 @@ function TupleLaunchpad({
       setJoining(null);
     }
   }
-  if (stateLoading || loading) {
-    return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 py-2 text-sm text-muted-foreground", "aria-live": "polite", children: [
-      /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin", "aria-hidden": "true" }),
-      /* @__PURE__ */ jsx("span", { children: "Loading rooms and calls\u2026" })
-    ] });
-  }
-  return /* @__PURE__ */ jsxs("section", { className: "space-y-5", "aria-live": "polite", children: [
-    error ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm text-destructive", children: [
-      /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1", children: error }),
-      /* @__PURE__ */ jsxs(Button, { type: "button", size: "icon", variant: "ghost", className: "relative size-8 shrink-0", "aria-label": "Retry loading rooms and calls", onClick: () => void refresh(), children: [
-        /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-        /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4", "aria-hidden": "true" })
-      ] })
-    ] }) : null,
-    personalRoom ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Personal room" }),
-      /* @__PURE__ */ jsx("div", { className: "-mx-2", children: /* @__PURE__ */ jsxs(
-        "button",
-        {
-          type: "button",
-          className: "active:bg-muted/60 focus-visible:outline-ring group hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-md p-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait disabled:hover:bg-transparent",
-          disabled: joining !== null,
-          onClick: () => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
-          children: [
-            /* @__PURE__ */ jsx(Icon, { name: "GridView", className: "size-4 shrink-0 text-muted-foreground", "aria-hidden": "true" }),
-            /* @__PURE__ */ jsxs("span", { className: "min-w-0 flex-1", children: [
-              /* @__PURE__ */ jsx("span", { className: "block text-sm font-medium", children: "Your room" }),
-              /* @__PURE__ */ jsx("span", { className: "block text-xs text-muted-foreground", children: "Enter and copy link" })
-            ] }),
-            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "group-hover:text-foreground text-muted-foreground size-4 shrink-0", "aria-hidden": "true" })
-          ]
-        }
-      ) })
-    ] }) : null,
-    launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Happening now" }),
-      /* @__PURE__ */ jsx("div", { className: "divide-y divide-foreground/8", children: launchpad.calls.map((call) => {
-        const visibleParticipants = call.participants.slice(0, 3);
-        const title = call.room?.name || call.participants.join(" & ") || "Tuple call";
-        const people = call.participants.length + call.unknownParticipants;
-        const joinTarget = call.joinTarget;
-        return /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-3 py-3 first:pt-1", children: [
-          /* @__PURE__ */ jsx("div", { className: "flex shrink-0 -space-x-1.5", "aria-hidden": "true", children: (visibleParticipants.length ? visibleParticipants : ["Tuple"]).map((participant, index) => /* @__PURE__ */ jsx("span", { className: "flex size-7 items-center justify-center rounded-full bg-muted text-[0.625rem] font-semibold ring-2 ring-background", children: initials(participant) }, `${participant}-${index}`)) }),
-          /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
-            /* @__PURE__ */ jsx("div", { className: "truncate text-sm font-medium", children: title }),
-            /* @__PURE__ */ jsx("div", { className: "truncate text-xs text-muted-foreground", children: call.room?.name && call.participants.length ? call.participants.join(", ") : `${people || call.capacity} in the call` })
-          ] }),
-          call.joinable && joinTarget ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", variant: "secondary", disabled: joining !== null, onClick: () => void join(joinTarget, `call:${call.id}`), children: [
-            joining === `call:${call.id}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin", "aria-hidden": "true" }) : null,
-            "Join"
-          ] }) : /* @__PURE__ */ jsx("span", { className: "text-xs text-muted-foreground", children: "Full" })
-        ] }, call.id);
-      }) })
-    ] }) : launchpad ? /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground", children: "No other calls happening right now." }) : null,
-    launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2 border-t border-foreground/8 pt-5", children: [
-      /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Recent calls" }),
-      /* @__PURE__ */ jsx("div", { className: "-mx-2 divide-y divide-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
-        "button",
-        {
-          type: "button",
-          className: "active:bg-muted/60 focus-visible:outline-ring group hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-md px-2 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2",
-          onClick: () => onSelectRecording(call),
-          children: [
-            /* @__PURE__ */ jsx(Icon, { name: "Clock", className: "size-4 shrink-0 text-muted-foreground", "aria-hidden": "true" }),
-            /* @__PURE__ */ jsxs("span", { className: "min-w-0 flex-1", children: [
-              /* @__PURE__ */ jsx("span", { className: "block truncate text-sm font-medium", children: storedCallTitle(call) }),
-              call.summary ? /* @__PURE__ */ jsx("span", { className: "block truncate text-xs text-muted-foreground", title: call.summary, children: call.summary }) : null,
-              /* @__PURE__ */ jsx("span", { className: `block truncate text-xs text-muted-foreground ${call.summary ? "opacity-75" : ""}`, children: storedCallTime(call) })
-            ] }),
-            /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "group-hover:text-foreground text-muted-foreground size-4 shrink-0", "aria-hidden": "true" })
-          ]
-        },
-        call.callId
-      )) })
-    ] }) : null
-  ] });
+  return /* @__PURE__ */ jsx(
+    TupleLaunchpadView,
+    {
+      stateLoading,
+      launchpad,
+      loading,
+      error,
+      joining,
+      onRetry: () => void refresh(),
+      onJoin: (target, id, copyUrl) => void join(target, id, copyUrl),
+      onSelectRecording
+    }
+  );
 }
 function StoredCallSelection({
   recording,
@@ -4108,99 +4302,6 @@ function StoredCallSelection({
       }
     )
   ] });
-}
-function callDescription(state) {
-  const call = state?.call;
-  if (!call) return "Tuple is ready when your next call starts.";
-  const participantCount = call.participants.length;
-  let company;
-  if (participantCount === 0) {
-    company = call.roomKind === "personal" ? "Personal room" : call.roomName ? call.roomName : "Solo call";
-  } else if (participantCount === 1) {
-    company = `With ${call.participants[0]}`;
-  } else {
-    company = `With ${participantCount} others`;
-  }
-  return `${call.transcribing ? "Transcribing" : "Transcription is off"} \xB7 ${company}`;
-}
-function CallOverview({
-  state,
-  loading,
-  onRetry,
-  onStartTranscription,
-  quiet = false
-}) {
-  const title = loading ? "Connecting to Tuple" : state?.error ? "Tuple is unavailable" : state?.inCall ? "Current call" : "No active Tuple call";
-  async function copyJoinLink() {
-    const joinUrl = state?.call?.joinUrl;
-    if (!joinUrl) return;
-    try {
-      await navigator.clipboard.writeText(joinUrl);
-      toast.success("Join link copied.");
-    } catch {
-      toast.error("Could not copy the join link.");
-    }
-  }
-  return /* @__PURE__ */ jsx(
-    "section",
-    {
-      className: quiet ? void 0 : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8",
-      "aria-live": "polite",
-      children: /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-start gap-2.5", children: [
-        /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
-          /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: title }),
-          /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-1.5 text-base text-muted-foreground sm:text-sm", children: [
-            state?.inCall ? /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: `size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`,
-                "aria-hidden": "true"
-              }
-            ) : null,
-            /* @__PURE__ */ jsxs("p", { className: "min-w-0 text-pretty", children: [
-              state?.error ?? callDescription(state),
-              !state?.error && state?.environment && state.environment !== "prod" ? ` \xB7 ${state.environment === "staging" ? "Staging" : "Development"}` : ""
-            ] })
-          ] })
-        ] }),
-        state?.error ? /* @__PURE__ */ jsxs(
-          Button,
-          {
-            type: "button",
-            size: "icon",
-            variant: "ghost",
-            className: "relative size-8 shrink-0",
-            "aria-label": "Retry Tuple connection",
-            onClick: onRetry,
-            children: [
-              /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-              /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4 shrink-0", "aria-hidden": "true" })
-            ]
-          }
-        ) : null,
-        state?.call ? /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 flex-wrap items-center gap-2", children: [
-          state.call.joinUrl ? /* @__PURE__ */ jsxs(
-            Button,
-            {
-              type: "button",
-              size: "sm",
-              variant: "ghost",
-              className: "pl-1.5 pr-2.5",
-              onClick: () => void copyJoinLink(),
-              children: [
-                /* @__PURE__ */ jsx(Icon, { name: "Copy", className: "size-4 shrink-0", "aria-hidden": "true" }),
-                "Copy link"
-              ]
-            }
-          ) : null,
-          !state.call.transcribing && onStartTranscription ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", className: "pl-1.5 pr-2.5", onClick: onStartTranscription, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "Mic", className: "size-4 shrink-0", "aria-hidden": "true" }),
-            "Start transcription"
-          ] }) : null
-        ] }) : null
-      ] })
-    }
-  );
 }
 function SnapshotPreview({
   snapshot,
@@ -4274,6 +4375,7 @@ function NewCallThread({ projectId }) {
         state,
         loading,
         onRetry: () => void refresh(),
+        onCopyJoinLink: () => void copyCallJoinLink(state),
         onStartTranscription: () => void startTranscription()
       }
     ),
@@ -4338,56 +4440,21 @@ function ThreadCallPanel({ threadId }) {
   if (!state?.inCall) {
     return selectedRecording ? /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, threadId, onBack: () => setSelectedRecording(null) }) : /* @__PURE__ */ jsx(TupleLaunchpad, { state, loading, onSelectRecording: setSelectedRecording });
   }
-  return /* @__PURE__ */ jsxs("div", { className: "isolate space-y-6 antialiased", children: [
-    /* @__PURE__ */ jsx(
-      CallOverview,
-      {
-        state,
-        loading,
-        onRetry: () => void refresh(),
-        onStartTranscription: () => void startTranscription(),
-        quiet: true
-      }
-    ),
-    /* @__PURE__ */ jsxs(
-      "form",
-      {
-        className: "space-y-3",
-        onSubmit: (event) => {
-          event.preventDefault();
-          void send();
-        },
-        children: [
-          /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsx("label", { className: "text-base font-medium sm:text-sm", htmlFor: "tuple-task", children: "Purpose" }),
-            /* @__PURE__ */ jsx(
-              Input,
-              {
-                id: "tuple-task",
-                name: "tuple-task",
-                type: "text",
-                value: task,
-                onChange: (event) => setTask(event.target.value),
-                placeholder: "Summarize decisions and suggest next steps"
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxs(
-            Button,
-            {
-              type: "submit",
-              className: "w-full pl-2 pr-3",
-              disabled: !task.trim() || !state?.call?.transcribing || sending,
-              children: [
-                /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 shrink-0 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
-                sending ? "Sending\u2026" : `Send ${minutes} min to current thread`
-              ]
-            }
-          )
-        ]
-      }
-    )
-  ] });
+  return /* @__PURE__ */ jsx(
+    ThreadCallPanelView,
+    {
+      state,
+      loading,
+      minutes,
+      task,
+      sending,
+      onTaskChange: setTask,
+      onSend: () => void send(),
+      onRetry: () => void refresh(),
+      onCopyJoinLink: () => void copyCallJoinLink(state),
+      onStartTranscription: () => void startTranscription()
+    }
+  );
 }
 function SidebarAccessory() {
   const { state } = useCallState();

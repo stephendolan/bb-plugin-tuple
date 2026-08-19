@@ -62,3 +62,22 @@ bb plugin install .
 ```
 
 `npm run check` typechecks, tests, and produces the bb plugin bundles in `dist/`.
+
+### Visual state lab
+
+The plugin uses Ladle to render the real production views across the drawer
+widths and states most likely to expose layout defects:
+
+```sh
+npm run storybook
+```
+
+The canvas includes live, sending, transcription-off, long-participant, room,
+active-call, history, loading, joining, and CLI-unavailable states at 280, 360,
+and 480 pixels. Playwright checks every panel for horizontal overflow and keeps
+local macOS screenshot baselines:
+
+```sh
+npm run test:visual
+npm run test:visual:update # intentionally accept a reviewed visual change
+```

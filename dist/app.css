@@ -118,8 +118,22 @@
 }
 @layer utilities {
   @scope ([data-bb-plugin="tuple"], [data-bb-plugin-root]:not([data-bb-plugin])) {
+    .\@container {
+      container-type: inline-size;
+    }
     .collapse {
       visibility: collapse;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border-width: 0;
     }
     .absolute {
       position: absolute;
@@ -219,6 +233,9 @@
     .h-full {
       height: 100%;
     }
+    .h-lh {
+      height: 1lh;
+    }
     .max-h-64 {
       max-height: calc(var(--spacing) * 64);
     }
@@ -308,6 +325,20 @@
     .gap-4 {
       gap: calc(var(--spacing) * 4);
     }
+    .space-y-0\.5 {
+      :where(& > :not(:last-child)) {
+        --tw-space-y-reverse: 0;
+        margin-block-start: calc(calc(var(--spacing) * 0.5) * var(--tw-space-y-reverse));
+        margin-block-end: calc(calc(var(--spacing) * 0.5) * calc(1 - var(--tw-space-y-reverse)));
+      }
+    }
+    .space-y-1 {
+      :where(& > :not(:last-child)) {
+        --tw-space-y-reverse: 0;
+        margin-block-start: calc(calc(var(--spacing) * 1) * var(--tw-space-y-reverse));
+        margin-block-end: calc(calc(var(--spacing) * 1) * calc(1 - var(--tw-space-y-reverse)));
+      }
+    }
     .space-y-2 {
       :where(& > :not(:last-child)) {
         --tw-space-y-reverse: 0;
@@ -348,23 +379,6 @@
         --tw-space-x-reverse: 0;
         margin-inline-start: calc(calc(var(--spacing) * -1.5) * var(--tw-space-x-reverse));
         margin-inline-end: calc(calc(var(--spacing) * -1.5) * calc(1 - var(--tw-space-x-reverse)));
-      }
-    }
-    .divide-y {
-      :where(& > :not(:last-child)) {
-        --tw-divide-y-reverse: 0;
-        border-bottom-style: var(--tw-border-style);
-        border-top-style: var(--tw-border-style);
-        border-top-width: calc(1px * var(--tw-divide-y-reverse));
-        border-bottom-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
-      }
-    }
-    .divide-foreground\/8 {
-      :where(& > :not(:last-child)) {
-        border-color: var(--foreground);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--foreground) 8%, transparent);
-        }
       }
     }
     .truncate {
@@ -496,8 +510,8 @@
     .py-2 {
       padding-block: calc(var(--spacing) * 2);
     }
-    .py-3 {
-      padding-block: calc(var(--spacing) * 3);
+    .py-2\.5 {
+      padding-block: calc(var(--spacing) * 2.5);
     }
     .pt-0\.5 {
       padding-top: calc(var(--spacing) * 0.5);
@@ -639,13 +653,6 @@
       --tw-duration: 150ms;
       transition-duration: 150ms;
     }
-    .group-hover\:text-foreground {
-      &:is(:where(.group):hover *) {
-        @media (hover: hover) {
-          color: var(--foreground);
-        }
-      }
-    }
     .file\:border-0 {
       &::file-selector-button {
         border-style: var(--tw-border-style);
@@ -677,11 +684,6 @@
     .placeholder\:text-muted-foreground {
       &::placeholder {
         color: var(--muted-foreground);
-      }
-    }
-    .first\:pt-1 {
-      &:first-child {
-        padding-top: calc(var(--spacing) * 1);
       }
     }
     .hover\:border-l-primary-foreground\/30 {
@@ -904,6 +906,28 @@
         padding: calc(var(--spacing) * 5);
       }
     }
+    .\@min-\[17rem\]\:not-sr-only {
+      @container (width >= 17rem) {
+        position: static;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 0;
+        overflow: visible;
+        clip-path: none;
+        white-space: normal;
+      }
+    }
+    .\@min-\[17rem\]\:pr-2\.5 {
+      @container (width >= 17rem) {
+        padding-right: calc(var(--spacing) * 2.5);
+      }
+    }
+    .\@min-\[17rem\]\:pl-1\.5 {
+      @container (width >= 17rem) {
+        padding-left: calc(var(--spacing) * 1.5);
+      }
+    }
     .max-md\:pointer-coarse\:size-2 {
       @media (width < 48rem) {
         @media (pointer: coarse) {
@@ -1118,11 +1142,6 @@
   inherits: false;
   initial-value: 0;
 }
-@property --tw-divide-y-reverse {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
 @property --tw-border-style {
   syntax: "*";
   inherits: false;
@@ -1236,7 +1255,6 @@
       --tw-translate-z: 0;
       --tw-space-y-reverse: 0;
       --tw-space-x-reverse: 0;
-      --tw-divide-y-reverse: 0;
       --tw-border-style: solid;
       --tw-font-weight: initial;
       --tw-shadow: 0 0 #0000;
