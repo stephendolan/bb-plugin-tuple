@@ -20,7 +20,7 @@ const liveCall: CallState = {
     muted: false,
     transcribing: true,
     roomSlug: "personal-room",
-    roomName: "Vector Viper",
+    roomName: "Demo room",
     roomKind: "personal",
     joinUrl: "https://staging.tuple.app/c/personal-room",
     participants: [],
@@ -36,7 +36,7 @@ const longIdentityCall: CallState = {
     ...liveCall.call!,
     roomKind: "team",
     roomName: "Infrastructure planning and reliability review",
-    participants: ["Alexandria Montgomery-Smythe"],
+    participants: ["An Intentionally Long Example Participant Name"],
   },
 };
 
@@ -87,7 +87,7 @@ const scenarios = [
   sending?: boolean;
 }>;
 
-const widths = [280, 360, 480] as const;
+const widths = [280, 360, 480, 600] as const;
 
 export function StateMatrix() {
   return (

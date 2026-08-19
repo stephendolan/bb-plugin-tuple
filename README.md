@@ -74,7 +74,7 @@ npm run storybook
 
 The canvas includes live, sending, transcription-off, long-participant, room,
 active-call, history, loading, joining, and CLI-unavailable states at 280, 360,
-and 480 pixels. Playwright checks every panel for horizontal overflow and keeps
+480, and 600 pixels. Playwright checks every panel for horizontal overflow and keeps
 local macOS screenshot baselines:
 
 ```sh

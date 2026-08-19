@@ -16,22 +16,22 @@ const richLaunchpad: Launchpad = {
   calls: [
     {
       id: "ongoing-1",
-      participants: ["Monroe Dev account 1"],
+      participants: ["Demo teammate"],
       unknownParticipants: 0,
       capacity: 2,
       joinable: true,
       room: null,
-      joinTarget: "monroe@example.com",
+      joinTarget: "demo@example.com",
     },
   ],
   history: [
     {
       callId: "recording-1",
-      title: "Product planning and customer follow-up",
-      summary: "Reviewed the rollout, chose the smaller launch, and assigned the remaining customer follow-ups.",
+      title: "Launch readiness review",
+      summary: "Reviewed the rollout, chose the smaller launch, and assigned the remaining follow-ups.",
       startedAt: `${now}T20:15:00.000Z`,
       endedAt: `${now}T20:20:00.000Z`,
-      participants: ["Stephen Dolan", "Alexandria Montgomery-Smythe"],
+      participants: ["Demo host", "Example teammate"],
       promptContext: "Stored call one",
     },
     {
@@ -40,7 +40,7 @@ const richLaunchpad: Launchpad = {
       summary: "A short solo recording used to exercise transcription capture.",
       startedAt: `${now}T16:35:00.000Z`,
       endedAt: `${now}T16:48:00.000Z`,
-      participants: ["Stephen Dolan"],
+      participants: ["Demo host"],
       promptContext: "Stored call two",
     },
     {
@@ -49,8 +49,53 @@ const richLaunchpad: Launchpad = {
       summary: null,
       startedAt: `${now}T15:55:00.000Z`,
       endedAt: `${now}T16:15:00.000Z`,
-      participants: ["Jonathan MainWindows", "Sherlock", "Stephen Dolan"],
+      participants: ["Demo host", "Example teammate", "Test agent"],
       promptContext: "Stored call three",
+    },
+    {
+      callId: "recording-4",
+      title: "CLI and screen-sharing rehearsal",
+      summary: "Exercised the CLI with a status request and a shared-screen capture.",
+      startedAt: `${now}T15:29:00.000Z`,
+      endedAt: `${now}T15:39:00.000Z`,
+      participants: ["Demo host", "Test agent"],
+      promptContext: "Stored call four",
+    },
+    {
+      callId: "recording-5",
+      title: "Integration smoke test",
+      summary: "Exercised agent interaction and screen sharing. No durable follow-up was recorded.",
+      startedAt: `${now}T14:30:00.000Z`,
+      endedAt: `${now}T14:32:00.000Z`,
+      participants: ["Demo host", "Test agent"],
+      promptContext: "Stored call five",
+    },
+    {
+      callId: "recording-6",
+      title: "Untitled test capture",
+      summary: "A synthetic empty capture with no durable knowledge or follow-up.",
+      startedAt: `${now}T14:09:00.000Z`,
+      endedAt: `${now}T14:15:00.000Z`,
+      participants: ["Demo host"],
+      promptContext: "Stored call six",
+    },
+    {
+      callId: "recording-7",
+      title: "Untitled test capture",
+      summary: "A synthetic empty capture with no durable knowledge or follow-up.",
+      startedAt: `${now}T13:51:00.000Z`,
+      endedAt: `${now}T13:52:00.000Z`,
+      participants: ["Demo host"],
+      promptContext: "Stored call seven",
+    },
+    {
+      callId: "recording-8",
+      title: "Untitled test capture",
+      summary: "A synthetic empty capture with no durable knowledge or follow-up.",
+      startedAt: `${now}T13:15:00.000Z`,
+      endedAt: `${now}T13:20:00.000Z`,
+      participants: ["Demo host"],
+      promptContext: "Stored call eight",
     },
   ],
 };
@@ -70,7 +115,7 @@ const scenarios = [
   error?: string;
 }>;
 
-const widths = [280, 360, 480] as const;
+const widths = [280, 360, 480, 600] as const;
 
 export function StateMatrix() {
   return (

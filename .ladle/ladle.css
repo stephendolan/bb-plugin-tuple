@@ -111,7 +111,7 @@ body {
 
 .tuple-gallery-grid {
   display: grid;
-  grid-template-columns: 132px 280px 360px 480px;
+  grid-template-columns: 132px 280px 360px 480px 600px;
   gap: 16px;
   align-items: start;
 }

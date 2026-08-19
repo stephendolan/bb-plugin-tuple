@@ -64,7 +64,7 @@ export function TupleLaunchpadView({
   }
 
   return (
-    <section className="space-y-6" aria-live="polite">
+    <section className="@container space-y-5" aria-live="polite">
       {error ? (
         <div className="flex items-center gap-2 text-sm text-destructive">
           <span className="min-w-0 flex-1">{error}</span>
@@ -77,11 +77,11 @@ export function TupleLaunchpadView({
 
       {personalRoom ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Personal room</h3>
-          <div className="-mx-2">
+          <h3 className="text-xs font-medium text-muted-foreground">Personal room</h3>
+          <div className="overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             <button
               type="button"
-              className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-start gap-3 rounded-md p-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait disabled:hover:bg-transparent"
+              className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-start gap-3 px-3 py-2.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:cursor-wait disabled:hover:bg-transparent"
               disabled={joining !== null}
               onClick={() => onJoin(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl)}
             >
@@ -100,15 +100,15 @@ export function TupleLaunchpadView({
 
       {launchpad?.calls.length ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Happening now</h3>
-          <div className="space-y-1">
+          <h3 className="text-xs font-medium text-muted-foreground">Happening now</h3>
+          <div className="divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             {launchpad.calls.map((call) => {
               const visibleParticipants = call.participants.slice(0, 3);
               const title = call.room?.name || call.participants.join(" & ") || "Tuple call";
               const people = call.participants.length + call.unknownParticipants;
               const joinTarget = call.joinTarget;
               return (
-                <div key={call.id} className="flex min-w-0 items-center gap-3 py-1">
+                <div key={call.id} className="flex min-w-0 items-center gap-3 px-3 py-2.5">
                   <div className="flex shrink-0 -space-x-1.5" aria-hidden="true">
                     {(visibleParticipants.length ? visibleParticipants : ["Tuple"]).map((participant, index) => (
                       <span key={`${participant}-${index}`} className="flex size-7 items-center justify-center rounded-full bg-muted text-[0.625rem] font-semibold ring-2 ring-background">
@@ -139,20 +139,25 @@ export function TupleLaunchpadView({
 
       {launchpad?.history.length ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">Recent calls</h3>
-          <div className="-mx-2 space-y-0.5">
+          <h3 className="text-xs font-medium text-muted-foreground">Recent calls</h3>
+          <div className="divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             {launchpad.history.map((call) => (
               <button
                 key={call.callId}
                 type="button"
-                className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 w-full min-w-0 cursor-pointer rounded-md px-2 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 w-full min-w-0 cursor-pointer px-3 py-2.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2"
                 onClick={() => onSelectRecording(call)}
               >
-                <span className="block truncate text-sm font-medium">{storedCallTitle(call)}</span>
+                <span className="flex min-w-0 items-baseline gap-3">
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium leading-tight">{storedCallTitle(call)}</span>
+                  <span className="hidden shrink-0 text-[0.6875rem] leading-tight text-muted-foreground opacity-70 @min-[26rem]:block">
+                    {storedCallTime(call)}
+                  </span>
+                </span>
                 {call.summary ? (
-                  <span className="block truncate text-xs text-muted-foreground" title={call.summary}>{call.summary}</span>
+                  <span className="mt-0.5 block truncate text-xs leading-snug text-muted-foreground" title={call.summary}>{call.summary}</span>
                 ) : null}
-                <span className={`block truncate text-xs text-muted-foreground ${call.summary ? "opacity-75" : ""}`}>
+                <span className={`mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`}>
                   {storedCallTime(call)}
                 </span>
               </button>
