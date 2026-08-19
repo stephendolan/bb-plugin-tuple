@@ -3893,7 +3893,7 @@ function CallOverview({
               ]
             }
           ) : null,
-          state?.call ? /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 flex-wrap items-center gap-2", children: [
+          state?.call ? /* @__PURE__ */ jsxs("div", { className: "flex w-full shrink-0 flex-wrap items-center justify-end gap-2 @min-[22rem]:w-auto", children: [
             state.call.joinUrl ? /* @__PURE__ */ jsxs(
               Button,
               {
@@ -4122,8 +4122,229 @@ function TupleLaunchpadView({
   ] });
 }
 
+// Repos/@tuple/bb-plugin-tuple/components/stored-call-selection-view.tsx
+function StoredCallSelectionView({
+  recording,
+  destination,
+  task = "",
+  sending = false,
+  inputId = `tuple-recording-task-${recording.callId}`,
+  newThreadComposer,
+  onBack,
+  onTaskChange,
+  onSend
+}) {
+  function submit(event) {
+    event.preventDefault();
+    onSend?.();
+  }
+  const participantCount = recording.participants.length;
+  return /* @__PURE__ */ jsxs("section", { className: "@container space-y-5", children: [
+    /* @__PURE__ */ jsxs(
+      Button,
+      {
+        type: "button",
+        size: "sm",
+        variant: "ghost",
+        className: "-ml-2 pl-1.5 pr-2.5 text-muted-foreground",
+        onClick: onBack,
+        children: [
+          /* @__PURE__ */ jsx(Icon, { name: "ChevronLeft", className: "size-4", "aria-hidden": "true" }),
+          "Recent calls"
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsx("h2", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Recorded call" }),
+      /* @__PURE__ */ jsx("div", { className: "rounded-lg bg-muted/15 p-3 ring-1 ring-foreground/8", children: /* @__PURE__ */ jsxs("div", { className: "min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
+        /* @__PURE__ */ jsx("h1", { className: "truncate text-sm font-semibold leading-tight", children: storedCallTitle(recording) }),
+        /* @__PURE__ */ jsx("p", { className: "mt-0.5 truncate text-[0.6875rem] leading-tight text-muted-foreground tabular-nums @min-[26rem]:col-start-2 @min-[26rem]:row-start-1 @min-[26rem]:mt-0", children: storedCallTime(recording) }),
+        recording.summary ? /* @__PURE__ */ jsx("p", { className: "mt-2 text-pretty text-sm leading-relaxed text-foreground/85 @min-[26rem]:col-start-1 @min-[26rem]:row-start-2", children: recording.summary }) : null,
+        /* @__PURE__ */ jsxs("p", { className: "mt-0.5 text-[0.6875rem] leading-snug text-muted-foreground opacity-70 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2", children: [
+          participantCount,
+          " ",
+          participantCount === 1 ? "participant" : "participants"
+        ] })
+      ] }) })
+    ] }),
+    destination === "current-thread" ? /* @__PURE__ */ jsxs("form", { className: "space-y-3", onSubmit: submit, children: [
+      /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsx("label", { className: "text-base font-medium sm:text-sm", htmlFor: inputId, children: "Ask the current thread to" }),
+        /* @__PURE__ */ jsx(
+          Input,
+          {
+            id: inputId,
+            name: "tuple-recording-task",
+            value: task,
+            onChange: (event) => onTaskChange?.(event.target.value),
+            placeholder: "Summarize decisions and identify follow-ups"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxs(Button, { type: "submit", className: "w-full pl-2 pr-3", disabled: !task.trim() || sending, children: [
+        /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 shrink-0 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
+        sending ? "Sending\u2026" : "Send recorded call"
+      ] })
+    ] }) : /* @__PURE__ */ jsxs("section", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxs("div", { children: [
+        /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Start a new thread" }),
+        /* @__PURE__ */ jsx("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: "The new thread will read this recording directly from Tuple." })
+      ] }),
+      newThreadComposer
+    ] })
+  ] });
+}
+
+// Repos/@tuple/bb-plugin-tuple/components/new-call-thread-view.tsx
+function NewCallThreadView({
+  state,
+  loading,
+  minutes,
+  snapshot,
+  capturing,
+  newThreadComposer,
+  onRetry,
+  onCopyJoinLink,
+  onStartTranscription,
+  onCapture
+}) {
+  return /* @__PURE__ */ jsxs("div", { className: "@container space-y-5", children: [
+    /* @__PURE__ */ jsx(
+      CallOverview,
+      {
+        state,
+        loading,
+        onRetry,
+        onCopyJoinLink,
+        onStartTranscription
+      }
+    ),
+    !snapshot ? state.call?.transcribing ? /* @__PURE__ */ jsxs("section", { className: "space-y-2", children: [
+      /* @__PURE__ */ jsx("h2", { className: "px-3 text-xs font-medium text-muted-foreground", children: "New thread" }),
+      /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-start gap-4 rounded-lg bg-muted/15 p-3 ring-1 ring-foreground/8 @min-[26rem]:flex-row @min-[26rem]:items-center @min-[26rem]:justify-between", children: [
+        /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsx("h3", { className: "text-balance text-sm font-semibold", children: "Start from this conversation" }),
+          /* @__PURE__ */ jsx("p", { className: "mt-0.5 max-w-[65ch] text-pretty text-base text-muted-foreground sm:text-sm", children: "Review the recent transcript before starting the thread." })
+        ] }),
+        /* @__PURE__ */ jsxs(
+          Button,
+          {
+            type: "button",
+            className: "shrink-0 pl-2 pr-3",
+            disabled: capturing,
+            onClick: onCapture,
+            children: [
+              /* @__PURE__ */ jsx(Icon, { name: capturing ? "Spinner" : "BubbleChatQuestion", className: `size-4 shrink-0 ${capturing ? "animate-spin" : ""}`, "aria-hidden": "true" }),
+              capturing ? "Capturing\u2026" : `Use last ${minutes} min`
+            ]
+          }
+        )
+      ] })
+    ] }) : null : /* @__PURE__ */ jsxs(Fragment2, { children: [
+      /* @__PURE__ */ jsxs("section", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsx("h2", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Recent conversation" }),
+        /* @__PURE__ */ jsxs("div", { className: "rounded-lg bg-muted/15 p-3 ring-1 ring-foreground/8", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-3", children: [
+            /* @__PURE__ */ jsxs("p", { className: "min-w-0 flex-1 text-sm text-muted-foreground", children: [
+              snapshot.segmentCount,
+              " speech segment",
+              snapshot.segmentCount === 1 ? "" : "s",
+              " \xB7 Last ",
+              snapshot.minutes,
+              " min",
+              snapshot.truncated ? " \xB7 Oldest text trimmed" : ""
+            ] }),
+            /* @__PURE__ */ jsxs(
+              Button,
+              {
+                type: "button",
+                size: "icon",
+                variant: "ghost",
+                className: "relative -m-2 size-8 shrink-0",
+                disabled: capturing,
+                "aria-label": "Recapture the latest conversation",
+                onClick: onCapture,
+                children: [
+                  /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
+                  /* @__PURE__ */ jsx(Icon, { name: capturing ? "Spinner" : "RotateCcw", className: `size-4 shrink-0 ${capturing ? "animate-spin" : ""}`, "aria-hidden": "true" })
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsx("pre", { className: "mt-3 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-sm leading-relaxed text-foreground/85", children: snapshot.transcript || "No speech was captured in this window." })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs("section", { className: "space-y-3", children: [
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Start a new thread" }),
+          /* @__PURE__ */ jsx("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: "Add a task for the thread, then choose how it should run." })
+        ] }),
+        newThreadComposer
+      ] })
+    ] })
+  ] });
+}
+
+// Repos/@tuple/bb-plugin-tuple/components/tuple-slot-view.tsx
+var defaultTupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
+function TupleStatusIcon({
+  state,
+  iconUrl = defaultTupleCompactIconUrl
+}) {
+  const mask = `url("${iconUrl}")`;
+  return /* @__PURE__ */ jsxs("span", { className: "relative flex size-5 shrink-0 items-center justify-center", "aria-hidden": "true", children: [
+    /* @__PURE__ */ jsx(
+      "span",
+      {
+        className: "size-4 bg-current",
+        style: {
+          maskImage: mask,
+          maskPosition: "center",
+          maskRepeat: "no-repeat",
+          maskSize: "contain",
+          WebkitMaskImage: mask,
+          WebkitMaskPosition: "center",
+          WebkitMaskRepeat: "no-repeat",
+          WebkitMaskSize: "contain"
+        }
+      }
+    ),
+    state?.inCall ? /* @__PURE__ */ jsx("span", { className: "absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" }) : null
+  ] });
+}
+function TupleSidebarAccessory({ state }) {
+  if (!state?.inCall) return null;
+  return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1.5 text-xs text-muted-foreground", children: [
+    /* @__PURE__ */ jsx("span", { className: `size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}` }),
+    state.call?.transcribing ? "Live" : "In call"
+  ] });
+}
+function TupleComposerActionButton({
+  state,
+  loading,
+  minutes,
+  iconUrl,
+  onAction
+}) {
+  const label = !state?.inCall ? "Open Tuple" : state.call?.transcribing ? `Add the last ${minutes} minutes of this Tuple call to the draft` : "Start Tuple transcription";
+  return /* @__PURE__ */ jsxs(
+    "button",
+    {
+      type: "button",
+      className: "focus-visible:outline-ring hover:bg-accent hover:text-foreground text-muted-foreground relative flex size-8 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
+      disabled: loading,
+      "aria-label": label,
+      title: label,
+      onClick: onAction,
+      children: [
+        /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
+        loading ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(TupleStatusIcon, { state, iconUrl })
+      ]
+    }
+  );
+}
+
 // Repos/@tuple/bb-plugin-tuple/app.tsx
-var tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
 async function copyCallJoinLink(state) {
   const joinUrl = state?.call?.joinUrl;
   if (!joinUrl) return;
@@ -4158,28 +4379,6 @@ function useCallState() {
   useEffect(() => void refresh(), [refresh]);
   useRealtime("call-state", (next) => setState(next));
   return { state, loading, refresh, startTranscription, rpc };
-}
-function TupleStatusIcon({ state }) {
-  const mask = `url("${tupleCompactIconUrl}")`;
-  return /* @__PURE__ */ jsxs("span", { className: "relative flex size-5 shrink-0 items-center justify-center", "aria-hidden": "true", children: [
-    /* @__PURE__ */ jsx(
-      "span",
-      {
-        className: "size-4 bg-current",
-        style: {
-          maskImage: mask,
-          maskPosition: "center",
-          maskRepeat: "no-repeat",
-          maskSize: "contain",
-          WebkitMaskImage: mask,
-          WebkitMaskPosition: "center",
-          WebkitMaskRepeat: "no-repeat",
-          WebkitMaskSize: "contain"
-        }
-      }
-    ),
-    state?.inCall ? /* @__PURE__ */ jsx("span", { className: "absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" }) : null
-  ] });
 }
 function useTupleLaunchpad(enabled) {
   const rpc = useRpc();
@@ -4278,87 +4477,27 @@ function StoredCallSelection({
       setSending(false);
     }
   }
-  return /* @__PURE__ */ jsxs("section", { className: "space-y-5", children: [
-    /* @__PURE__ */ jsxs("header", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxs(Button, { type: "button", size: "icon", variant: "ghost", className: "relative size-8 shrink-0", "aria-label": "Back to Tuple calls", onClick: onBack, children: [
-        /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-        /* @__PURE__ */ jsx(Icon, { name: "ChevronLeft", className: "size-4", "aria-hidden": "true" })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1 pt-0.5", children: [
-        /* @__PURE__ */ jsx("h2", { className: "truncate font-semibold", children: storedCallTitle(recording) }),
-        /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground", children: storedCallTime(recording) })
-      ] })
-    ] }),
-    recording.summary ? /* @__PURE__ */ jsx("p", { className: "text-sm text-foreground/85", children: recording.summary }) : null,
-    /* @__PURE__ */ jsx("div", { className: "rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground", children: "The receiving agent will read this recording directly from Tuple. The transcript is not copied into the thread draft." }),
-    threadId ? /* @__PURE__ */ jsxs("form", { className: "space-y-2.5", onSubmit: (event) => {
-      event.preventDefault();
-      void sendToThread();
-    }, children: [
-      /* @__PURE__ */ jsx("label", { className: "font-medium", htmlFor: `tuple-recording-task-${recording.callId}`, children: "Purpose" }),
-      /* @__PURE__ */ jsx(
-        Input,
+  return /* @__PURE__ */ jsx(
+    StoredCallSelectionView,
+    {
+      recording,
+      destination: threadId ? "current-thread" : "new-thread",
+      task,
+      sending,
+      onBack,
+      onTaskChange: setTask,
+      onSend: () => void sendToThread(),
+      newThreadComposer: /* @__PURE__ */ jsx(
+        experimental_NewThreadComposer,
         {
-          id: `tuple-recording-task-${recording.callId}`,
-          value: task,
-          onChange: (event) => setTask(event.target.value),
-          placeholder: "Summarize decisions and identify follow-ups"
-        }
-      ),
-      /* @__PURE__ */ jsxs(Button, { type: "submit", className: "w-full", disabled: !task.trim() || sending, children: [
-        /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
-        sending ? "Sending\u2026" : "Send call to current thread"
-      ] })
-    ] }) : /* @__PURE__ */ jsx(
-      experimental_NewThreadComposer,
-      {
-        defaultProjectId: projectId ?? void 0,
-        initialPrompt: recording.promptContext,
-        draftKey: `tuple-recording-${recording.callId}`,
-        onSubmit: createThread
-      }
-    )
-  ] });
-}
-function SnapshotPreview({
-  snapshot,
-  capturing,
-  onRecapture
-}) {
-  return /* @__PURE__ */ jsxs("section", { className: "space-y-3 border-t border-foreground/8 pt-5", children: [
-    /* @__PURE__ */ jsxs("div", { className: "flex items-start justify-between gap-3", children: [
-      /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Recent conversation" }),
-        /* @__PURE__ */ jsxs("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: [
-          snapshot.segmentCount,
-          " speech segment",
-          snapshot.segmentCount === 1 ? "" : "s",
-          " from the last ",
-          snapshot.minutes,
-          " minutes",
-          snapshot.truncated ? " \xB7 Oldest text trimmed" : "",
-          "."
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxs(
-        Button,
-        {
-          type: "button",
-          size: "icon",
-          variant: "ghost",
-          className: "relative size-8 shrink-0",
-          disabled: capturing,
-          "aria-label": "Recapture the latest conversation",
-          onClick: onRecapture,
-          children: [
-            /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-            /* @__PURE__ */ jsx(Icon, { name: capturing ? "Spinner" : "RotateCcw", className: `size-4 shrink-0 ${capturing ? "animate-spin" : ""}`, "aria-hidden": "true" })
-          ]
+          defaultProjectId: projectId ?? void 0,
+          initialPrompt: recording.promptContext,
+          draftKey: `tuple-recording-${recording.callId}`,
+          onSubmit: createThread
         }
       )
-    ] }),
-    /* @__PURE__ */ jsx("pre", { className: "max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted/45 p-3 text-sm text-foreground/85 ring-1 ring-foreground/8", children: snapshot.transcript || "No speech was captured in this window." })
-  ] });
+    }
+  );
 }
 function NewCallThread({ projectId }) {
   const { state, loading, refresh, startTranscription, rpc } = useCallState();
@@ -4385,54 +4524,29 @@ function NewCallThread({ projectId }) {
   if (!state?.inCall) {
     return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: selectedRecording ? /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, projectId, onBack: () => setSelectedRecording(null) }) : /* @__PURE__ */ jsx(TupleLaunchpad, { state, loading, onSelectRecording: setSelectedRecording }) }) });
   }
-  return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto w-full max-w-3xl space-y-5", children: [
-    /* @__PURE__ */ jsx(
-      CallOverview,
-      {
-        state,
-        loading,
-        onRetry: () => void refresh(),
-        onCopyJoinLink: () => void copyCallJoinLink(state),
-        onStartTranscription: () => void startTranscription()
-      }
-    ),
-    !snapshot ? /* @__PURE__ */ jsxs("section", { className: "flex flex-col items-start gap-4 border-t border-foreground/8 pt-5 sm:flex-row sm:items-center sm:justify-between", children: [
-      /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
-        /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Start a thread from this conversation" }),
-        /* @__PURE__ */ jsx("p", { className: "max-w-[65ch] text-pretty text-base text-muted-foreground sm:text-sm", children: "Review the recent transcript, then tell the new thread what to do with it." })
-      ] }),
-      /* @__PURE__ */ jsxs(
-        Button,
+  return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(
+    NewCallThreadView,
+    {
+      state,
+      loading,
+      minutes,
+      snapshot,
+      capturing,
+      onRetry: () => void refresh(),
+      onCopyJoinLink: () => void copyCallJoinLink(state),
+      onStartTranscription: () => void startTranscription(),
+      onCapture: () => void capture(),
+      newThreadComposer: snapshot ? /* @__PURE__ */ jsx(
+        experimental_NewThreadComposer,
         {
-          type: "button",
-          className: "shrink-0 pl-2 pr-3",
-          disabled: !state?.call?.transcribing || capturing,
-          onClick: () => void capture(),
-          children: [
-            capturing ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "BubbleChatQuestion", className: "size-4 shrink-0", "aria-hidden": "true" }),
-            capturing ? "Capturing\u2026" : `Use last ${minutes} minutes`
-          ]
+          defaultProjectId: projectId ?? void 0,
+          initialPrompt: snapshot.promptContext,
+          draftKey: `tuple-call-${snapshot.callId}-${snapshot.capturedAt}`,
+          onSubmit: createThread
         }
-      )
-    ] }) : /* @__PURE__ */ jsxs(Fragment2, { children: [
-      /* @__PURE__ */ jsx(SnapshotPreview, { snapshot, capturing, onRecapture: () => void capture() }),
-      /* @__PURE__ */ jsxs("section", { className: "space-y-3 border-t border-foreground/8 pt-5", children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Start a new thread" }),
-          /* @__PURE__ */ jsx("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: "The transcript is already in the draft. Add your task, choose how the thread should run, and send." })
-        ] }),
-        /* @__PURE__ */ jsx(
-          experimental_NewThreadComposer,
-          {
-            defaultProjectId: projectId ?? void 0,
-            initialPrompt: snapshot.promptContext,
-            draftKey: `tuple-call-${snapshot.callId}-${snapshot.capturedAt}`,
-            onSubmit: createThread
-          }
-        )
-      ] })
-    ] })
-  ] }) });
+      ) : void 0
+    }
+  ) }) });
 }
 function ThreadCallPanel({ threadId }) {
   const { state, loading, refresh, startTranscription, rpc } = useCallState();
@@ -4475,11 +4589,7 @@ function ThreadCallPanel({ threadId }) {
 }
 function SidebarAccessory() {
   const { state } = useCallState();
-  if (!state?.inCall) return null;
-  return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1.5 text-xs text-muted-foreground", children: [
-    /* @__PURE__ */ jsx("span", { className: `size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}` }),
-    state.call?.transcribing ? "Live" : "In call"
-  ] });
+  return /* @__PURE__ */ jsx(TupleSidebarAccessory, { state });
 }
 function NavCallThread() {
   const { projectId } = useBbContext();
@@ -4514,20 +4624,13 @@ function ComposerTupleAction() {
       setLoading(false);
     }
   }
-  const label = !state?.inCall ? "Open Tuple" : state.call?.transcribing ? `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft` : "Start Tuple transcription";
-  return /* @__PURE__ */ jsxs(
-    "button",
+  return /* @__PURE__ */ jsx(
+    TupleComposerActionButton,
     {
-      type: "button",
-      className: "focus-visible:outline-ring hover:bg-accent hover:text-foreground text-muted-foreground relative flex size-8 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
-      disabled: loading,
-      "aria-label": label,
-      title: label,
-      onClick: () => void runAction(),
-      children: [
-        /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-        loading ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(TupleStatusIcon, { state })
-      ]
+      state,
+      loading,
+      minutes: Number(values?.defaultMinutes ?? "5"),
+      onAction: () => void runAction()
     }
   );
 }

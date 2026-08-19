@@ -70,7 +70,7 @@ export function CallOverview({
             </Button>
           ) : null}
           {state?.call ? (
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <div className="flex w-full shrink-0 flex-wrap items-center justify-end gap-2 @min-[22rem]:w-auto">
               {state.call.joinUrl ? (
                 <Button
                   type="button"

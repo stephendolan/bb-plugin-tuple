@@ -138,7 +138,7 @@ describe("Tuple Call app", () => {
 
     await slot.findByText("Current call");
     await slot.findByText("Transcribing · Personal room · Staging");
-    fireEvent.click(await slot.findByRole("button", { name: "Use last 5 minutes" }));
+    fireEvent.click(await slot.findByRole("button", { name: "Use last 5 min" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getSnapshot"]);
     slot.lifecycle.unmount();
@@ -225,7 +225,7 @@ describe("Tuple Call app", () => {
     await waitFor(() => expect(slot.inspection.rpcCalls.some((call) => call.method === "joinTuple")).toBe(true));
     expect(writeText).toHaveBeenCalledWith("https://staging.tuple.app/c/demo-room");
     fireEvent.click(slot.getByRole("button", { name: /Morgan Lee & Casey Chen/ }));
-    await slot.findByText("The receiving agent will read this recording directly from Tuple. The transcript is not copied into the thread draft.");
+    await slot.findByText("The new thread will read this recording directly from Tuple.");
     slot.lifecycle.unmount();
   });
 

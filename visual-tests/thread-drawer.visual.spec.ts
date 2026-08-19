@@ -44,3 +44,27 @@ test("out-of-call state matrix", async ({ page }) => {
   await page.locator('[data-state="Full launchpad"][data-width="360"] button').first().hover();
   await expect(matrix).toHaveScreenshot("out-of-call-state-matrix.png");
 });
+
+test("recorded call state matrix", async ({ page }) => {
+  await page.goto("/?story=tuple--recorded-call--state-matrix&mode=preview");
+  const matrix = page.getByTestId("recorded-call-matrix");
+  await expect(matrix).toBeVisible();
+  await expectNoPanelOverflow(page);
+  await expect(matrix).toHaveScreenshot("recorded-call-state-matrix.png");
+});
+
+test("new thread from call state matrix", async ({ page }) => {
+  await page.goto("/?story=tuple--new-thread-from-call--state-matrix&mode=preview");
+  const matrix = page.getByTestId("new-call-thread-matrix");
+  await expect(matrix).toBeVisible();
+  await expectNoPanelOverflow(page);
+  await expect(matrix).toHaveScreenshot("new-call-thread-state-matrix.png");
+});
+
+test("compact slot state matrix", async ({ page }) => {
+  await page.goto("/?story=tuple--compact-slots--state-matrix&mode=preview");
+  const matrix = page.getByTestId("compact-slot-matrix");
+  await expect(matrix).toBeVisible();
+  await expectNoPanelOverflow(page);
+  await expect(matrix).toHaveScreenshot("compact-slot-state-matrix.png");
+});

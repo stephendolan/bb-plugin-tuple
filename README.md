@@ -72,8 +72,10 @@ widths and states most likely to expose layout defects:
 npm run storybook
 ```
 
-The canvas includes live, sending, transcription-off, long-participant, room,
-active-call, history, loading, joining, and CLI-unavailable states at 280, 360,
+The canvas covers every plugin-owned interface: the current-thread drawer,
+out-of-call launchpad, recorded-call selection, live-call new-thread capture,
+and the compact sidebar and composer slots. Their loading, sending, transcription,
+capture, history, joining, empty, and CLI-unavailable variants render at 280, 360,
 480, and 600 pixels. Playwright checks every panel for horizontal overflow and keeps
 local macOS screenshot baselines:
 

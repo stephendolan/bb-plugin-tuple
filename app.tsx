@@ -12,18 +12,14 @@ import {
 } from "@get-bb/plugin-sdk/app";
 import { toast } from "sonner";
 import type { CallState, Launchpad, TranscriptSnapshot, rpcContract } from "./server";
-import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/ui/icon";
-import { Input } from "@/components/ui/input";
-import { CallOverview, ThreadCallPanelView } from "@/components/thread-call-panel-view";
+import { ThreadCallPanelView } from "@/components/thread-call-panel-view";
 import {
   TupleLaunchpadView,
-  storedCallTime,
-  storedCallTitle,
   type StoredCall,
 } from "@/components/tuple-launchpad-view";
-
-const tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
+import { StoredCallSelectionView } from "@/components/stored-call-selection-view";
+import { NewCallThreadView } from "@/components/new-call-thread-view";
+import { TupleComposerActionButton, TupleSidebarAccessory } from "@/components/tuple-slot-view";
 
 async function copyCallJoinLink(state: CallState | null) {
   const joinUrl = state?.call?.joinUrl;
@@ -63,30 +59,6 @@ function useCallState() {
   useEffect(() => void refresh(), [refresh]);
   useRealtime("call-state", (next) => setState(next as CallState));
   return { state, loading, refresh, startTranscription, rpc };
-}
-
-function TupleStatusIcon({ state }: { state: CallState | null }) {
-  const mask = `url("${tupleCompactIconUrl}")`;
-  return (
-    <span className="relative flex size-5 shrink-0 items-center justify-center" aria-hidden="true">
-      <span
-        className="size-4 bg-current"
-        style={{
-          maskImage: mask,
-          maskPosition: "center",
-          maskRepeat: "no-repeat",
-          maskSize: "contain",
-          WebkitMaskImage: mask,
-          WebkitMaskPosition: "center",
-          WebkitMaskRepeat: "no-repeat",
-          WebkitMaskSize: "contain",
-        }}
-      />
-      {state?.inCall ? (
-        <span className="absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" />
-      ) : null}
-    </span>
-  );
 }
 
 function useTupleLaunchpad(enabled: boolean) {
@@ -205,86 +177,23 @@ function StoredCallSelection({
   }
 
   return (
-    <section className="space-y-5">
-      <header className="flex items-start gap-3">
-        <Button type="button" size="icon" variant="ghost" className="relative size-8 shrink-0" aria-label="Back to Tuple calls" onClick={onBack}>
-          <span className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden" aria-hidden="true" />
-          <Icon name="ChevronLeft" className="size-4" aria-hidden="true" />
-        </Button>
-        <div className="min-w-0 flex-1 pt-0.5">
-          <h2 className="truncate font-semibold">{storedCallTitle(recording)}</h2>
-          <p className="text-sm text-muted-foreground">{storedCallTime(recording)}</p>
-        </div>
-      </header>
-
-      {recording.summary ? <p className="text-sm text-foreground/85">{recording.summary}</p> : null}
-
-      <div className="rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
-        The receiving agent will read this recording directly from Tuple. The transcript is not copied into the thread draft.
-      </div>
-
-      {threadId ? (
-        <form className="space-y-2.5" onSubmit={(event) => { event.preventDefault(); void sendToThread(); }}>
-          <label className="font-medium" htmlFor={`tuple-recording-task-${recording.callId}`}>Purpose</label>
-          <Input
-            id={`tuple-recording-task-${recording.callId}`}
-            value={task}
-            onChange={(event) => setTask(event.target.value)}
-            placeholder="Summarize decisions and identify follow-ups"
-          />
-          <Button type="submit" className="w-full" disabled={!task.trim() || sending}>
-            <Icon name={sending ? "Spinner" : "Sent"} className={`size-4 ${sending ? "animate-spin" : ""}`} aria-hidden="true" />
-            {sending ? "Sending…" : "Send call to current thread"}
-          </Button>
-        </form>
-      ) : (
+    <StoredCallSelectionView
+      recording={recording}
+      destination={threadId ? "current-thread" : "new-thread"}
+      task={task}
+      sending={sending}
+      onBack={onBack}
+      onTaskChange={setTask}
+      onSend={() => void sendToThread()}
+      newThreadComposer={
         <NewThreadComposer
           defaultProjectId={projectId ?? undefined}
           initialPrompt={recording.promptContext}
           draftKey={`tuple-recording-${recording.callId}`}
           onSubmit={createThread}
         />
-      )}
-    </section>
-  );
-}
-
-function SnapshotPreview({
-  snapshot,
-  capturing,
-  onRecapture,
-}: {
-  snapshot: TranscriptSnapshot;
-  capturing: boolean;
-  onRecapture: () => void;
-}) {
-  return (
-    <section className="space-y-3 border-t border-foreground/8 pt-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-balance font-semibold">Recent conversation</h2>
-          <p className="text-pretty text-base text-muted-foreground sm:text-sm">
-            {snapshot.segmentCount} speech segment{snapshot.segmentCount === 1 ? "" : "s"} from the last {snapshot.minutes} minutes
-            {snapshot.truncated ? " · Oldest text trimmed" : ""}.
-          </p>
-        </div>
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          className="relative size-8 shrink-0"
-          disabled={capturing}
-          aria-label="Recapture the latest conversation"
-          onClick={onRecapture}
-        >
-          <span className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden" aria-hidden="true" />
-          <Icon name={capturing ? "Spinner" : "RotateCcw"} className={`size-4 shrink-0 ${capturing ? "animate-spin" : ""}`} aria-hidden="true" />
-        </Button>
-      </div>
-      <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted/45 p-3 text-sm text-foreground/85 ring-1 ring-foreground/8">
-        {snapshot.transcript || "No speech was captured in this window."}
-      </pre>
-    </section>
+      }
+    />
   );
 }
 
@@ -329,55 +238,26 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
 
   return (
     <main className="isolate h-full overflow-auto p-4 antialiased md:p-5">
-      <div className="mx-auto w-full max-w-3xl space-y-5">
-        <CallOverview
+      <div className="mx-auto w-full max-w-3xl">
+        <NewCallThreadView
           state={state}
           loading={loading}
+          minutes={minutes}
+          snapshot={snapshot}
+          capturing={capturing}
           onRetry={() => void refresh()}
           onCopyJoinLink={() => void copyCallJoinLink(state)}
           onStartTranscription={() => void startTranscription()}
+          onCapture={() => void capture()}
+          newThreadComposer={snapshot ? (
+            <NewThreadComposer
+              defaultProjectId={projectId ?? undefined}
+              initialPrompt={snapshot.promptContext}
+              draftKey={`tuple-call-${snapshot.callId}-${snapshot.capturedAt}`}
+              onSubmit={createThread}
+            />
+          ) : undefined}
         />
-        {!snapshot ? (
-          <section className="flex flex-col items-start gap-4 border-t border-foreground/8 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <h2 className="text-balance font-semibold">Start a thread from this conversation</h2>
-              <p className="max-w-[65ch] text-pretty text-base text-muted-foreground sm:text-sm">
-                Review the recent transcript, then tell the new thread what to do with it.
-              </p>
-            </div>
-            <Button
-              type="button"
-              className="shrink-0 pl-2 pr-3"
-              disabled={!state?.call?.transcribing || capturing}
-              onClick={() => void capture()}
-            >
-              {capturing ? (
-                <Icon name="Spinner" className="size-4 shrink-0 animate-spin" aria-hidden="true" />
-              ) : (
-                <Icon name="BubbleChatQuestion" className="size-4 shrink-0" aria-hidden="true" />
-              )}
-              {capturing ? "Capturing…" : `Use last ${minutes} minutes`}
-            </Button>
-          </section>
-        ) : (
-          <>
-            <SnapshotPreview snapshot={snapshot} capturing={capturing} onRecapture={() => void capture()} />
-            <section className="space-y-3 border-t border-foreground/8 pt-5">
-              <div>
-                <h2 className="text-balance font-semibold">Start a new thread</h2>
-                <p className="text-pretty text-base text-muted-foreground sm:text-sm">
-                  The transcript is already in the draft. Add your task, choose how the thread should run, and send.
-                </p>
-              </div>
-              <NewThreadComposer
-                defaultProjectId={projectId ?? undefined}
-                initialPrompt={snapshot.promptContext}
-                draftKey={`tuple-call-${snapshot.callId}-${snapshot.capturedAt}`}
-                onSubmit={createThread}
-              />
-            </section>
-          </>
-        )}
       </div>
     </main>
   );
@@ -431,13 +311,7 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
 
 function SidebarAccessory() {
   const { state } = useCallState();
-  if (!state?.inCall) return null;
-  return (
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-      <span className={`size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`} />
-      {state.call?.transcribing ? "Live" : "In call"}
-    </div>
-  );
+  return <TupleSidebarAccessory state={state} />;
 }
 
 function NavCallThread() {
@@ -477,27 +351,13 @@ function ComposerTupleAction() {
     }
   }
 
-  const label = !state?.inCall
-    ? "Open Tuple"
-    : state.call?.transcribing
-      ? `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft`
-      : "Start Tuple transcription";
   return (
-    <button
-      type="button"
-      className="focus-visible:outline-ring hover:bg-accent hover:text-foreground text-muted-foreground relative flex size-8 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
-      disabled={loading}
-      aria-label={label}
-      title={label}
-      onClick={() => void runAction()}
-    >
-      <span className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden" aria-hidden="true" />
-      {loading ? (
-        <Icon name="Spinner" className="size-4 shrink-0 animate-spin" aria-hidden="true" />
-      ) : (
-        <TupleStatusIcon state={state} />
-      )}
-    </button>
+    <TupleComposerActionButton
+      state={state}
+      loading={loading}
+      minutes={Number(values?.defaultMinutes ?? "5")}
+      onAction={() => void runAction()}
+    />
   );
 }
 
