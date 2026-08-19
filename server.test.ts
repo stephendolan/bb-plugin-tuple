@@ -4,6 +4,7 @@ import {
   normalizeState,
   parseTranscript,
   recordingReferencePrompt,
+  storedCallContext,
   storedCallMatchesQuery,
   transcriptSearchQuery,
 } from "./server";
@@ -26,7 +27,9 @@ describe("parseTranscript", () => {
       JSON.stringify({ type: "transcription_finished", time: "2026-08-18T20:02:00Z", data: { text: "   ", user_id: 42 } }),
     ].join("\n");
 
-    expect(parseTranscript(output)).toEqual([expect.stringContaining("User 42: hello")]);
+    const transcript = parseTranscript(output);
+    expect(transcript).toEqual([expect.stringContaining("User 42: hello")]);
+    expect(transcript[0]).toContain("2026-08-18T20:01:00Z");
   });
 
   it("references a stored call without embedding transcript content", () => {
@@ -37,6 +40,8 @@ describe("parseTranscript", () => {
     expect(prompt).toContain("tuple_call_context");
     expect(prompt).toContain("tuple-staging agent guide history");
     expect(prompt).toContain("canonical, version-matched workflow guide");
+    expect(prompt).toContain("Before analysis or implementation");
+    expect(prompt).toContain("screen-at-a-moment");
     expect(prompt).toContain("Find the decisions");
     expect(prompt).not.toContain("BEGIN UNTRUSTED TUPLE TRANSCRIPT");
   });
@@ -44,6 +49,19 @@ describe("parseTranscript", () => {
   it("leaves the purpose prompt at the end for the new-thread composer", () => {
     const prompt = recordingReferencePrompt("call-123", "tuple-staging");
     expect(prompt).toMatch(/Rename this thread to match the purpose below, then complete it:\n$/);
+  });
+
+  it("puts the complete trusted history guide before untrusted call evidence", () => {
+    const context = storedCallContext(
+      "call-123",
+      "# Working with stored Tuple calls\n\n## Screen at a moment\nCapture the relevant frame.",
+      ["[01:56 PM | 2026-08-18T20:01:00Z] User 42: Let's sketch it."],
+    );
+
+    expect(context).toContain("## Screen at a moment");
+    expect(context.indexOf("--- END TRUSTED TUPLE HISTORY GUIDE ---"))
+      .toBeLessThan(context.indexOf("--- BEGIN UNTRUSTED TUPLE TRANSCRIPT ---"));
+    expect(context).toContain("2026-08-18T20:01:00Z");
   });
 
   it("references an exact live-call window without embedding its transcript", () => {
@@ -61,6 +79,7 @@ describe("parseTranscript", () => {
     expect(prompt).toContain('until: "2026-08-19T01:55:00.000Z"');
     expect(prompt).toContain("untrusted input");
     expect(prompt).toContain("tuple-staging agent guide history");
+    expect(prompt).toContain("screen-at-a-moment");
     expect(prompt).toContain("Summarize the decision");
     expect(prompt).not.toContain("BEGIN UNTRUSTED TUPLE TRANSCRIPT");
     expect(prompt).not.toContain("ship it");
