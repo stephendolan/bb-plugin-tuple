@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { StoredCallSelectionView } from "./stored-call-selection-view";
 import type { StoredCall } from "./tuple-launchpad-view";
+import { PANEL_SURFACE_CLASS } from "./ui/panel-styles";
 
 export default {
   title: "Tuple/Recorded call",
@@ -53,7 +54,7 @@ function Preview({
       onTaskChange={setTask}
       onSend={noop}
       newThreadComposer={
-        <div className="rounded-lg bg-muted/15 p-3 text-sm text-muted-foreground ring-1 ring-foreground/8">
+        <div className={`${PANEL_SURFACE_CLASS} p-3 text-sm text-muted-foreground`}>
           BB new-thread composer slot
         </div>
       }

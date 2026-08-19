@@ -18,9 +18,6 @@
     --text-base--line-height: 1.375rem;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
-    --leading-tight: 1.25;
-    --leading-snug: 1.375;
-    --leading-relaxed: 1.625;
     --shadow-2xs: var(--shadow-2xs);
     --shadow-xs: var(--shadow-xs);
     --shadow-sm: var(--shadow-sm);
@@ -219,6 +216,10 @@
       width: calc(var(--spacing) * 8);
       height: calc(var(--spacing) * 8);
     }
+    .size-\[28px\] {
+      width: 28px;
+      height: 28px;
+    }
     .size-\[max\(100\%\,3rem\)\] {
       width: max(100%, 3rem);
       height: max(100%, 3rem);
@@ -227,11 +228,8 @@
       width: auto;
       height: auto;
     }
-    .h-3\.5 {
-      height: calc(var(--spacing) * 3.5);
-    }
-    .h-4 {
-      height: calc(var(--spacing) * 4);
+    .h-\(--bb-sidebar-row-height\) {
+      height: var(--bb-sidebar-row-height);
     }
     .h-7 {
       height: calc(var(--spacing) * 7);
@@ -245,12 +243,6 @@
     .h-10 {
       height: calc(var(--spacing) * 10);
     }
-    .h-\[28px\] {
-      height: 28px;
-    }
-    .h-\[var\(--bb-sidebar-row-height\)\] {
-      height: var(--bb-sidebar-row-height);
-    }
     .h-full {
       height: 100%;
     }
@@ -263,26 +255,11 @@
     .min-h-0 {
       min-height: calc(var(--spacing) * 0);
     }
-    .w-3\.5 {
-      width: calc(var(--spacing) * 3.5);
-    }
-    .w-4 {
-      width: calc(var(--spacing) * 4);
-    }
     .w-6 {
       width: calc(var(--spacing) * 6);
     }
-    .w-7 {
-      width: calc(var(--spacing) * 7);
-    }
-    .w-8 {
-      width: calc(var(--spacing) * 8);
-    }
     .w-9 {
       width: calc(var(--spacing) * 9);
-    }
-    .w-\[28px\] {
-      width: 28px;
     }
     .w-full {
       width: 100%;
@@ -431,9 +408,6 @@
     .rounded-md {
       border-radius: calc(var(--radius) - 2px);
     }
-    .rounded-xl {
-      border-radius: calc(var(--radius) + 4px);
-    }
     .rounded-l-none {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
@@ -486,12 +460,6 @@
       background-color: var(--muted);
       @supports (color: color-mix(in lab, red, red)) {
         background-color: color-mix(in oklab, var(--muted) 30%, transparent);
-      }
-    }
-    .bg-muted\/35 {
-      background-color: var(--muted);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--muted) 35%, transparent);
       }
     }
     .bg-secondary {
@@ -556,6 +524,10 @@
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
     }
+    .text-sm\/5 {
+      font-size: var(--text-sm);
+      line-height: calc(var(--spacing) * 5);
+    }
     .text-xs {
       font-size: var(--text-xs);
       line-height: var(--tw-leading, var(--text-xs--line-height));
@@ -565,18 +537,6 @@
     }
     .text-\[0\.6875rem\] {
       font-size: 0.6875rem;
-    }
-    .leading-relaxed {
-      --tw-leading: var(--leading-relaxed);
-      line-height: var(--leading-relaxed);
-    }
-    .leading-snug {
-      --tw-leading: var(--leading-snug);
-      line-height: var(--leading-snug);
-    }
-    .leading-tight {
-      --tw-leading: var(--leading-tight);
-      line-height: var(--leading-tight);
     }
     .font-medium {
       --tw-font-weight: var(--font-weight-medium);
@@ -1087,10 +1047,34 @@
         }
       }
     }
-    .max-md\:pointer-coarse\:h-5 {
+    .max-md\:pointer-coarse\:size-9 {
       @media (width < 48rem) {
         @media (pointer: coarse) {
-          height: calc(var(--spacing) * 5);
+          width: calc(var(--spacing) * 9);
+          height: calc(var(--spacing) * 9);
+        }
+      }
+    }
+    .max-md\:pointer-coarse\:size-10 {
+      @media (width < 48rem) {
+        @media (pointer: coarse) {
+          width: calc(var(--spacing) * 10);
+          height: calc(var(--spacing) * 10);
+        }
+      }
+    }
+    .max-md\:pointer-coarse\:size-\[36px\] {
+      @media (width < 48rem) {
+        @media (pointer: coarse) {
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+    .max-md\:pointer-coarse\:h-\(--bb-sidebar-row-height-coarse\) {
+      @media (width < 48rem) {
+        @media (pointer: coarse) {
+          height: var(--bb-sidebar-row-height-coarse);
         }
       }
     }
@@ -1105,48 +1089,6 @@
       @media (width < 48rem) {
         @media (pointer: coarse) {
           height: calc(var(--spacing) * 10);
-        }
-      }
-    }
-    .max-md\:pointer-coarse\:h-\[36px\] {
-      @media (width < 48rem) {
-        @media (pointer: coarse) {
-          height: 36px;
-        }
-      }
-    }
-    .max-md\:pointer-coarse\:h-\[var\(--bb-sidebar-row-height-coarse\)\] {
-      @media (width < 48rem) {
-        @media (pointer: coarse) {
-          height: var(--bb-sidebar-row-height-coarse);
-        }
-      }
-    }
-    .max-md\:pointer-coarse\:w-5 {
-      @media (width < 48rem) {
-        @media (pointer: coarse) {
-          width: calc(var(--spacing) * 5);
-        }
-      }
-    }
-    .max-md\:pointer-coarse\:w-9 {
-      @media (width < 48rem) {
-        @media (pointer: coarse) {
-          width: calc(var(--spacing) * 9);
-        }
-      }
-    }
-    .max-md\:pointer-coarse\:w-10 {
-      @media (width < 48rem) {
-        @media (pointer: coarse) {
-          width: calc(var(--spacing) * 10);
-        }
-      }
-    }
-    .max-md\:pointer-coarse\:w-\[36px\] {
-      @media (width < 48rem) {
-        @media (pointer: coarse) {
-          width: 36px;
         }
       }
     }
@@ -1295,10 +1237,6 @@
   inherits: false;
   initial-value: solid;
 }
-@property --tw-leading {
-  syntax: "*";
-  inherits: false;
-}
 @property --tw-font-weight {
   syntax: "*";
   inherits: false;
@@ -1434,7 +1372,6 @@
       --tw-space-x-reverse: 0;
       --tw-divide-y-reverse: 0;
       --tw-border-style: solid;
-      --tw-leading: initial;
       --tw-font-weight: initial;
       --tw-ordinal: initial;
       --tw-slashed-zero: initial;

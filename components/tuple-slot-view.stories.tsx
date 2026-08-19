@@ -53,7 +53,7 @@ export function StateMatrix() {
                   iconUrl={iconUrl}
                   onAction={noop}
                 />
-                <span className="text-sm text-muted-foreground">Composer</span>
+                <span className="text-muted-foreground text-sm">Composer</span>
               </div>
               <TupleSidebarAccessory state={state} />
             </div>

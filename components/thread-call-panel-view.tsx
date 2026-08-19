@@ -3,6 +3,7 @@ import type { CallState } from "../server";
 import { Button } from "./ui/button";
 import { Icon } from "./ui/icon";
 import { Input } from "./ui/input";
+import { PANEL_SURFACE_CLASS } from "./ui/panel-styles";
 
 function callDescription(state: CallState | null) {
   const call = state?.call;
@@ -50,12 +51,12 @@ export function CallOverview({
 
   return (
     <section
-      className={`@container ${quiet ? "" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}`}
+      className={`@container ${quiet ? "" : `${PANEL_SURFACE_CLASS} p-3`}`}
       aria-live="polite"
     >
       <div className="space-y-1">
         <div className="flex min-w-0 flex-wrap items-start gap-2.5">
-          <h2 className="min-w-0 flex-1 text-balance font-semibold">{title}</h2>
+          <h2 className="min-w-0 flex-1 font-semibold text-balance">{title}</h2>
           {state?.error ? (
             <Button
               type="button"
@@ -76,7 +77,7 @@ export function CallOverview({
                   type="button"
                   size="sm"
                   variant="ghost"
-                  className="px-2 @min-[17rem]:pl-1.5 @min-[17rem]:pr-2.5"
+                  className="px-2 @min-[17rem]:pr-2.5 @min-[17rem]:pl-1.5"
                   aria-label="Copy link"
                   onClick={onCopyJoinLink}
                 >
@@ -85,7 +86,7 @@ export function CallOverview({
                 </Button>
               ) : null}
               {!quiet && !state.call.transcribing && onStartTranscription ? (
-                <Button type="button" size="sm" className="pl-1.5 pr-2.5" onClick={onStartTranscription}>
+                <Button type="button" size="sm" className="pr-2.5 pl-1.5" onClick={onStartTranscription}>
                   <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
                   Start transcription
                 </Button>
@@ -93,7 +94,7 @@ export function CallOverview({
             </div>
           ) : null}
         </div>
-        <div className="flex min-w-0 items-start gap-1.5 text-base text-muted-foreground sm:text-sm">
+        <div className="text-muted-foreground flex min-w-0 items-start gap-1.5 text-base sm:text-sm">
           {state?.inCall ? (
             <span className="flex h-lh shrink-0 items-center" aria-hidden="true">
               <span className={`size-1.5 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`} />
@@ -169,7 +170,7 @@ export function ThreadCallPanelView({
       {!state.call?.transcribing ? (
         <Button
           type="button"
-          className="w-full pl-2 pr-3"
+          className="w-full pr-3 pl-2"
           onClick={onStartTranscription}
         >
           <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
@@ -190,7 +191,7 @@ export function ThreadCallPanelView({
           </div>
           <Button
             type="submit"
-            className="w-full pl-2 pr-3"
+            className="w-full pr-3 pl-2"
             disabled={!task.trim() || sending}
           >
             <Icon name={sending ? "Spinner" : "Sent"} className={`size-4 shrink-0 ${sending ? "animate-spin" : ""}`} aria-hidden="true" />

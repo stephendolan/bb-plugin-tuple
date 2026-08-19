@@ -27,7 +27,7 @@ export function TupleStatusIcon({
         }}
       />
       {state?.inCall ? (
-        <span className="absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" />
+        <span className="ring-background absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1" />
       ) : null}
     </span>
   );
@@ -36,7 +36,7 @@ export function TupleStatusIcon({
 export function TupleSidebarAccessory({ state }: { state: CallState | null }) {
   if (!state?.inCall) return null;
   return (
-    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
       <span className={`size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`} />
       {state.call?.transcribing ? "Live" : "In call"}
     </div>

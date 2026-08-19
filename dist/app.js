@@ -3819,7 +3819,7 @@ function Icon({
 
 // Repos/@tuple/bb-plugin-tuple/components/ui/coarse-pointer-sizing.ts
 var COARSE_POINTER_TEXT_BASE_CLASS = "text-sm max-md:pointer-coarse:text-base";
-var HEADER_ICON_BUTTON_BOX_CLASS = "h-[28px] w-[28px] rounded-md p-0 max-md:pointer-coarse:h-[36px] max-md:pointer-coarse:w-[36px]";
+var HEADER_ICON_BUTTON_BOX_CLASS = "size-[28px] rounded-md p-0 max-md:pointer-coarse:size-[36px]";
 var COARSE_POINTER_HEADER_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[16px] max-md:pointer-coarse:[&_svg]:size-[20px]`;
 var COARSE_POINTER_HEADER_REDUCED_GLYPH_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[13px] max-md:pointer-coarse:[&_svg]:size-[16px]`;
 var COARSE_POINTER_INPUT_HEIGHT_CLASS = "h-9 max-md:pointer-coarse:h-10";
@@ -3845,6 +3845,12 @@ var Input = forwardRef(
   }
 );
 Input.displayName = "Input";
+
+// Repos/@tuple/bb-plugin-tuple/components/ui/panel-styles.ts
+var PANEL_SECTION_CLASS = "space-y-2";
+var PANEL_SECTION_HEADING_CLASS = "text-muted-foreground px-3 text-xs font-medium";
+var PANEL_SURFACE_CLASS = "bg-muted/15 ring-foreground/8 rounded-lg ring-1";
+var PANEL_CLIPPED_SURFACE_CLASS = `${PANEL_SURFACE_CLASS} overflow-hidden`;
 
 // Repos/@tuple/bb-plugin-tuple/components/thread-call-panel-view.tsx
 function callDescription(state) {
@@ -3873,11 +3879,11 @@ function CallOverview({
   return /* @__PURE__ */ jsx(
     "section",
     {
-      className: `@container ${quiet ? "" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}`,
+      className: `@container ${quiet ? "" : `${PANEL_SURFACE_CLASS} p-3`}`,
       "aria-live": "polite",
       children: /* @__PURE__ */ jsxs("div", { className: "space-y-1", children: [
         /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-start gap-2.5", children: [
-          /* @__PURE__ */ jsx("h2", { className: "min-w-0 flex-1 text-balance font-semibold", children: title }),
+          /* @__PURE__ */ jsx("h2", { className: "min-w-0 flex-1 font-semibold text-balance", children: title }),
           state?.error ? /* @__PURE__ */ jsxs(
             Button,
             {
@@ -3900,7 +3906,7 @@ function CallOverview({
                 type: "button",
                 size: "sm",
                 variant: "ghost",
-                className: "px-2 @min-[17rem]:pl-1.5 @min-[17rem]:pr-2.5",
+                className: "px-2 @min-[17rem]:pr-2.5 @min-[17rem]:pl-1.5",
                 "aria-label": "Copy link",
                 onClick: onCopyJoinLink,
                 children: [
@@ -3909,13 +3915,13 @@ function CallOverview({
                 ]
               }
             ) : null,
-            !quiet && !state.call.transcribing && onStartTranscription ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", className: "pl-1.5 pr-2.5", onClick: onStartTranscription, children: [
+            !quiet && !state.call.transcribing && onStartTranscription ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", className: "pr-2.5 pl-1.5", onClick: onStartTranscription, children: [
               /* @__PURE__ */ jsx(Icon, { name: "Mic", className: "size-4 shrink-0", "aria-hidden": "true" }),
               "Start transcription"
             ] }) : null
           ] }) : null
         ] }),
-        /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-1.5 text-base text-muted-foreground sm:text-sm", children: [
+        /* @__PURE__ */ jsxs("div", { className: "text-muted-foreground flex min-w-0 items-start gap-1.5 text-base sm:text-sm", children: [
           state?.inCall ? /* @__PURE__ */ jsx("span", { className: "flex h-lh shrink-0 items-center", "aria-hidden": "true", children: /* @__PURE__ */ jsx("span", { className: `size-1.5 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}` }) }) : null,
           /* @__PURE__ */ jsxs("p", { className: "min-w-0 text-pretty", children: [
             state?.error ?? callDescription(state),
@@ -3964,7 +3970,7 @@ function ThreadCallPanelView({
       Button,
       {
         type: "button",
-        className: "w-full pl-2 pr-3",
+        className: "w-full pr-3 pl-2",
         onClick: onStartTranscription,
         children: [
           /* @__PURE__ */ jsx(Icon, { name: "Mic", className: "size-4 shrink-0", "aria-hidden": "true" }),
@@ -3990,7 +3996,7 @@ function ThreadCallPanelView({
         Button,
         {
           type: "submit",
-          className: "w-full pl-2 pr-3",
+          className: "w-full pr-3 pl-2",
           disabled: !task.trim() || sending,
           children: [
             /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 shrink-0 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
@@ -4031,22 +4037,22 @@ function TupleLaunchpadView({
 }) {
   const personalRoom = launchpad?.personalRoom;
   if (stateLoading || loading) {
-    return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 py-2 text-sm text-muted-foreground", "aria-live": "polite", children: [
+    return /* @__PURE__ */ jsxs("div", { className: "text-muted-foreground flex items-center gap-3 py-2 text-sm", "aria-live": "polite", children: [
       /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin", "aria-hidden": "true" }),
       /* @__PURE__ */ jsx("span", { children: "Loading rooms and calls\u2026" })
     ] });
   }
   return /* @__PURE__ */ jsxs("section", { className: "@container space-y-5", "aria-live": "polite", children: [
-    error ? /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm text-destructive", children: [
+    error ? /* @__PURE__ */ jsxs("div", { className: "text-destructive flex items-center gap-2 text-sm", children: [
       /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1", children: error }),
       /* @__PURE__ */ jsxs(Button, { type: "button", size: "icon", variant: "ghost", className: "relative size-8 shrink-0", "aria-label": "Retry loading rooms and calls", onClick: onRetry, children: [
         /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
         /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4", "aria-hidden": "true" })
       ] })
     ] }) : null,
-    personalRoom ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Personal room" }),
-      /* @__PURE__ */ jsx("div", { className: "overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: /* @__PURE__ */ jsxs(
+    personalRoom ? /* @__PURE__ */ jsxs("div", { className: PANEL_SECTION_CLASS, children: [
+      /* @__PURE__ */ jsx("h3", { className: PANEL_SECTION_HEADING_CLASS, children: "Personal room" }),
+      /* @__PURE__ */ jsx("div", { className: PANEL_CLIPPED_SURFACE_CLASS, children: /* @__PURE__ */ jsxs(
         "button",
         {
           type: "button",
@@ -4054,71 +4060,71 @@ function TupleLaunchpadView({
           disabled: joining !== null,
           onClick: () => onJoin(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
           children: [
-            /* @__PURE__ */ jsx(Icon, { name: "GridView", className: "size-4 h-lh shrink-0 text-muted-foreground", "aria-hidden": "true" }),
+            /* @__PURE__ */ jsx(Icon, { name: "GridView", className: "text-muted-foreground size-4 h-lh shrink-0", "aria-hidden": "true" }),
             /* @__PURE__ */ jsxs("span", { className: "min-w-0 flex-1", children: [
               /* @__PURE__ */ jsx("span", { className: "block text-sm font-medium", children: "Your room" }),
-              /* @__PURE__ */ jsx("span", { className: "block text-xs text-muted-foreground", children: "Enter and copy link" })
+              /* @__PURE__ */ jsx("span", { className: "text-muted-foreground block text-xs", children: "Enter and copy link" })
             ] }),
-            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 h-lh shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : null
+            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "text-muted-foreground size-4 h-lh shrink-0 animate-spin", "aria-hidden": "true" }) : null
           ]
         }
       ) })
     ] }) : null,
-    launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Happening now" }),
-      /* @__PURE__ */ jsx("div", { className: "divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: launchpad.calls.map((call) => {
+    launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: PANEL_SECTION_CLASS, children: [
+      /* @__PURE__ */ jsx("h3", { className: PANEL_SECTION_HEADING_CLASS, children: "Happening now" }),
+      /* @__PURE__ */ jsx("div", { className: `${PANEL_CLIPPED_SURFACE_CLASS} divide-y divide-foreground/6`, children: launchpad.calls.map((call) => {
         const visibleParticipants = call.participants.slice(0, 3);
         const title = call.room?.name || call.participants.join(" & ") || "Tuple call";
         const people = call.participants.length + call.unknownParticipants;
         const joinTarget = call.joinTarget;
         return /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-3 px-3 py-2.5", children: [
-          /* @__PURE__ */ jsx("div", { className: "flex shrink-0 -space-x-1.5", "aria-hidden": "true", children: (visibleParticipants.length ? visibleParticipants : ["Tuple"]).map((participant, index) => /* @__PURE__ */ jsx("span", { className: "flex size-7 items-center justify-center rounded-full bg-muted text-[0.625rem] font-semibold ring-2 ring-background", children: initials(participant) }, `${participant}-${index}`)) }),
+          /* @__PURE__ */ jsx("div", { className: "flex shrink-0 -space-x-1.5", "aria-hidden": "true", children: (visibleParticipants.length ? visibleParticipants : ["Tuple"]).map((participant, index) => /* @__PURE__ */ jsx("span", { className: "bg-muted ring-background flex size-7 items-center justify-center rounded-full text-[0.625rem] font-semibold ring-2", children: initials(participant) }, `${participant}-${index}`)) }),
           /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
             /* @__PURE__ */ jsx("div", { className: "truncate text-sm font-medium", children: title }),
-            /* @__PURE__ */ jsx("div", { className: "truncate text-xs text-muted-foreground", children: call.room?.name && call.participants.length ? call.participants.join(", ") : `${people || call.capacity} in the call` })
+            /* @__PURE__ */ jsx("div", { className: "text-muted-foreground truncate text-xs", children: call.room?.name && call.participants.length ? call.participants.join(", ") : `${people || call.capacity} in the call` })
           ] }),
           call.joinable && joinTarget ? /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", variant: "secondary", disabled: joining !== null, onClick: () => onJoin(joinTarget, `call:${call.id}`), children: [
             joining === `call:${call.id}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 animate-spin", "aria-hidden": "true" }) : null,
             "Join"
-          ] }) : /* @__PURE__ */ jsx("span", { className: "text-xs text-muted-foreground", children: "Full" })
+          ] }) : /* @__PURE__ */ jsx("span", { className: "text-muted-foreground text-xs", children: "Full" })
         ] }, call.id);
       }) })
     ] }) : null,
-    launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Recent calls" }),
-      /* @__PURE__ */ jsx("div", { className: "overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
+    launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: PANEL_SECTION_CLASS, children: [
+      /* @__PURE__ */ jsx("h3", { className: PANEL_SECTION_HEADING_CLASS, children: "Recent calls" }),
+      /* @__PURE__ */ jsx("div", { className: PANEL_CLIPPED_SURFACE_CLASS, children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
         "button",
         {
           type: "button",
           "data-history-row": true,
-          className: "active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground/6 after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2",
+          className: "active:bg-muted/60 after:bg-foreground/6 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2",
           onClick: () => onSelectRecording(call),
           children: [
             /* @__PURE__ */ jsxs("span", { className: "block min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
-              /* @__PURE__ */ jsx("span", { className: "min-w-0 truncate text-sm font-medium leading-tight", children: storedCallTitle(call) }),
-              /* @__PURE__ */ jsx("span", { className: "hidden text-left text-[0.6875rem] leading-tight text-muted-foreground opacity-70 tabular-nums @min-[26rem]:block", children: storedCallTime(call) }),
+              /* @__PURE__ */ jsx("span", { className: "min-w-0 truncate text-sm font-medium", children: storedCallTitle(call) }),
+              /* @__PURE__ */ jsx("span", { className: "text-muted-foreground hidden text-left text-[0.6875rem] tabular-nums opacity-70 @min-[26rem]:block", children: storedCallTime(call) }),
               /* @__PURE__ */ jsx(
                 "span",
                 {
-                  className: "mt-0.5 block min-w-0 truncate text-xs leading-snug text-muted-foreground @min-[26rem]:col-start-1 @min-[26rem]:row-start-2",
+                  className: "text-muted-foreground mt-0.5 block min-w-0 truncate text-xs @min-[26rem]:col-start-1 @min-[26rem]:row-start-2",
                   title: call.summary ?? void 0,
                   "aria-hidden": call.summary ? void 0 : true,
                   children: call.summary || "\xA0"
                 }
               ),
-              /* @__PURE__ */ jsxs("span", { className: "mt-0.5 hidden text-left text-[0.6875rem] leading-snug text-muted-foreground opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block", children: [
+              /* @__PURE__ */ jsxs("span", { className: "text-muted-foreground mt-0.5 hidden text-left text-[0.6875rem] opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block", children: [
                 call.participants.length,
                 " ",
                 call.participants.length === 1 ? "participant" : "participants"
               ] })
             ] }),
-            /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
+            /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
           ]
         },
         call.callId
       )) })
     ] }) : null,
-    !error && launchpad && !personalRoom && !launchpad.calls.length && !launchpad.history.length ? /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground", children: "No Tuple rooms or calls yet." }) : null
+    !error && launchpad && !personalRoom && !launchpad.calls.length && !launchpad.history.length ? /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-sm", children: "No Tuple rooms or calls yet." }) : null
   ] });
 }
 
@@ -4146,7 +4152,7 @@ function StoredCallSelectionView({
         type: "button",
         size: "sm",
         variant: "ghost",
-        className: "-ml-2 pl-1.5 pr-2.5 text-muted-foreground",
+        className: "text-muted-foreground -ml-2 pr-2.5 pl-1.5",
         onClick: onBack,
         children: [
           /* @__PURE__ */ jsx(Icon, { name: "ChevronLeft", className: "size-4", "aria-hidden": "true" }),
@@ -4154,13 +4160,13 @@ function StoredCallSelectionView({
         ]
       }
     ),
-    /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h2", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Recorded call" }),
-      /* @__PURE__ */ jsx("div", { className: "rounded-lg bg-muted/15 p-3 ring-1 ring-foreground/8", children: /* @__PURE__ */ jsxs("div", { className: "min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
-        /* @__PURE__ */ jsx("h1", { className: "truncate text-sm font-semibold leading-tight", children: storedCallTitle(recording) }),
-        /* @__PURE__ */ jsx("p", { className: "mt-0.5 truncate text-[0.6875rem] leading-tight text-muted-foreground tabular-nums @min-[26rem]:col-start-2 @min-[26rem]:row-start-1 @min-[26rem]:mt-0", children: storedCallTime(recording) }),
-        recording.summary ? /* @__PURE__ */ jsx("p", { className: "mt-2 text-pretty text-sm leading-relaxed text-foreground/85 @min-[26rem]:col-start-1 @min-[26rem]:row-start-2", children: recording.summary }) : null,
-        /* @__PURE__ */ jsxs("p", { className: "mt-0.5 text-[0.6875rem] leading-snug text-muted-foreground opacity-70 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2", children: [
+    /* @__PURE__ */ jsxs("div", { className: PANEL_SECTION_CLASS, children: [
+      /* @__PURE__ */ jsx("h2", { className: PANEL_SECTION_HEADING_CLASS, children: "Recorded call" }),
+      /* @__PURE__ */ jsx("div", { className: `${PANEL_SURFACE_CLASS} p-3`, children: /* @__PURE__ */ jsxs("div", { className: "min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
+        /* @__PURE__ */ jsx("h1", { className: "truncate text-sm font-semibold", children: storedCallTitle(recording) }),
+        /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-0.5 truncate text-[0.6875rem] tabular-nums @min-[26rem]:col-start-2 @min-[26rem]:row-start-1 @min-[26rem]:mt-0", children: storedCallTime(recording) }),
+        recording.summary ? /* @__PURE__ */ jsx("p", { className: "text-foreground/85 mt-2 text-sm/5 text-pretty @min-[26rem]:col-start-1 @min-[26rem]:row-start-2", children: recording.summary }) : null,
+        /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground mt-0.5 text-[0.6875rem] opacity-70 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2", children: [
           participantCount,
           " ",
           participantCount === 1 ? "participant" : "participants"
@@ -4175,20 +4181,21 @@ function StoredCallSelectionView({
           {
             id: inputId,
             name: "tuple-recording-task",
+            type: "text",
             value: task,
             onChange: (event) => onTaskChange?.(event.target.value),
             placeholder: "Summarize decisions and identify follow-ups"
           }
         )
       ] }),
-      /* @__PURE__ */ jsxs(Button, { type: "submit", className: "w-full pl-2 pr-3", disabled: !task.trim() || sending, children: [
+      /* @__PURE__ */ jsxs(Button, { type: "submit", className: "w-full pr-3 pl-2", disabled: !task.trim() || sending, children: [
         /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 shrink-0 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
         sending ? "Sending\u2026" : "Send recorded call"
       ] })
     ] }) : /* @__PURE__ */ jsxs("section", { className: "space-y-3", children: [
       /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Start a new thread" }),
-        /* @__PURE__ */ jsx("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: "The new thread will read this recording directly from Tuple." })
+        /* @__PURE__ */ jsx("h2", { className: "font-semibold text-balance", children: "Start a new thread" }),
+        /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-base text-pretty sm:text-sm", children: "The new thread will read this recording directly from Tuple." })
       ] }),
       newThreadComposer
     ] })
@@ -4219,18 +4226,18 @@ function NewCallThreadView({
         onStartTranscription
       }
     ),
-    !snapshot ? state.call?.transcribing ? /* @__PURE__ */ jsxs("section", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h2", { className: "px-3 text-xs font-medium text-muted-foreground", children: "New thread" }),
-      /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-start gap-4 rounded-lg bg-muted/15 p-3 ring-1 ring-foreground/8 @min-[26rem]:flex-row @min-[26rem]:items-center @min-[26rem]:justify-between", children: [
+    !snapshot ? state.call?.transcribing ? /* @__PURE__ */ jsxs("section", { className: PANEL_SECTION_CLASS, children: [
+      /* @__PURE__ */ jsx("h2", { className: PANEL_SECTION_HEADING_CLASS, children: "New thread" }),
+      /* @__PURE__ */ jsxs("div", { className: `${PANEL_SURFACE_CLASS} flex flex-col items-start gap-4 p-3 @min-[26rem]:flex-row @min-[26rem]:items-center @min-[26rem]:justify-between`, children: [
         /* @__PURE__ */ jsxs("div", { className: "min-w-0", children: [
-          /* @__PURE__ */ jsx("h3", { className: "text-balance text-sm font-semibold", children: "Start from this conversation" }),
-          /* @__PURE__ */ jsx("p", { className: "mt-0.5 max-w-[65ch] text-pretty text-base text-muted-foreground sm:text-sm", children: "Review the recent transcript before starting the thread." })
+          /* @__PURE__ */ jsx("h3", { className: "text-sm font-semibold text-balance", children: "Start from this conversation" }),
+          /* @__PURE__ */ jsx("p", { className: "text-muted-foreground mt-0.5 max-w-[65ch] text-base text-pretty sm:text-sm", children: "Review the recent transcript before starting the thread." })
         ] }),
         /* @__PURE__ */ jsxs(
           Button,
           {
             type: "button",
-            className: "shrink-0 pl-2 pr-3",
+            className: "shrink-0 pr-3 pl-2",
             disabled: capturing,
             onClick: onCapture,
             children: [
@@ -4241,11 +4248,11 @@ function NewCallThreadView({
         )
       ] })
     ] }) : null : /* @__PURE__ */ jsxs(Fragment2, { children: [
-      /* @__PURE__ */ jsxs("section", { className: "space-y-2", children: [
-        /* @__PURE__ */ jsx("h2", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Recent conversation" }),
-        /* @__PURE__ */ jsxs("div", { className: "rounded-lg bg-muted/15 p-3 ring-1 ring-foreground/8", children: [
+      /* @__PURE__ */ jsxs("section", { className: PANEL_SECTION_CLASS, children: [
+        /* @__PURE__ */ jsx("h2", { className: PANEL_SECTION_HEADING_CLASS, children: "Recent conversation" }),
+        /* @__PURE__ */ jsxs("div", { className: `${PANEL_SURFACE_CLASS} p-3`, children: [
           /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-3", children: [
-            /* @__PURE__ */ jsxs("p", { className: "min-w-0 flex-1 text-sm text-muted-foreground", children: [
+            /* @__PURE__ */ jsxs("p", { className: "text-muted-foreground min-w-0 flex-1 text-sm", children: [
               snapshot.segmentCount,
               " speech segment",
               snapshot.segmentCount === 1 ? "" : "s",
@@ -4271,13 +4278,13 @@ function NewCallThreadView({
               }
             )
           ] }),
-          /* @__PURE__ */ jsx("pre", { className: "mt-3 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-sm leading-relaxed text-foreground/85", children: snapshot.transcript || "No speech was captured in this window." })
+          /* @__PURE__ */ jsx("pre", { className: "bg-muted/30 text-foreground/85 mt-3 max-h-64 overflow-auto rounded-md p-3 text-sm/5 whitespace-pre-wrap", children: snapshot.transcript || "No speech was captured in this window." })
         ] })
       ] }),
       /* @__PURE__ */ jsxs("section", { className: "space-y-3", children: [
         /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: "Start a new thread" }),
-          /* @__PURE__ */ jsx("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: "Add a task for the thread, then choose how it should run." })
+          /* @__PURE__ */ jsx("h2", { className: "font-semibold text-balance", children: "Start a new thread" }),
+          /* @__PURE__ */ jsx("p", { className: "text-muted-foreground text-base text-pretty sm:text-sm", children: "Add a task for the thread, then choose how it should run." })
         ] }),
         newThreadComposer
       ] })
@@ -4309,12 +4316,12 @@ function TupleStatusIcon({
         }
       }
     ),
-    state?.inCall ? /* @__PURE__ */ jsx("span", { className: "absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1 ring-background" }) : null
+    state?.inCall ? /* @__PURE__ */ jsx("span", { className: "ring-background absolute right-0 bottom-0 size-1.5 rounded-full bg-emerald-500 ring-1" }) : null
   ] });
 }
 function TupleSidebarAccessory({ state }) {
   if (!state?.inCall) return null;
-  return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1.5 text-xs text-muted-foreground", children: [
+  return /* @__PURE__ */ jsxs("div", { className: "text-muted-foreground flex items-center gap-1.5 text-xs", children: [
     /* @__PURE__ */ jsx("span", { className: `size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}` }),
     state.call?.transcribing ? "Live" : "In call"
   ] });

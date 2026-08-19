@@ -1,5 +1,6 @@
 import type { CallState, TranscriptSnapshot } from "../server";
 import { NewCallThreadView } from "./new-call-thread-view";
+import { PANEL_SURFACE_CLASS } from "./ui/panel-styles";
 
 export default {
   title: "Tuple/New thread from call",
@@ -80,7 +81,7 @@ export function StateMatrix() {
                   onStartTranscription={noop}
                   onCapture={noop}
                   newThreadComposer={
-                    <div className="rounded-lg bg-muted/15 p-3 text-sm text-muted-foreground ring-1 ring-foreground/8">
+                    <div className={`${PANEL_SURFACE_CLASS} p-3 text-sm text-muted-foreground`}>
                       BB new-thread composer slot
                     </div>
                   }
