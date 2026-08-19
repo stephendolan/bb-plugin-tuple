@@ -23,7 +23,7 @@ const liveState = {
 };
 
 describe("Tuple Call app", () => {
-  it("shows the composer action only during a live Tuple call", async () => {
+  it("opens the Tuple thread panel when idle and adds call context when live", async () => {
     const app = await loadPluginApp(() => import("./app"));
     const action = app.composerCustomizations[0]!.actions![0]!;
     const idle = renderSlot(
@@ -34,11 +34,17 @@ describe("Tuple Call app", () => {
         rpc: {
           getState: () => ({ ...liveState, inCall: false, call: null }),
         },
+        openThreadPanel: () => true,
       },
     );
 
-    await waitFor(() => expect(idle.inspection.rpcCalls).toHaveLength(1));
-    expect(idle.queryByRole("button")).toBeNull();
+    fireEvent.click(await idle.findByRole("button", { name: "Open Tuple" }));
+    expect(idle.inspection.navigateCalls).toEqual([
+      {
+        method: "openThreadPanel",
+        options: { actionId: "call", title: "Tuple" },
+      },
+    ]);
     idle.lifecycle.unmount();
 
     const live = renderSlot(

@@ -11,7 +11,7 @@ reference a recorded call.
 - A **Tuple** sidebar with your personal room, joinable calls, and recent call history.
 - Live call and transcription status, with a shortcut to start transcription.
 - A new-task flow that lets you review a recent transcript before sending it.
-- A compact live-call editor action for adding recent call context to a draft.
+- A compact editor shortcut that opens Tuple when idle and adds recent call context when live.
 - A per-task panel for sending the last 1–30 minutes of a call with a purpose.
 - Recorded-call handoff by Tuple recording ID, so transcript content is retrieved
   only when the receiving agent needs it.

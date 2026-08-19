@@ -4396,9 +4396,15 @@ function NavCallThread() {
 function ComposerTupleAction() {
   const { state, rpc, startTranscription } = useCallState();
   const composer = useComposer();
+  const navigate = useBbNavigate();
   const { values } = useSettings();
   const [loading, setLoading] = useState(false);
   async function runAction() {
+    if (!state?.inCall) {
+      const opened = navigate.openThreadPanel({ actionId: "call", title: "Tuple" });
+      if (!opened) navigate.toPluginPanel("call");
+      return;
+    }
     setLoading(true);
     try {
       if (!state?.call?.transcribing) {
@@ -4416,8 +4422,7 @@ function ComposerTupleAction() {
       setLoading(false);
     }
   }
-  if (!state?.inCall) return null;
-  const label = state.call?.transcribing ? `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft` : "Start Tuple transcription";
+  const label = !state?.inCall ? "Open Tuple" : state.call?.transcribing ? `Add the last ${values?.defaultMinutes ?? "5"} minutes of this Tuple call to the draft` : "Start Tuple transcription";
   return /* @__PURE__ */ jsxs(
     "button",
     {
