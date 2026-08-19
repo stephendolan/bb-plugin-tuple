@@ -4105,7 +4105,12 @@ function TupleLaunchpadView({
                   "aria-hidden": call.summary ? void 0 : true,
                   children: call.summary || "\xA0"
                 }
-              )
+              ),
+              /* @__PURE__ */ jsxs("span", { className: "mt-0.5 hidden text-left text-[0.6875rem] leading-snug text-muted-foreground opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block", children: [
+                call.participants.length,
+                " ",
+                call.participants.length === 1 ? "participant" : "participants"
+              ] })
             ] }),
             /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
           ]

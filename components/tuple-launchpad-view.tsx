@@ -161,6 +161,9 @@ export function TupleLaunchpadView({
                   >
                     {call.summary || "\u00a0"}
                   </span>
+                  <span className="mt-0.5 hidden text-left text-[0.6875rem] leading-snug text-muted-foreground opacity-55 @min-[26rem]:col-start-2 @min-[26rem]:row-start-2 @min-[26rem]:block">
+                    {call.participants.length} {call.participants.length === 1 ? "participant" : "participants"}
+                  </span>
                 </span>
                 <span className={`mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`}>
                   {storedCallTime(call)}
