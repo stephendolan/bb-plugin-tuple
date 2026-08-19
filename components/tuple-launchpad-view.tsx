@@ -77,7 +77,7 @@ export function TupleLaunchpadView({
 
       {personalRoom ? (
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-muted-foreground">Personal room</h3>
+          <h3 className="px-3 text-xs font-medium text-muted-foreground">Personal room</h3>
           <div className="overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             <button
               type="button"
@@ -100,7 +100,7 @@ export function TupleLaunchpadView({
 
       {launchpad?.calls.length ? (
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-muted-foreground">Happening now</h3>
+          <h3 className="px-3 text-xs font-medium text-muted-foreground">Happening now</h3>
           <div className="divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             {launchpad.calls.map((call) => {
               const visibleParticipants = call.participants.slice(0, 3);
@@ -139,7 +139,7 @@ export function TupleLaunchpadView({
 
       {launchpad?.history.length ? (
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-muted-foreground">Recent calls</h3>
+          <h3 className="px-3 text-xs font-medium text-muted-foreground">Recent calls</h3>
           <div className="overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             {launchpad.history.map((call) => (
               <button
@@ -149,18 +149,18 @@ export function TupleLaunchpadView({
                 className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground/6 after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2"
                 onClick={() => onSelectRecording(call)}
               >
-                <span className="flex min-w-0 items-baseline gap-3">
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium leading-tight">{storedCallTitle(call)}</span>
-                  <span className="hidden shrink-0 text-[0.6875rem] leading-tight text-muted-foreground opacity-70 @min-[26rem]:block">
+                <span className="block min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3">
+                  <span className="min-w-0 truncate text-sm font-medium leading-tight">{storedCallTitle(call)}</span>
+                  <span className="hidden text-left text-[0.6875rem] leading-tight text-muted-foreground opacity-70 tabular-nums @min-[26rem]:block">
                     {storedCallTime(call)}
                   </span>
-                </span>
-                <span
-                  className="mt-0.5 block truncate text-xs leading-snug text-muted-foreground"
-                  title={call.summary ?? undefined}
-                  aria-hidden={call.summary ? undefined : true}
-                >
-                  {call.summary || "\u00a0"}
+                  <span
+                    className="mt-0.5 block min-w-0 truncate text-xs leading-snug text-muted-foreground @min-[26rem]:col-start-1 @min-[26rem]:row-start-2"
+                    title={call.summary ?? undefined}
+                    aria-hidden={call.summary ? undefined : true}
+                  >
+                    {call.summary || "\u00a0"}
+                  </span>
                 </span>
                 <span className={`mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`}>
                   {storedCallTime(call)}

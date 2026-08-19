@@ -4045,7 +4045,7 @@ function TupleLaunchpadView({
       ] })
     ] }) : null,
     personalRoom ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "text-xs font-medium text-muted-foreground", children: "Personal room" }),
+      /* @__PURE__ */ jsx("h3", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Personal room" }),
       /* @__PURE__ */ jsx("div", { className: "overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: /* @__PURE__ */ jsxs(
         "button",
         {
@@ -4065,7 +4065,7 @@ function TupleLaunchpadView({
       ) })
     ] }) : null,
     launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "text-xs font-medium text-muted-foreground", children: "Happening now" }),
+      /* @__PURE__ */ jsx("h3", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Happening now" }),
       /* @__PURE__ */ jsx("div", { className: "divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: launchpad.calls.map((call) => {
         const visibleParticipants = call.participants.slice(0, 3);
         const title = call.room?.name || call.participants.join(" & ") || "Tuple call";
@@ -4085,7 +4085,7 @@ function TupleLaunchpadView({
       }) })
     ] }) : null,
     launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-      /* @__PURE__ */ jsx("h3", { className: "text-xs font-medium text-muted-foreground", children: "Recent calls" }),
+      /* @__PURE__ */ jsx("h3", { className: "px-3 text-xs font-medium text-muted-foreground", children: "Recent calls" }),
       /* @__PURE__ */ jsx("div", { className: "overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
         "button",
         {
@@ -4094,19 +4094,19 @@ function TupleLaunchpadView({
           className: "active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground/6 after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2",
           onClick: () => onSelectRecording(call),
           children: [
-            /* @__PURE__ */ jsxs("span", { className: "flex min-w-0 items-baseline gap-3", children: [
-              /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1 truncate text-sm font-medium leading-tight", children: storedCallTitle(call) }),
-              /* @__PURE__ */ jsx("span", { className: "hidden shrink-0 text-[0.6875rem] leading-tight text-muted-foreground opacity-70 @min-[26rem]:block", children: storedCallTime(call) })
+            /* @__PURE__ */ jsxs("span", { className: "block min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3", children: [
+              /* @__PURE__ */ jsx("span", { className: "min-w-0 truncate text-sm font-medium leading-tight", children: storedCallTitle(call) }),
+              /* @__PURE__ */ jsx("span", { className: "hidden text-left text-[0.6875rem] leading-tight text-muted-foreground opacity-70 tabular-nums @min-[26rem]:block", children: storedCallTime(call) }),
+              /* @__PURE__ */ jsx(
+                "span",
+                {
+                  className: "mt-0.5 block min-w-0 truncate text-xs leading-snug text-muted-foreground @min-[26rem]:col-start-1 @min-[26rem]:row-start-2",
+                  title: call.summary ?? void 0,
+                  "aria-hidden": call.summary ? void 0 : true,
+                  children: call.summary || "\xA0"
+                }
+              )
             ] }),
-            /* @__PURE__ */ jsx(
-              "span",
-              {
-                className: "mt-0.5 block truncate text-xs leading-snug text-muted-foreground",
-                title: call.summary ?? void 0,
-                "aria-hidden": call.summary ? void 0 : true,
-                children: call.summary || "\xA0"
-              }
-            ),
             /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
           ]
         },
