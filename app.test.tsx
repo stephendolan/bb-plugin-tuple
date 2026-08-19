@@ -137,7 +137,7 @@ describe("Tuple Call app", () => {
     );
 
     await slot.findByText("Current call");
-    await slot.findByText("Personal room · Transcribing · Staging");
+    await slot.findByText("Transcribing · Personal room · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Use last 5 minutes" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getSnapshot"]);
@@ -158,7 +158,7 @@ describe("Tuple Call app", () => {
     );
 
     await slot.findByText("Current call");
-    await slot.findByText("Personal room · Transcribing · Staging");
+    await slot.findByText("Transcribing · Personal room · Staging");
     await slot.findByRole("button", { name: "Copy link" });
     await slot.findByLabelText("Purpose");
     await slot.findByRole("button", { name: "Send 5 min to current thread" });
@@ -247,9 +247,9 @@ describe("Tuple Call app", () => {
       },
     );
 
-    await slot.findByText("Personal room · Transcription is off · Staging");
+    await slot.findByText("Transcription is off · Personal room · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
-    await slot.findByText("Personal room · Transcribing · Staging");
+    await slot.findByText("Transcribing · Personal room · Staging");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "startTranscription"]);
     slot.lifecycle.unmount();
   });

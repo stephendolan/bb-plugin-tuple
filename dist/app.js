@@ -139,7 +139,7 @@ var {
   useSonner
 } = mod3;
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+// node_modules/@radix-ui/react-compose-refs/dist/index.mjs
 var __defProp2 = Object.defineProperty;
 var __name = (target, value) => __defProp2(target, "name", { value, configurable: true });
 function setRef(ref, value) {
@@ -180,7 +180,7 @@ function useComposedRefs(...refs) {
 }
 __name(useComposedRefs, "useComposedRefs");
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-slot/dist/index.mjs
+// node_modules/@radix-ui/react-slot/dist/index.mjs
 var __defProp3 = Object.defineProperty;
 var __name2 = (target, value) => __defProp3(target, "name", { value, configurable: true });
 // @__NO_SIDE_EFFECTS__
@@ -316,7 +316,7 @@ var createSlottableError = /* @__PURE__ */ __name2((ownerName) => {
 }, "createSlottableError");
 var use2 = react_exports[" use ".trim().toString()];
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/clsx/dist/clsx.mjs
+// node_modules/clsx/dist/clsx.mjs
 function r(e) {
   var t, f, n = "";
   if ("string" == typeof e || "number" == typeof e) n += e;
@@ -331,7 +331,7 @@ function clsx() {
   return n;
 }
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/class-variance-authority/dist/index.mjs
+// node_modules/class-variance-authority/dist/index.mjs
 var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
 var cx = clsx;
 var cva = (base, config) => (props) => {
@@ -373,7 +373,7 @@ var cva = (base, config) => (props) => {
   return cx(base, getVariantClassNames, getCompoundVariantClassNames, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
 };
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/tailwind-merge/dist/bundle-mjs.mjs
+// node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var concatArrays = (array1, array2) => {
   const combinedArray = new Array(array1.length + array2.length);
   for (let i = 0; i < array1.length; i++) {
@@ -3627,12 +3627,12 @@ var getDefaultConfig = () => {
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 
-// Repos/@tuple/bb-plugin-tuple/lib/utils.ts
+// lib/utils.ts
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// Repos/@tuple/bb-plugin-tuple/components/ui/motion.ts
+// components/ui/motion.ts
 var CONTROL_HOVER_TRANSITION = "transition-colors duration-150 hover:duration-0";
 
 // bb-plugin-runtime-shim:react/jsx-runtime
@@ -3647,7 +3647,7 @@ var {
   jsxs
 } = mod4;
 
-// Repos/@tuple/bb-plugin-tuple/components/ui/button.tsx
+// components/ui/button.tsx
 var buttonVariants = cva(
   `inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ${CONTROL_HOVER_TRANSITION} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
@@ -3688,7 +3688,7 @@ var Button = forwardRef(
 );
 Button.displayName = "Button";
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/core-free-icons/dist/esm/index.js
+// node_modules/@hugeicons/core-free-icons/dist/esm/index.js
 var ArrowLeft01Icon = [
   ["path", { d: "M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }]
 ];
@@ -3730,7 +3730,7 @@ var SentIcon = [
   ["path", { d: "M11.4999 12.5L14.9999 9", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
 ];
 
-// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
+// node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
 var defaultAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
   width: 24,
@@ -3781,7 +3781,7 @@ var HugeiconsIcon = forwardRef(({ color = "currentColor", size = 24, strokeWidth
 });
 HugeiconsIcon.displayName = "HugeiconsIcon";
 
-// Repos/@tuple/bb-plugin-tuple/components/ui/icon.tsx
+// components/ui/icon.tsx
 var ICON_MAP = {
   BubbleChatQuestion: BubbleChatQuestionIcon,
   ChevronLeft: ArrowLeft01Icon,
@@ -3812,14 +3812,14 @@ function Icon({
   );
 }
 
-// Repos/@tuple/bb-plugin-tuple/components/ui/coarse-pointer-sizing.ts
+// components/ui/coarse-pointer-sizing.ts
 var COARSE_POINTER_TEXT_BASE_CLASS = "text-sm max-md:pointer-coarse:text-base";
 var HEADER_ICON_BUTTON_BOX_CLASS = "h-[28px] w-[28px] rounded-md p-0 max-md:pointer-coarse:h-[36px] max-md:pointer-coarse:w-[36px]";
 var COARSE_POINTER_HEADER_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[16px] max-md:pointer-coarse:[&_svg]:size-[20px]`;
 var COARSE_POINTER_HEADER_REDUCED_GLYPH_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[13px] max-md:pointer-coarse:[&_svg]:size-[16px]`;
 var COARSE_POINTER_INPUT_HEIGHT_CLASS = "h-9 max-md:pointer-coarse:h-10";
 
-// Repos/@tuple/bb-plugin-tuple/components/ui/input.tsx
+// components/ui/input.tsx
 var Input = forwardRef(
   ({ className, type, ...props }, ref) => {
     return /* @__PURE__ */ jsx(
@@ -3841,7 +3841,7 @@ var Input = forwardRef(
 );
 Input.displayName = "Input";
 
-// Repos/@tuple/bb-plugin-tuple/app.tsx
+// app.tsx
 var tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
 function useCallState() {
   const rpc = useRpc();
@@ -4121,7 +4121,7 @@ function callDescription(state) {
   } else {
     company = `With ${participantCount} others`;
   }
-  return `${company} \xB7 ${call.transcribing ? "Transcribing" : "Transcription is off"}`;
+  return `${call.transcribing ? "Transcribing" : "Transcription is off"} \xB7 ${company}`;
 }
 function CallOverview({
   state,
@@ -4148,13 +4148,19 @@ function CallOverview({
       "aria-live": "polite",
       children: /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-start gap-2.5", children: [
         /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
-          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-            state?.inCall ? /* @__PURE__ */ jsx("span", { className: "size-1.5 shrink-0 rounded-full bg-emerald-500", "aria-hidden": "true" }) : null,
-            /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: title })
-          ] }),
-          /* @__PURE__ */ jsxs("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: [
-            state?.error ?? callDescription(state),
-            !state?.error && state?.environment && state.environment !== "prod" ? ` \xB7 ${state.environment === "staging" ? "Staging" : "Development"}` : ""
+          /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: title }),
+          /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-center gap-1.5 text-base text-muted-foreground sm:text-sm", children: [
+            state?.inCall ? /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: `size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`,
+                "aria-hidden": "true"
+              }
+            ) : null,
+            /* @__PURE__ */ jsxs("p", { className: "min-w-0 text-pretty", children: [
+              state?.error ?? callDescription(state),
+              !state?.error && state?.environment && state.environment !== "prod" ? ` \xB7 ${state.environment === "staging" ? "Staging" : "Development"}` : ""
+            ] })
           ] })
         ] }),
         state?.error ? /* @__PURE__ */ jsxs(
@@ -4178,7 +4184,7 @@ function CallOverview({
             {
               type: "button",
               size: "sm",
-              variant: "secondary",
+              variant: "ghost",
               className: "pl-1.5 pr-2.5",
               onClick: () => void copyJoinLink(),
               children: [

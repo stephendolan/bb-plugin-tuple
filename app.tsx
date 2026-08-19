@@ -381,7 +381,7 @@ function callDescription(state: CallState | null) {
   } else {
     company = `With ${participantCount} others`;
   }
-  return `${company} · ${call.transcribing ? "Transcribing" : "Transcription is off"}`;
+  return `${call.transcribing ? "Transcribing" : "Transcription is off"} · ${company}`;
 }
 
 function CallOverview({
@@ -423,16 +423,21 @@ function CallOverview({
     >
       <div className="flex min-w-0 flex-wrap items-start gap-2.5">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            {state?.inCall ? <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" /> : null}
-            <h2 className="text-balance font-semibold">{title}</h2>
+          <h2 className="text-balance font-semibold">{title}</h2>
+          <div className="flex min-w-0 items-center gap-1.5 text-base text-muted-foreground sm:text-sm">
+            {state?.inCall ? (
+              <span
+                className={`size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`}
+                aria-hidden="true"
+              />
+            ) : null}
+            <p className="min-w-0 text-pretty">
+              {state?.error ?? callDescription(state)}
+              {!state?.error && state?.environment && state.environment !== "prod"
+                ? ` · ${state.environment === "staging" ? "Staging" : "Development"}`
+                : ""}
+            </p>
           </div>
-          <p className="text-pretty text-base text-muted-foreground sm:text-sm">
-            {state?.error ?? callDescription(state)}
-            {!state?.error && state?.environment && state.environment !== "prod"
-              ? ` · ${state.environment === "staging" ? "Staging" : "Development"}`
-              : ""}
-          </p>
         </div>
         {state?.error ? (
           <Button
@@ -453,7 +458,7 @@ function CallOverview({
               <Button
                 type="button"
                 size="sm"
-                variant="secondary"
+                variant="ghost"
                 className="pl-1.5 pr-2.5"
                 onClick={() => void copyJoinLink()}
               >
