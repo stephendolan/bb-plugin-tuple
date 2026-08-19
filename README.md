@@ -83,3 +83,7 @@ local macOS screenshot baselines:
 npm run test:visual
 npm run test:visual:update # intentionally accept a reviewed visual change
 ```
+
+## License
+
+[MIT](LICENSE)
