@@ -29,6 +29,8 @@ const liveCall: CallState = {
 const snapshot: TranscriptSnapshot = {
   callId: "call-story",
   minutes: 5,
+  since: "2026-08-18T20:00:00.000Z",
+  until: "2026-08-18T20:05:00.000Z",
   capturedAt: "2026-08-18T20:05:00.000Z",
   segmentCount: 4,
   truncated: false,

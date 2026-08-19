@@ -58,6 +58,8 @@ describe("Tuple Call app", () => {
           getSnapshot: () => ({
             callId: "call-1",
             minutes: 5,
+            since: "2026-08-18T19:55:00.000Z",
+            until: "2026-08-18T20:00:00.000Z",
             capturedAt: "2026-08-18T20:00:00.000Z",
             segmentCount: 1,
             transcript: "[04:00 PM] User 42: ship it",
@@ -126,6 +128,8 @@ describe("Tuple Call app", () => {
           getSnapshot: () => ({
             callId: "call-1",
             minutes: 5,
+            since: "2026-08-18T19:55:00.000Z",
+            until: "2026-08-18T20:00:00.000Z",
             capturedAt: "2026-08-18T20:00:00.000Z",
             segmentCount: 1,
             transcript: "[04:00 PM] User 42: ship it",

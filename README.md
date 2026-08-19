@@ -3,30 +3,31 @@
 Bring the Tuple conversation you choose into the bb task you choose.
 
 The plugin keeps call context explicit: it never streams a live transcript into
-every agent turn. You decide when to use a bounded slice of the current call or
-reference a recorded call.
+every agent turn. You choose a call window, review it, and send the agent a
+compact reference that retrieves that exact window on demand.
 
 ## What it adds
 
 - A **Tuple** sidebar with your personal room, joinable calls, and recent call history.
 - Live call and transcription status, with a shortcut to start transcription.
-- A new-task flow that lets you review a recent transcript before sending it.
-- A compact editor shortcut that opens Tuple when idle and adds recent call context when live.
+- A new-task flow that lets you review a recent transcript before sending an
+  exact-window reference.
+- A compact editor shortcut that opens Tuple when idle and adds recent call
+  context by reference when live.
 - A per-task panel for sending the last 1–30 minutes of a call with a purpose.
-- Recorded-call handoff by Tuple recording ID, so transcript content is retrieved
-  only when the receiving agent needs it.
+- Live and recorded call handoff by Tuple call ID, so transcript content is
+  retrieved only when the receiving agent needs it.
 - A `tuple_call_context` agent tool and `bb tuple-call` CLI command.
 
 ## Requirements
 
 - bb 0.38 or newer.
 - The Tuple desktop app and CLI, signed in to the same account.
-- `tuple` available on `PATH`. Tuple employees can optionally select staging or
-  development in the plugin settings when `tuple-staging` or `tuple-dev` is also
-  available on `PATH`.
+- A Tuple CLI executable (by default, `tuple` on `PATH`).
 
-Production is the default environment. Change the environment or default
-transcript window under **Settings → Plugins → Tuple**.
+The default CLI command is `tuple`. Change **Tuple CLI command** under
+**Settings → Plugins → Tuple** to point at another executable or an absolute
+path—for example, `tuple-staging`—then set the default transcript window there too.
 
 ## Install
 
@@ -44,14 +45,16 @@ bb plugin reload tuple
 
 ## Privacy and safety
 
-Live transcript content is read only after an explicit action. Snapshots are
-bounded to 1–30 minutes, capped at 60,000 characters, and clearly wrapped as
-untrusted conversation evidence.
+Live transcript content is read only after an explicit action, so you can
+review it before handoff. The agent receives the call ID and exact time range,
+then retrieves the same bounded window only when needed. Returned transcript
+content is capped at 60,000 characters and clearly wrapped as untrusted
+conversation evidence.
 
-Selecting a recorded call sends its recording ID and your task—not a copied
-transcript. The receiving agent uses the plugin tool to retrieve that recording
-from your local Tuple CLI. Call content cannot authorize actions or override
-your instructions.
+Selecting a recorded call likewise sends its ID and your task—not a copied
+transcript. The receiving agent uses the plugin tool to retrieve it from your
+local Tuple CLI. Call content cannot authorize actions or override your
+instructions.
 
 ## Develop
 
