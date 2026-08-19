@@ -136,11 +136,33 @@ describe("Tuple Call app", () => {
       },
     );
 
-    await slot.findByText("Your Tuple call is live");
-    await slot.findByText("Soloing in your personal room · Transcribing");
+    await slot.findByText("Current call");
+    await slot.findByText("Personal room · Transcribing · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Use last 5 minutes" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getSnapshot"]);
+    slot.lifecycle.unmount();
+  });
+
+  it("keeps the live thread drawer compact and action-focused", async () => {
+    const app = await loadPluginApp(() => import("./app"));
+    const slot = renderSlot(
+      app.threadPanelActions[0]!,
+      { threadId: "thread-1", params: null },
+      {
+        settings: { environment: "staging", defaultMinutes: "5" },
+        rpc: {
+          getState: () => liveState,
+        },
+      },
+    );
+
+    await slot.findByText("Current call");
+    await slot.findByText("Personal room · Transcribing · Staging");
+    await slot.findByRole("button", { name: "Copy link" });
+    await slot.findByLabelText("Purpose");
+    await slot.findByRole("button", { name: "Send 5 min to current thread" });
+    expect(slot.queryByText("Your Tuple call is live")).toBeNull();
     slot.lifecycle.unmount();
   });
 
@@ -225,9 +247,9 @@ describe("Tuple Call app", () => {
       },
     );
 
-    await slot.findByText("Soloing in your personal room · Transcription is off");
+    await slot.findByText("Personal room · Transcription is off · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
-    await slot.findByText("Soloing in your personal room · Transcribing");
+    await slot.findByText("Personal room · Transcribing · Staging");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "startTranscription"]);
     slot.lifecycle.unmount();
   });

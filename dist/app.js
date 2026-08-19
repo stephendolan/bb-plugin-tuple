@@ -4060,7 +4060,7 @@ function StoredCallSelection({
     try {
       await rpc.call("sendRecordingToThread", { threadId, callId: recording.callId, task });
       setTask("");
-      toast.success("Sent this Tuple call to the thread.");
+      toast.success("Sent the Tuple call to the current thread.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not send the Tuple call.");
     } finally {
@@ -4096,7 +4096,7 @@ function StoredCallSelection({
       ),
       /* @__PURE__ */ jsxs(Button, { type: "submit", className: "w-full", disabled: !task.trim() || sending, children: [
         /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
-        sending ? "Sending\u2026" : "Send call to this thread"
+        sending ? "Sending\u2026" : "Send call to current thread"
       ] })
     ] }) : /* @__PURE__ */ jsx(
       experimental_NewThreadComposer,
@@ -4115,11 +4115,11 @@ function callDescription(state) {
   const participantCount = call.participants.length;
   let company;
   if (participantCount === 0) {
-    company = call.roomKind === "personal" ? "Soloing in your personal room" : call.roomName ? `Soloing in ${call.roomName}` : "Soloing in this call";
+    company = call.roomKind === "personal" ? "Personal room" : call.roomName ? call.roomName : "Solo call";
   } else if (participantCount === 1) {
-    company = `Pairing with ${call.participants[0]}`;
+    company = `With ${call.participants[0]}`;
   } else {
-    company = `Pairing with ${participantCount} others`;
+    company = `With ${participantCount} others`;
   }
   return `${company} \xB7 ${call.transcribing ? "Transcribing" : "Transcription is off"}`;
 }
@@ -4130,7 +4130,7 @@ function CallOverview({
   onStartTranscription,
   quiet = false
 }) {
-  const title = loading ? "Connecting to Tuple" : state?.error ? "Tuple is unavailable" : state?.inCall ? "Your Tuple call is live" : "No active Tuple call";
+  const title = loading ? "Connecting to Tuple" : state?.error ? "Tuple is unavailable" : state?.inCall ? "Current call" : "No active Tuple call";
   async function copyJoinLink() {
     const joinUrl = state?.call?.joinUrl;
     if (!joinUrl) return;
@@ -4141,38 +4141,38 @@ function CallOverview({
       toast.error("Could not copy the join link.");
     }
   }
-  return /* @__PURE__ */ jsxs(
+  return /* @__PURE__ */ jsx(
     "section",
     {
-      className: quiet ? "space-y-3" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8",
+      className: quiet ? void 0 : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8",
       "aria-live": "polite",
-      children: [
-        /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 items-start gap-2.5", children: [
-          /* @__PURE__ */ jsx(TupleStatusIcon, { state }),
-          /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
-            /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-center gap-2", children: [
-              /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: title }),
-              state?.environment && state.environment !== "prod" ? /* @__PURE__ */ jsx("div", { className: "rounded-full bg-foreground/7 px-2 py-0.5 text-xs font-medium text-muted-foreground", children: state.environment === "staging" ? "Staging" : "Development" }) : null
-            ] }),
-            /* @__PURE__ */ jsx("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: state?.error ?? callDescription(state) })
+      children: /* @__PURE__ */ jsxs("div", { className: "flex min-w-0 flex-wrap items-start gap-2.5", children: [
+        /* @__PURE__ */ jsxs("div", { className: "min-w-0 flex-1", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+            state?.inCall ? /* @__PURE__ */ jsx("span", { className: "size-1.5 shrink-0 rounded-full bg-emerald-500", "aria-hidden": "true" }) : null,
+            /* @__PURE__ */ jsx("h2", { className: "text-balance font-semibold", children: title })
           ] }),
-          state?.error ? /* @__PURE__ */ jsxs(
-            Button,
-            {
-              type: "button",
-              size: "icon",
-              variant: "ghost",
-              className: "relative size-8 shrink-0",
-              "aria-label": "Retry Tuple connection",
-              onClick: onRetry,
-              children: [
-                /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
-                /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4 shrink-0", "aria-hidden": "true" })
-              ]
-            }
-          ) : null
+          /* @__PURE__ */ jsxs("p", { className: "text-pretty text-base text-muted-foreground sm:text-sm", children: [
+            state?.error ?? callDescription(state),
+            !state?.error && state?.environment && state.environment !== "prod" ? ` \xB7 ${state.environment === "staging" ? "Staging" : "Development"}` : ""
+          ] })
         ] }),
-        state?.call ? /* @__PURE__ */ jsxs("div", { className: "mt-3 flex flex-wrap items-center gap-2 pl-12", children: [
+        state?.error ? /* @__PURE__ */ jsxs(
+          Button,
+          {
+            type: "button",
+            size: "icon",
+            variant: "ghost",
+            className: "relative size-8 shrink-0",
+            "aria-label": "Retry Tuple connection",
+            onClick: onRetry,
+            children: [
+              /* @__PURE__ */ jsx("span", { className: "absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden", "aria-hidden": "true" }),
+              /* @__PURE__ */ jsx(Icon, { name: "RotateCcw", className: "size-4 shrink-0", "aria-hidden": "true" })
+            ]
+          }
+        ) : null,
+        state?.call ? /* @__PURE__ */ jsxs("div", { className: "flex shrink-0 flex-wrap items-center gap-2", children: [
           state.call.joinUrl ? /* @__PURE__ */ jsxs(
             Button,
             {
@@ -4183,7 +4183,7 @@ function CallOverview({
               onClick: () => void copyJoinLink(),
               children: [
                 /* @__PURE__ */ jsx(Icon, { name: "Copy", className: "size-4 shrink-0", "aria-hidden": "true" }),
-                "Copy join link"
+                "Copy link"
               ]
             }
           ) : null,
@@ -4192,7 +4192,7 @@ function CallOverview({
             "Start transcription"
           ] }) : null
         ] }) : null
-      ]
+      ] })
     }
   );
 }
@@ -4322,7 +4322,7 @@ function ThreadCallPanel({ threadId }) {
     try {
       await rpc.call("sendToThread", { threadId, minutes, task });
       setTask("");
-      toast.success("Sent to this thread with Tuple context.");
+      toast.success("Sent to the current thread with Tuple context.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not send Tuple context.");
     } finally {
@@ -4332,7 +4332,7 @@ function ThreadCallPanel({ threadId }) {
   if (!state?.inCall) {
     return selectedRecording ? /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, threadId, onBack: () => setSelectedRecording(null) }) : /* @__PURE__ */ jsx(TupleLaunchpad, { state, loading, onSelectRecording: setSelectedRecording });
   }
-  return /* @__PURE__ */ jsxs("div", { className: "isolate space-y-5 antialiased", children: [
+  return /* @__PURE__ */ jsxs("div", { className: "isolate space-y-6 antialiased", children: [
     /* @__PURE__ */ jsx(
       CallOverview,
       {
@@ -4346,24 +4346,26 @@ function ThreadCallPanel({ threadId }) {
     /* @__PURE__ */ jsxs(
       "form",
       {
-        className: "space-y-2.5 border-t border-foreground/8 pt-5",
+        className: "space-y-3",
         onSubmit: (event) => {
           event.preventDefault();
           void send();
         },
         children: [
-          /* @__PURE__ */ jsx("label", { className: "font-medium", htmlFor: "tuple-task", children: "Purpose" }),
-          /* @__PURE__ */ jsx(
-            Input,
-            {
-              id: "tuple-task",
-              name: "tuple-task",
-              type: "text",
-              value: task,
-              onChange: (event) => setTask(event.target.value),
-              placeholder: "Summarize decisions and suggest next steps"
-            }
-          ),
+          /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsx("label", { className: "text-base font-medium sm:text-sm", htmlFor: "tuple-task", children: "Purpose" }),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                id: "tuple-task",
+                name: "tuple-task",
+                type: "text",
+                value: task,
+                onChange: (event) => setTask(event.target.value),
+                placeholder: "Summarize decisions and suggest next steps"
+              }
+            )
+          ] }),
           /* @__PURE__ */ jsxs(
             Button,
             {
@@ -4372,7 +4374,7 @@ function ThreadCallPanel({ threadId }) {
               disabled: !task.trim() || !state?.call?.transcribing || sending,
               children: [
                 /* @__PURE__ */ jsx(Icon, { name: sending ? "Spinner" : "Sent", className: `size-4 shrink-0 ${sending ? "animate-spin" : ""}`, "aria-hidden": "true" }),
-                sending ? "Sending\u2026" : `Send last ${minutes} min to this thread`
+                sending ? "Sending\u2026" : `Send ${minutes} min to current thread`
               ]
             }
           )

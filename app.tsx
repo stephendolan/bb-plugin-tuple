@@ -312,7 +312,7 @@ function StoredCallSelection({
     try {
       await rpc.call("sendRecordingToThread", { threadId, callId: recording.callId, task });
       setTask("");
-      toast.success("Sent this Tuple call to the thread.");
+      toast.success("Sent the Tuple call to the current thread.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not send the Tuple call.");
     } finally {
@@ -350,7 +350,7 @@ function StoredCallSelection({
           />
           <Button type="submit" className="w-full" disabled={!task.trim() || sending}>
             <Icon name={sending ? "Spinner" : "Sent"} className={`size-4 ${sending ? "animate-spin" : ""}`} aria-hidden="true" />
-            {sending ? "Sending…" : "Send call to this thread"}
+            {sending ? "Sending…" : "Send call to current thread"}
           </Button>
         </form>
       ) : (
@@ -372,14 +372,14 @@ function callDescription(state: CallState | null) {
   let company: string;
   if (participantCount === 0) {
     company = call.roomKind === "personal"
-      ? "Soloing in your personal room"
+      ? "Personal room"
       : call.roomName
-        ? `Soloing in ${call.roomName}`
-        : "Soloing in this call";
+        ? call.roomName
+        : "Solo call";
   } else if (participantCount === 1) {
-    company = `Pairing with ${call.participants[0]}`;
+    company = `With ${call.participants[0]}`;
   } else {
-    company = `Pairing with ${participantCount} others`;
+    company = `With ${participantCount} others`;
   }
   return `${company} · ${call.transcribing ? "Transcribing" : "Transcription is off"}`;
 }
@@ -402,7 +402,7 @@ function CallOverview({
     : state?.error
       ? "Tuple is unavailable"
       : state?.inCall
-        ? "Your Tuple call is live"
+        ? "Current call"
         : "No active Tuple call";
 
   async function copyJoinLink() {
@@ -418,22 +418,20 @@ function CallOverview({
 
   return (
     <section
-      className={quiet ? "space-y-3" : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}
+      className={quiet ? undefined : "rounded-xl bg-muted/35 p-4 ring-1 ring-foreground/8"}
       aria-live="polite"
     >
-      <div className="flex min-w-0 items-start gap-2.5">
-        <TupleStatusIcon state={state} />
+      <div className="flex min-w-0 flex-wrap items-start gap-2.5">
         <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            {state?.inCall ? <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" /> : null}
             <h2 className="text-balance font-semibold">{title}</h2>
-            {state?.environment && state.environment !== "prod" ? (
-              <div className="rounded-full bg-foreground/7 px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                {state.environment === "staging" ? "Staging" : "Development"}
-              </div>
-            ) : null}
           </div>
           <p className="text-pretty text-base text-muted-foreground sm:text-sm">
             {state?.error ?? callDescription(state)}
+            {!state?.error && state?.environment && state.environment !== "prod"
+              ? ` · ${state.environment === "staging" ? "Staging" : "Development"}`
+              : ""}
           </p>
         </div>
         {state?.error ? (
@@ -449,30 +447,29 @@ function CallOverview({
             <Icon name="RotateCcw" className="size-4 shrink-0" aria-hidden="true" />
           </Button>
         ) : null}
+        {state?.call ? (
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {state.call.joinUrl ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="pl-1.5 pr-2.5"
+                onClick={() => void copyJoinLink()}
+              >
+                <Icon name="Copy" className="size-4 shrink-0" aria-hidden="true" />
+                Copy link
+              </Button>
+            ) : null}
+            {!state.call.transcribing && onStartTranscription ? (
+              <Button type="button" size="sm" className="pl-1.5 pr-2.5" onClick={onStartTranscription}>
+                <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
+                Start transcription
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
-
-      {state?.call ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2 pl-12">
-          {state.call.joinUrl ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              className="pl-1.5 pr-2.5"
-              onClick={() => void copyJoinLink()}
-            >
-              <Icon name="Copy" className="size-4 shrink-0" aria-hidden="true" />
-              Copy join link
-            </Button>
-          ) : null}
-          {!state.call.transcribing && onStartTranscription ? (
-            <Button type="button" size="sm" className="pl-1.5 pr-2.5" onClick={onStartTranscription}>
-              <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
-              Start transcription
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
     </section>
   );
 }
@@ -624,7 +621,7 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
     try {
       await rpc.call("sendToThread", { threadId, minutes, task });
       setTask("");
-      toast.success("Sent to this thread with Tuple context.");
+      toast.success("Sent to the current thread with Tuple context.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not send Tuple context.");
     } finally {
@@ -641,7 +638,7 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
   }
 
   return (
-    <div className="isolate space-y-5 antialiased">
+    <div className="isolate space-y-6 antialiased">
       <CallOverview
         state={state}
         loading={loading}
@@ -650,28 +647,30 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
         quiet
       />
       <form
-        className="space-y-2.5 border-t border-foreground/8 pt-5"
+        className="space-y-3"
         onSubmit={(event) => {
           event.preventDefault();
           void send();
         }}
       >
-        <label className="font-medium" htmlFor="tuple-task">Purpose</label>
-        <Input
-          id="tuple-task"
-          name="tuple-task"
-          type="text"
-          value={task}
-          onChange={(event) => setTask(event.target.value)}
-          placeholder="Summarize decisions and suggest next steps"
-        />
+        <div className="space-y-2">
+          <label className="text-base font-medium sm:text-sm" htmlFor="tuple-task">Purpose</label>
+          <Input
+            id="tuple-task"
+            name="tuple-task"
+            type="text"
+            value={task}
+            onChange={(event) => setTask(event.target.value)}
+            placeholder="Summarize decisions and suggest next steps"
+          />
+        </div>
         <Button
           type="submit"
           className="w-full pl-2 pr-3"
           disabled={!task.trim() || !state?.call?.transcribing || sending}
         >
           <Icon name={sending ? "Spinner" : "Sent"} className={`size-4 shrink-0 ${sending ? "animate-spin" : ""}`} aria-hidden="true" />
-          {sending ? "Sending…" : `Send last ${minutes} min to this thread`}
+          {sending ? "Sending…" : `Send ${minutes} min to current thread`}
         </Button>
       </form>
     </div>

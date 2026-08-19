@@ -148,9 +148,6 @@
     .mx-auto {
       margin-inline: auto;
     }
-    .mt-3 {
-      margin-top: calc(var(--spacing) * 3);
-    }
     .block {
       display: block;
     }
@@ -339,6 +336,13 @@
         margin-block-end: calc(calc(var(--spacing) * 5) * calc(1 - var(--tw-space-y-reverse)));
       }
     }
+    .space-y-6 {
+      :where(& > :not(:last-child)) {
+        --tw-space-y-reverse: 0;
+        margin-block-start: calc(calc(var(--spacing) * 6) * var(--tw-space-y-reverse));
+        margin-block-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-y-reverse)));
+      }
+    }
     .-space-x-1\.5 {
       :where(& > :not(:last-child)) {
         --tw-space-x-reverse: 0;
@@ -432,12 +436,6 @@
     .bg-foreground {
       background-color: var(--foreground);
     }
-    .bg-foreground\/7 {
-      background-color: var(--foreground);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--foreground) 7%, transparent);
-      }
-    }
     .bg-muted {
       background-color: var(--muted);
     }
@@ -492,9 +490,6 @@
     .px-8 {
       padding-inline: calc(var(--spacing) * 8);
     }
-    .py-0\.5 {
-      padding-block: calc(var(--spacing) * 0.5);
-    }
     .py-1 {
       padding-block: calc(var(--spacing) * 1);
     }
@@ -521,9 +516,6 @@
     }
     .pl-2 {
       padding-left: calc(var(--spacing) * 2);
-    }
-    .pl-12 {
-      padding-left: calc(var(--spacing) * 12);
     }
     .text-left {
       text-align: left;

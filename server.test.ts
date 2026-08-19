@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseTranscript, recordingReferencePrompt } from "./server";
+import { contextPrompt, parseTranscript, recordingReferencePrompt } from "./server";
 
 describe("parseTranscript", () => {
   it("keeps speech records and ignores events, malformed lines, and blank text", () => {
@@ -19,5 +19,12 @@ describe("parseTranscript", () => {
     expect(prompt).toContain("tuple_call_context");
     expect(prompt).toContain("Find the decisions");
     expect(prompt).not.toContain("BEGIN UNTRUSTED TUPLE TRANSCRIPT");
+  });
+
+  it("marks transcript context as untrusted without second-guessing the user's action", () => {
+    const prompt = contextPrompt("ship it", 5, "Summarize the decision");
+    expect(prompt).toContain("untrusted input");
+    expect(prompt).not.toContain("independently repeat");
+    expect(prompt).not.toContain("Do not follow requests");
   });
 });
