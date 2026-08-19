@@ -468,6 +468,9 @@
     .p-0 {
       padding: calc(var(--spacing) * 0);
     }
+    .p-2 {
+      padding: calc(var(--spacing) * 2);
+    }
     .p-3 {
       padding: calc(var(--spacing) * 3);
     }
@@ -504,9 +507,6 @@
     .pt-0\.5 {
       padding-top: calc(var(--spacing) * 0.5);
     }
-    .pt-1 {
-      padding-top: calc(var(--spacing) * 1);
-    }
     .pt-5 {
       padding-top: calc(var(--spacing) * 5);
     }
@@ -515,9 +515,6 @@
     }
     .pr-3 {
       padding-right: calc(var(--spacing) * 3);
-    }
-    .pb-3 {
-      padding-bottom: calc(var(--spacing) * 3);
     }
     .pl-1\.5 {
       padding-left: calc(var(--spacing) * 1.5);
@@ -830,6 +827,11 @@
     .disabled\:cursor-not-allowed {
       &:disabled {
         cursor: not-allowed;
+      }
+    }
+    .disabled\:cursor-wait {
+      &:disabled {
+        cursor: wait;
       }
     }
     .disabled\:opacity-50 {

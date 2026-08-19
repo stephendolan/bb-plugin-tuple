@@ -3983,7 +3983,7 @@ function TupleLaunchpad({
         "button",
         {
           type: "button",
-          className: "group flex w-full min-w-0 items-center gap-3 rounded-md px-2 pt-1 pb-3 text-left hover:bg-muted/40 active:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:hover:bg-transparent",
+          className: "active:bg-muted/60 focus-visible:outline-ring group hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-md p-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait disabled:hover:bg-transparent",
           disabled: joining !== null,
           onClick: () => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
           children: [
@@ -3992,7 +3992,7 @@ function TupleLaunchpad({
               /* @__PURE__ */ jsx("span", { className: "block text-sm font-medium", children: "Your room" }),
               /* @__PURE__ */ jsx("span", { className: "block text-xs text-muted-foreground", children: "Enter and copy link" })
             ] }),
-            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground group-hover:text-foreground", "aria-hidden": "true" })
+            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "group-hover:text-foreground text-muted-foreground size-4 shrink-0", "aria-hidden": "true" })
           ]
         }
       ) })
@@ -4023,7 +4023,7 @@ function TupleLaunchpad({
         "button",
         {
           type: "button",
-          className: "group flex w-full min-w-0 items-center gap-3 rounded-md px-2 py-3 text-left hover:bg-muted/40 active:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          className: "active:bg-muted/60 focus-visible:outline-ring group hover:bg-muted/40 flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-md px-2 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2",
           onClick: () => onSelectRecording(call),
           children: [
             /* @__PURE__ */ jsx(Icon, { name: "Clock", className: "size-4 shrink-0 text-muted-foreground", "aria-hidden": "true" }),
@@ -4032,7 +4032,7 @@ function TupleLaunchpad({
               call.summary ? /* @__PURE__ */ jsx("span", { className: "block truncate text-xs text-muted-foreground", title: call.summary, children: call.summary }) : null,
               /* @__PURE__ */ jsx("span", { className: `block truncate text-xs text-muted-foreground ${call.summary ? "opacity-75" : ""}`, children: storedCallTime(call) })
             ] }),
-            /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground group-hover:text-foreground", "aria-hidden": "true" })
+            /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "group-hover:text-foreground text-muted-foreground size-4 shrink-0", "aria-hidden": "true" })
           ]
         },
         call.callId
@@ -4422,7 +4422,7 @@ function ComposerTupleAction() {
     "button",
     {
       type: "button",
-      className: "relative flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50",
+      className: "focus-visible:outline-ring hover:bg-accent hover:text-foreground text-muted-foreground relative flex size-8 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50",
       disabled: loading,
       "aria-label": label,
       title: label,
