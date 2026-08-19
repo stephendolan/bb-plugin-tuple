@@ -721,6 +721,53 @@
         color: var(--muted-foreground);
       }
     }
+    .after\:absolute {
+      &::after {
+        content: var(--tw-content);
+        position: absolute;
+      }
+    }
+    .after\:inset-x-0 {
+      &::after {
+        content: var(--tw-content);
+        inset-inline: calc(var(--spacing) * 0);
+      }
+    }
+    .after\:bottom-0 {
+      &::after {
+        content: var(--tw-content);
+        bottom: calc(var(--spacing) * 0);
+      }
+    }
+    .after\:h-px {
+      &::after {
+        content: var(--tw-content);
+        height: 1px;
+      }
+    }
+    .after\:bg-foreground\/6 {
+      &::after {
+        content: var(--tw-content);
+        background-color: var(--foreground);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
+        }
+      }
+    }
+    .after\:content-\[\'\'\] {
+      &::after {
+        --tw-content: '';
+        content: var(--tw-content);
+      }
+    }
+    .last\:after\:hidden {
+      &:last-child {
+        &::after {
+          content: var(--tw-content);
+          display: none;
+        }
+      }
+    }
     .hover\:border-l-primary-foreground\/30 {
       &:hover {
         @media (hover: hover) {
@@ -1284,6 +1331,11 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-content {
+  syntax: "*";
+  initial-value: "";
+  inherits: false;
+}
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -1334,6 +1386,7 @@
       --tw-ring-offset-shadow: 0 0 #0000;
       --tw-outline-style: solid;
       --tw-duration: initial;
+      --tw-content: "";
     }
   }
 }

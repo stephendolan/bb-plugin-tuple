@@ -140,12 +140,13 @@ export function TupleLaunchpadView({
       {launchpad?.history.length ? (
         <div className="space-y-2">
           <h3 className="text-xs font-medium text-muted-foreground">Recent calls</h3>
-          <div className="divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
+          <div className="overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8">
             {launchpad.history.map((call) => (
               <button
                 key={call.callId}
                 type="button"
-                className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 w-full min-w-0 cursor-pointer px-3 py-2.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2"
+                data-history-row
+                className="active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground/6 after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2"
                 onClick={() => onSelectRecording(call)}
               >
                 <span className="flex min-w-0 items-baseline gap-3">
@@ -154,9 +155,13 @@ export function TupleLaunchpadView({
                     {storedCallTime(call)}
                   </span>
                 </span>
-                {call.summary ? (
-                  <span className="mt-0.5 block truncate text-xs leading-snug text-muted-foreground" title={call.summary}>{call.summary}</span>
-                ) : null}
+                <span
+                  className="mt-0.5 block truncate text-xs leading-snug text-muted-foreground"
+                  title={call.summary ?? undefined}
+                  aria-hidden={call.summary ? undefined : true}
+                >
+                  {call.summary || "\u00a0"}
+                </span>
                 <span className={`mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`}>
                   {storedCallTime(call)}
                 </span>

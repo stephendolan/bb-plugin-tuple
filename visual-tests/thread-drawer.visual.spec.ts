@@ -35,6 +35,12 @@ test("out-of-call state matrix", async ({ page }) => {
   const matrix = page.getByTestId("launchpad-matrix");
   await expect(matrix).toBeVisible();
   await expectNoPanelOverflow(page);
+  for (const width of [280, 360, 480, 600]) {
+    const heights = await page
+      .locator(`[data-state="Full launchpad"][data-width="${width}"] [data-history-row]`)
+      .evaluateAll((rows: HTMLElement[]) => rows.map((row) => row.getBoundingClientRect().height));
+    expect(new Set(heights).size, `recent call rows at ${width}px should have equal height`).toBe(1);
+  }
   await page.locator('[data-state="Full launchpad"][data-width="360"] button').first().hover();
   await expect(matrix).toHaveScreenshot("out-of-call-state-matrix.png");
 });

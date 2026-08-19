@@ -139,7 +139,7 @@ var {
   useSonner
 } = mod3;
 
-// node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
 var __defProp2 = Object.defineProperty;
 var __name = (target, value) => __defProp2(target, "name", { value, configurable: true });
 function setRef(ref, value) {
@@ -180,7 +180,7 @@ function useComposedRefs(...refs) {
 }
 __name(useComposedRefs, "useComposedRefs");
 
-// node_modules/@radix-ui/react-slot/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/@radix-ui/react-slot/dist/index.mjs
 var __defProp3 = Object.defineProperty;
 var __name2 = (target, value) => __defProp3(target, "name", { value, configurable: true });
 // @__NO_SIDE_EFFECTS__
@@ -316,7 +316,7 @@ var createSlottableError = /* @__PURE__ */ __name2((ownerName) => {
 }, "createSlottableError");
 var use2 = react_exports[" use ".trim().toString()];
 
-// node_modules/clsx/dist/clsx.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/clsx/dist/clsx.mjs
 function r(e) {
   var t, f, n = "";
   if ("string" == typeof e || "number" == typeof e) n += e;
@@ -331,7 +331,7 @@ function clsx() {
   return n;
 }
 
-// node_modules/class-variance-authority/dist/index.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/class-variance-authority/dist/index.mjs
 var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
 var cx = clsx;
 var cva = (base, config) => (props) => {
@@ -373,7 +373,7 @@ var cva = (base, config) => (props) => {
   return cx(base, getVariantClassNames, getCompoundVariantClassNames, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
 };
 
-// node_modules/tailwind-merge/dist/bundle-mjs.mjs
+// Repos/@tuple/bb-plugin-tuple/node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var concatArrays = (array1, array2) => {
   const combinedArray = new Array(array1.length + array2.length);
   for (let i = 0; i < array1.length; i++) {
@@ -3627,12 +3627,12 @@ var getDefaultConfig = () => {
 };
 var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 
-// lib/utils.ts
+// Repos/@tuple/bb-plugin-tuple/lib/utils.ts
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// components/ui/motion.ts
+// Repos/@tuple/bb-plugin-tuple/components/ui/motion.ts
 var CONTROL_HOVER_TRANSITION = "transition-colors duration-150 hover:duration-0";
 
 // bb-plugin-runtime-shim:react/jsx-runtime
@@ -3647,7 +3647,7 @@ var {
   jsxs
 } = mod4;
 
-// components/ui/button.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/button.tsx
 var buttonVariants = cva(
   `inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ${CONTROL_HOVER_TRANSITION} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0`,
   {
@@ -3688,7 +3688,7 @@ var Button = forwardRef(
 );
 Button.displayName = "Button";
 
-// node_modules/@hugeicons/core-free-icons/dist/esm/index.js
+// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/core-free-icons/dist/esm/index.js
 var ArrowLeft01Icon = [
   ["path", { d: "M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }]
 ];
@@ -3734,7 +3734,7 @@ var SentIcon = [
   ["path", { d: "M11.4999 12.5L14.9999 9", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
 ];
 
-// node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
+// Repos/@tuple/bb-plugin-tuple/node_modules/@hugeicons/react/dist/esm/HugeiconsIcon.js
 var defaultAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
   width: 24,
@@ -3785,7 +3785,7 @@ var HugeiconsIcon = forwardRef(({ color = "currentColor", size = 24, strokeWidth
 });
 HugeiconsIcon.displayName = "HugeiconsIcon";
 
-// components/ui/icon.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/icon.tsx
 var ICON_MAP = {
   BubbleChatQuestion: BubbleChatQuestionIcon,
   ChevronLeft: ArrowLeft01Icon,
@@ -3817,14 +3817,14 @@ function Icon({
   );
 }
 
-// components/ui/coarse-pointer-sizing.ts
+// Repos/@tuple/bb-plugin-tuple/components/ui/coarse-pointer-sizing.ts
 var COARSE_POINTER_TEXT_BASE_CLASS = "text-sm max-md:pointer-coarse:text-base";
 var HEADER_ICON_BUTTON_BOX_CLASS = "h-[28px] w-[28px] rounded-md p-0 max-md:pointer-coarse:h-[36px] max-md:pointer-coarse:w-[36px]";
 var COARSE_POINTER_HEADER_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[16px] max-md:pointer-coarse:[&_svg]:size-[20px]`;
 var COARSE_POINTER_HEADER_REDUCED_GLYPH_ICON_BUTTON_CLASS = `${HEADER_ICON_BUTTON_BOX_CLASS} [&_svg]:size-[13px] max-md:pointer-coarse:[&_svg]:size-[16px]`;
 var COARSE_POINTER_INPUT_HEIGHT_CLASS = "h-9 max-md:pointer-coarse:h-10";
 
-// components/ui/input.tsx
+// Repos/@tuple/bb-plugin-tuple/components/ui/input.tsx
 var Input = forwardRef(
   ({ className, type, ...props }, ref) => {
     return /* @__PURE__ */ jsx(
@@ -3846,7 +3846,7 @@ var Input = forwardRef(
 );
 Input.displayName = "Input";
 
-// components/thread-call-panel-view.tsx
+// Repos/@tuple/bb-plugin-tuple/components/thread-call-panel-view.tsx
 function callDescription(state) {
   const call = state?.call;
   if (!call) return "Tuple is ready when your next call starts.";
@@ -4002,7 +4002,7 @@ function ThreadCallPanelView({
   ] });
 }
 
-// components/tuple-launchpad-view.tsx
+// Repos/@tuple/bb-plugin-tuple/components/tuple-launchpad-view.tsx
 function initials(name) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 }
@@ -4086,18 +4086,27 @@ function TupleLaunchpadView({
     ] }) : null,
     launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
       /* @__PURE__ */ jsx("h3", { className: "text-xs font-medium text-muted-foreground", children: "Recent calls" }),
-      /* @__PURE__ */ jsx("div", { className: "divide-y divide-foreground/6 overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
+      /* @__PURE__ */ jsx("div", { className: "overflow-hidden rounded-lg bg-muted/15 ring-1 ring-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
         "button",
         {
           type: "button",
-          className: "active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 w-full min-w-0 cursor-pointer px-3 py-2.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2",
+          "data-history-row": true,
+          className: "active:bg-muted/60 focus-visible:outline-ring hover:bg-muted/40 relative w-full min-w-0 cursor-pointer px-3 py-2.5 text-left after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground/6 after:content-[''] last:after:hidden focus-visible:outline-2 focus-visible:-outline-offset-2",
           onClick: () => onSelectRecording(call),
           children: [
             /* @__PURE__ */ jsxs("span", { className: "flex min-w-0 items-baseline gap-3", children: [
               /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1 truncate text-sm font-medium leading-tight", children: storedCallTitle(call) }),
               /* @__PURE__ */ jsx("span", { className: "hidden shrink-0 text-[0.6875rem] leading-tight text-muted-foreground opacity-70 @min-[26rem]:block", children: storedCallTime(call) })
             ] }),
-            call.summary ? /* @__PURE__ */ jsx("span", { className: "mt-0.5 block truncate text-xs leading-snug text-muted-foreground", title: call.summary, children: call.summary }) : null,
+            /* @__PURE__ */ jsx(
+              "span",
+              {
+                className: "mt-0.5 block truncate text-xs leading-snug text-muted-foreground",
+                title: call.summary ?? void 0,
+                "aria-hidden": call.summary ? void 0 : true,
+                children: call.summary || "\xA0"
+              }
+            ),
             /* @__PURE__ */ jsx("span", { className: `mt-0.5 block truncate text-[0.6875rem] leading-tight text-muted-foreground @min-[26rem]:hidden ${call.summary ? "opacity-70" : ""}`, children: storedCallTime(call) })
           ]
         },
@@ -4108,7 +4117,7 @@ function TupleLaunchpadView({
   ] });
 }
 
-// app.tsx
+// Repos/@tuple/bb-plugin-tuple/app.tsx
 var tupleCompactIconUrl = "/api/v1/plugins/tuple/assets/icon";
 async function copyCallJoinLink(state) {
   const joinUrl = state?.call?.joinUrl;
