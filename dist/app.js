@@ -4655,7 +4655,6 @@ function TupleLaunchpad({
 }
 function StoredCallSelection({
   recording,
-  projectId,
   threadId,
   onBack
 }) {
@@ -4693,7 +4692,6 @@ function StoredCallSelection({
       newThreadComposer: /* @__PURE__ */ jsx(
         experimental_NewThreadComposer,
         {
-          defaultProjectId: projectId ?? void 0,
           initialPrompt: recording.promptContext,
           draftKey: `tuple-recording-${recording.callId}`,
           onSubmit: createThread
@@ -4702,7 +4700,7 @@ function StoredCallSelection({
     }
   );
 }
-function NewCallThread({ projectId }) {
+function NewCallThread() {
   const { state, loading, refresh, startTranscription, rpc } = useCallState();
   const navigate = useBbNavigate();
   const { values } = useSettings();
@@ -4728,7 +4726,7 @@ function NewCallThread({ projectId }) {
     navigate.toThread(result.threadId);
   }
   if (selectedRecording) {
-    return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, projectId, onBack: () => setSelectedRecording(null) }) }) });
+    return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(StoredCallSelection, { recording: selectedRecording, onBack: () => setSelectedRecording(null) }) }) });
   }
   if (!state?.inCall) {
     return /* @__PURE__ */ jsx("main", { className: "isolate h-full overflow-auto p-4 antialiased md:p-5", children: /* @__PURE__ */ jsx("div", { className: "mx-auto w-full max-w-3xl", children: /* @__PURE__ */ jsx(TupleLaunchpad, { state, loading, onSelectRecording: setSelectedRecording }) }) });
@@ -4749,7 +4747,6 @@ function NewCallThread({ projectId }) {
         newThreadComposer: snapshot ? /* @__PURE__ */ jsx(
           experimental_NewThreadComposer,
           {
-            defaultProjectId: projectId ?? void 0,
             initialPrompt: snapshot.promptContext,
             draftKey: `tuple-call-${snapshot.callId}-${snapshot.capturedAt}`,
             onSubmit: createThread
@@ -4819,8 +4816,7 @@ function SidebarAccessory() {
   return /* @__PURE__ */ jsx(TupleSidebarAccessory, { state });
 }
 function NavCallThread() {
-  const { projectId } = useBbContext();
-  return /* @__PURE__ */ jsx(NewCallThread, { projectId });
+  return /* @__PURE__ */ jsx(NewCallThread, {});
 }
 function ComposerTupleAction() {
   const { state, rpc, startTranscription } = useCallState();
@@ -4881,7 +4877,7 @@ var app_default = definePluginApp((app) => {
     title: "Start from Tuple call",
     icon: "VideoCamera",
     layout: "flush",
-    component: ({ projectId }) => /* @__PURE__ */ jsx(NewCallThread, { projectId })
+    component: () => /* @__PURE__ */ jsx(NewCallThread, {})
   });
   app.composer.customize({
     id: "tuple-context",

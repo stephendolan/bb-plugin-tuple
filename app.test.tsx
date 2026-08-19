@@ -156,6 +156,7 @@ describe("Tuple Call app", () => {
     await slot.findByText("Transcribing · Personal room · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Use last 5 min" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
+    expect(slot.getByTestId("bb-new-thread-composer").getAttribute("data-default-project-id")).toBe("");
     await slot.findByRole("heading", { name: "Recent calls" });
     await slot.findByText("Earlier launch review");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "getSnapshot"]);

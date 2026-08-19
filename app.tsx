@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import {
   definePluginApp,
   experimental_NewThreadComposer as NewThreadComposer,
-  useBbContext,
   useBbNavigate,
   useComposer,
   useRealtime,
@@ -231,12 +230,10 @@ function TupleLaunchpad({
 
 function StoredCallSelection({
   recording,
-  projectId,
   threadId,
   onBack,
 }: {
   recording: StoredCall;
-  projectId?: string | null;
   threadId?: string;
   onBack: () => void;
 }) {
@@ -275,7 +272,6 @@ function StoredCallSelection({
       onSend={() => void sendToThread()}
       newThreadComposer={
         <NewThreadComposer
-          defaultProjectId={projectId ?? undefined}
           initialPrompt={recording.promptContext}
           draftKey={`tuple-recording-${recording.callId}`}
           onSubmit={createThread}
@@ -285,7 +281,7 @@ function StoredCallSelection({
   );
 }
 
-function NewCallThread({ projectId }: { projectId: string | null }) {
+function NewCallThread() {
   const { state, loading, refresh, startTranscription, rpc } = useCallState();
   const navigate = useBbNavigate();
   const { values } = useSettings();
@@ -317,7 +313,7 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
     return (
       <main className="isolate h-full overflow-auto p-4 antialiased md:p-5">
         <div className="mx-auto w-full max-w-3xl">
-          <StoredCallSelection recording={selectedRecording} projectId={projectId} onBack={() => setSelectedRecording(null)} />
+          <StoredCallSelection recording={selectedRecording} onBack={() => setSelectedRecording(null)} />
         </div>
       </main>
     );
@@ -348,7 +344,6 @@ function NewCallThread({ projectId }: { projectId: string | null }) {
           onCapture={() => void capture()}
           newThreadComposer={snapshot ? (
             <NewThreadComposer
-              defaultProjectId={projectId ?? undefined}
               initialPrompt={snapshot.promptContext}
               draftKey={`tuple-call-${snapshot.callId}-${snapshot.capturedAt}`}
               onSubmit={createThread}
@@ -425,8 +420,7 @@ function SidebarAccessory() {
 }
 
 function NavCallThread() {
-  const { projectId } = useBbContext();
-  return <NewCallThread projectId={projectId} />;
+  return <NewCallThread />;
 }
 
 function ComposerTupleAction() {
@@ -491,7 +485,7 @@ export default definePluginApp((app) => {
     title: "Start from Tuple call",
     icon: "VideoCamera",
     layout: "flush",
-    component: ({ projectId }) => <NewCallThread projectId={projectId} />,
+    component: () => <NewCallThread />,
   });
   app.composer.customize({
     id: "tuple-context",

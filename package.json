@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-tuple",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Bring live and recorded Tuple calls into bb as explicit, bounded context.",
   "type": "module",
   "scripts": {
