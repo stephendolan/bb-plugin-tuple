@@ -191,23 +191,25 @@ function TupleLaunchpad({
       {personalRoom ? (
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-muted-foreground">Personal room</h3>
-          <button
-            type="button"
-            className="group flex w-full min-w-0 items-center gap-3 pt-1 pb-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            disabled={joining !== null}
-            onClick={() => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl)}
-          >
-            <Icon name="GridView" className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-medium">Your room</span>
-              <span className="block text-xs text-muted-foreground">Enter and copy link</span>
-            </span>
-            {joining === `room:${personalRoom.slug}` ? (
-              <Icon name="Spinner" className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
-            ) : (
-              <Icon name="ChevronRight" className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-            )}
-          </button>
+          <div className="-mx-2">
+            <button
+              type="button"
+              className="group flex w-full min-w-0 items-center gap-3 rounded-md px-2 pt-1 pb-3 text-left hover:bg-muted/40 active:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:hover:bg-transparent"
+              disabled={joining !== null}
+              onClick={() => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl)}
+            >
+              <Icon name="GridView" className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium">Your room</span>
+                <span className="block text-xs text-muted-foreground">Enter and copy link</span>
+              </span>
+              {joining === `room:${personalRoom.slug}` ? (
+                <Icon name="Spinner" className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
+              ) : (
+                <Icon name="ChevronRight" className="size-4 shrink-0 text-muted-foreground group-hover:text-foreground" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
       ) : null}
 
@@ -255,12 +257,12 @@ function TupleLaunchpad({
       {launchpad?.history.length ? (
         <div className="space-y-2 border-t border-foreground/8 pt-5">
           <h3 className="text-sm font-medium text-muted-foreground">Recent calls</h3>
-          <div className="divide-y divide-foreground/8">
+          <div className="-mx-2 divide-y divide-foreground/8">
             {launchpad.history.map((call) => (
               <button
                 key={call.callId}
                 type="button"
-                className="group flex w-full min-w-0 items-center gap-3 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="group flex w-full min-w-0 items-center gap-3 rounded-md px-2 py-3 text-left hover:bg-muted/40 active:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 onClick={() => onSelectRecording(call)}
               >
                 <Icon name="Clock" className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -273,7 +275,7 @@ function TupleLaunchpad({
                     {storedCallTime(call)}
                   </span>
                 </span>
-                <Icon name="ChevronRight" className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <Icon name="ChevronRight" className="size-4 shrink-0 text-muted-foreground group-hover:text-foreground" aria-hidden="true" />
               </button>
             ))}
           </div>

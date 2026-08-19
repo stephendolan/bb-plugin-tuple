@@ -142,6 +142,9 @@
     .isolate {
       isolation: isolate;
     }
+    .-mx-2 {
+      margin-inline: calc(var(--spacing) * -2);
+    }
     .mx-auto {
       margin-inline: auto;
     }
@@ -640,11 +643,6 @@
       transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
       transition-duration: var(--tw-duration, var(--default-transition-duration));
     }
-    .transition-transform {
-      transition-property: transform, translate, scale, rotate;
-      transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-      transition-duration: var(--tw-duration, var(--default-transition-duration));
-    }
     .transition-none {
       transition-property: none;
     }
@@ -652,11 +650,10 @@
       --tw-duration: 150ms;
       transition-duration: 150ms;
     }
-    .group-hover\:translate-x-0\.5 {
+    .group-hover\:text-foreground {
       &:is(:where(.group):hover *) {
         @media (hover: hover) {
-          --tw-translate-x: calc(var(--spacing) * 0.5);
-          translate: var(--tw-translate-x) var(--tw-translate-y);
+          color: var(--foreground);
         }
       }
     }
@@ -735,6 +732,16 @@
         }
       }
     }
+    .hover\:bg-muted\/40 {
+      &:hover {
+        @media (hover: hover) {
+          background-color: var(--muted);
+          @supports (color: color-mix(in lab, red, red)) {
+            background-color: color-mix(in oklab, var(--muted) 40%, transparent);
+          }
+        }
+      }
+    }
     .hover\:bg-secondary\/80 {
       &:hover {
         @media (hover: hover) {
@@ -807,6 +814,14 @@
         outline-style: none;
       }
     }
+    .active\:bg-muted\/60 {
+      &:active {
+        background-color: var(--muted);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--muted) 60%, transparent);
+        }
+      }
+    }
     .disabled\:pointer-events-none {
       &:disabled {
         pointer-events: none;
@@ -820,6 +835,15 @@
     .disabled\:opacity-50 {
       &:disabled {
         opacity: 50%;
+      }
+    }
+    .disabled\:hover\:bg-transparent {
+      &:disabled {
+        &:hover {
+          @media (hover: hover) {
+            background-color: transparent;
+          }
+        }
       }
     }
     .aria-pressed\:bg-state-active {

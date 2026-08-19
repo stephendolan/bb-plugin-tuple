@@ -3979,11 +3979,11 @@ function TupleLaunchpad({
     ] }) : null,
     personalRoom ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
       /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Personal room" }),
-      /* @__PURE__ */ jsxs(
+      /* @__PURE__ */ jsx("div", { className: "-mx-2", children: /* @__PURE__ */ jsxs(
         "button",
         {
           type: "button",
-          className: "group flex w-full min-w-0 items-center gap-3 pt-1 pb-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          className: "group flex w-full min-w-0 items-center gap-3 rounded-md px-2 pt-1 pb-3 text-left hover:bg-muted/40 active:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:hover:bg-transparent",
           disabled: joining !== null,
           onClick: () => void join(personalRoom.joinUrl, `room:${personalRoom.slug}`, personalRoom.joinUrl),
           children: [
@@ -3992,10 +3992,10 @@ function TupleLaunchpad({
               /* @__PURE__ */ jsx("span", { className: "block text-sm font-medium", children: "Your room" }),
               /* @__PURE__ */ jsx("span", { className: "block text-xs text-muted-foreground", children: "Enter and copy link" })
             ] }),
-            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5", "aria-hidden": "true" })
+            joining === `room:${personalRoom.slug}` ? /* @__PURE__ */ jsx(Icon, { name: "Spinner", className: "size-4 shrink-0 animate-spin text-muted-foreground", "aria-hidden": "true" }) : /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground group-hover:text-foreground", "aria-hidden": "true" })
           ]
         }
-      )
+      ) })
     ] }) : null,
     launchpad?.calls.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
       /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Happening now" }),
@@ -4019,11 +4019,11 @@ function TupleLaunchpad({
     ] }) : launchpad ? /* @__PURE__ */ jsx("p", { className: "text-sm text-muted-foreground", children: "No other calls happening right now." }) : null,
     launchpad?.history.length ? /* @__PURE__ */ jsxs("div", { className: "space-y-2 border-t border-foreground/8 pt-5", children: [
       /* @__PURE__ */ jsx("h3", { className: "text-sm font-medium text-muted-foreground", children: "Recent calls" }),
-      /* @__PURE__ */ jsx("div", { className: "divide-y divide-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
+      /* @__PURE__ */ jsx("div", { className: "-mx-2 divide-y divide-foreground/8", children: launchpad.history.map((call) => /* @__PURE__ */ jsxs(
         "button",
         {
           type: "button",
-          className: "group flex w-full min-w-0 items-center gap-3 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          className: "group flex w-full min-w-0 items-center gap-3 rounded-md px-2 py-3 text-left hover:bg-muted/40 active:bg-muted/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           onClick: () => onSelectRecording(call),
           children: [
             /* @__PURE__ */ jsx(Icon, { name: "Clock", className: "size-4 shrink-0 text-muted-foreground", "aria-hidden": "true" }),
@@ -4032,7 +4032,7 @@ function TupleLaunchpad({
               call.summary ? /* @__PURE__ */ jsx("span", { className: "block truncate text-xs text-muted-foreground", title: call.summary, children: call.summary }) : null,
               /* @__PURE__ */ jsx("span", { className: `block truncate text-xs text-muted-foreground ${call.summary ? "opacity-75" : ""}`, children: storedCallTime(call) })
             ] }),
-            /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5", "aria-hidden": "true" })
+            /* @__PURE__ */ jsx(Icon, { name: "ChevronRight", className: "size-4 shrink-0 text-muted-foreground group-hover:text-foreground", "aria-hidden": "true" })
           ]
         },
         call.callId
