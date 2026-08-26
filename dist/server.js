@@ -524,7 +524,7 @@ __export(core_exports2, {
   parse: () => parse,
   parseAsync: () => parseAsync,
   prettifyError: () => prettifyError,
-  process: () => process,
+  process: () => process2,
   regexes: () => regexes_exports,
   registry: () => registry,
   safeDecode: () => safeDecode,
@@ -11449,7 +11449,7 @@ function initializeContext(params) {
     external: params?.external ?? void 0
   };
 }
-function process(schema, ctx, _params = { path: [], schemaPath: [] }) {
+function process2(schema, ctx, _params = { path: [], schemaPath: [] }) {
   var _a3;
   const def = schema._zod.def;
   const seen = ctx.seen.get(schema);
@@ -11486,7 +11486,7 @@ function process(schema, ctx, _params = { path: [], schemaPath: [] }) {
     if (parent) {
       if (!result.ref)
         result.ref = parent;
-      process(parent, ctx, params);
+      process2(parent, ctx, params);
       ctx.seen.get(parent).isParent = true;
     }
   }
@@ -11774,14 +11774,14 @@ function isTransforming(_schema, _ctx) {
 }
 var createToJSONSchemaMethod = (schema, processors = {}) => (params) => {
   const ctx = initializeContext({ ...params, processors });
-  process(schema, ctx);
+  process2(schema, ctx);
   extractDefs(ctx, schema);
   return finalize(ctx, schema);
 };
 var createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params) => {
   const { libraryOptions, target } = params ?? {};
   const ctx = initializeContext({ ...libraryOptions ?? {}, target, io, processors });
-  process(schema, ctx);
+  process2(schema, ctx);
   extractDefs(ctx, schema);
   return finalize(ctx, schema);
 };
@@ -12027,7 +12027,7 @@ var arrayProcessor = (schema, ctx, _json, params) => {
   if (typeof maximum === "number")
     json2.maxItems = maximum;
   json2.type = "array";
-  json2.items = process(def.element, ctx, {
+  json2.items = process2(def.element, ctx, {
     ...params,
     path: [...params.path, "items"]
   });
@@ -12039,7 +12039,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
   json2.properties = {};
   const shape = def.shape;
   for (const key in shape) {
-    json2.properties[key] = process(shape[key], ctx, {
+    json2.properties[key] = process2(shape[key], ctx, {
       ...params,
       path: [...params.path, "properties", key]
     });
@@ -12062,7 +12062,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
     if (ctx.io === "output")
       json2.additionalProperties = false;
   } else if (def.catchall) {
-    json2.additionalProperties = process(def.catchall, ctx, {
+    json2.additionalProperties = process2(def.catchall, ctx, {
       ...params,
       path: [...params.path, "additionalProperties"]
     });
@@ -12071,7 +12071,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
 var unionProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
   const isExclusive = def.inclusive === false;
-  const options = def.options.map((x, i) => process(x, ctx, {
+  const options = def.options.map((x, i) => process2(x, ctx, {
     ...params,
     path: [...params.path, isExclusive ? "oneOf" : "anyOf", i]
   }));
@@ -12083,11 +12083,11 @@ var unionProcessor = (schema, ctx, json2, params) => {
 };
 var intersectionProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  const a = process(def.left, ctx, {
+  const a = process2(def.left, ctx, {
     ...params,
     path: [...params.path, "allOf", 0]
   });
-  const b = process(def.right, ctx, {
+  const b = process2(def.right, ctx, {
     ...params,
     path: [...params.path, "allOf", 1]
   });
@@ -12104,11 +12104,11 @@ var tupleProcessor = (schema, ctx, _json, params) => {
   json2.type = "array";
   const prefixPath = ctx.target === "draft-2020-12" ? "prefixItems" : "items";
   const restPath = ctx.target === "draft-2020-12" ? "items" : ctx.target === "openapi-3.0" ? "items" : "additionalItems";
-  const prefixItems = def.items.map((x, i) => process(x, ctx, {
+  const prefixItems = def.items.map((x, i) => process2(x, ctx, {
     ...params,
     path: [...params.path, prefixPath, i]
   }));
-  const rest = def.rest ? process(def.rest, ctx, {
+  const rest = def.rest ? process2(def.rest, ctx, {
     ...params,
     path: [...params.path, restPath, ...ctx.target === "openapi-3.0" ? [def.items.length] : []]
   }) : null;
@@ -12148,7 +12148,7 @@ var recordProcessor = (schema, ctx, _json, params) => {
   const keyBag = keyType._zod.bag;
   const patterns = keyBag?.patterns;
   if (def.mode === "loose" && patterns && patterns.size > 0) {
-    const valueSchema = process(def.valueType, ctx, {
+    const valueSchema = process2(def.valueType, ctx, {
       ...params,
       path: [...params.path, "patternProperties", "*"]
     });
@@ -12158,12 +12158,12 @@ var recordProcessor = (schema, ctx, _json, params) => {
     }
   } else {
     if (ctx.target === "draft-07" || ctx.target === "draft-2020-12") {
-      json2.propertyNames = process(def.keyType, ctx, {
+      json2.propertyNames = process2(def.keyType, ctx, {
         ...params,
         path: [...params.path, "propertyNames"]
       });
     }
-    json2.additionalProperties = process(def.valueType, ctx, {
+    json2.additionalProperties = process2(def.valueType, ctx, {
       ...params,
       path: [...params.path, "additionalProperties"]
     });
@@ -12178,7 +12178,7 @@ var recordProcessor = (schema, ctx, _json, params) => {
 };
 var nullableProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  const inner = process(def.innerType, ctx, params);
+  const inner = process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   if (ctx.target === "openapi-3.0") {
     seen.ref = def.innerType;
@@ -12189,20 +12189,20 @@ var nullableProcessor = (schema, ctx, json2, params) => {
 };
 var nonoptionalProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
 };
 var defaultProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   json2.default = JSON.parse(JSON.stringify(def.defaultValue));
 };
 var prefaultProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   if (ctx.io === "input")
@@ -12210,7 +12210,7 @@ var prefaultProcessor = (schema, ctx, json2, params) => {
 };
 var catchProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   let catchValue;
@@ -12225,32 +12225,32 @@ var pipeProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
   const inIsTransform = def.in._zod.traits.has("$ZodTransform");
   const innerType = ctx.io === "input" ? inIsTransform ? def.out : def.in : def.out;
-  process(innerType, ctx, params);
+  process2(innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = innerType;
 };
 var readonlyProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   json2.readOnly = true;
 };
 var promiseProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
 };
 var optionalProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
-  process(def.innerType, ctx, params);
+  process2(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
 };
 var lazyProcessor = (schema, ctx, _json, params) => {
   const innerType = schema._zod.innerType;
-  process(innerType, ctx, params);
+  process2(innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = innerType;
 };
@@ -12302,7 +12302,7 @@ function toJSONSchema(input, params) {
     const defs = {};
     for (const entry of registry2._idmap.entries()) {
       const [_, schema] = entry;
-      process(schema, ctx2);
+      process2(schema, ctx2);
     }
     const schemas = {};
     const external = {
@@ -12325,7 +12325,7 @@ function toJSONSchema(input, params) {
     return { schemas };
   }
   const ctx = initializeContext({ ...params, processors: allProcessors });
-  process(input, ctx);
+  process2(input, ctx);
   extractDefs(ctx, input);
   return finalize(ctx, input);
 }
@@ -12383,7 +12383,7 @@ var JSONSchemaGenerator = class {
    * This must be called before emit().
    */
   process(schema, _params = { path: [], schemaPath: [] }) {
-    return process(schema, this.ctx, _params);
+    return process2(schema, this.ctx, _params);
   }
   /**
    * Emit the final JSON Schema after processing.
@@ -14558,7 +14558,6 @@ var transcriptSnapshotSchema = external_exports.object({
   since: external_exports.string(),
   until: external_exports.string(),
   capturedAt: external_exports.string(),
-  segmentCount: external_exports.number().int(),
   transcript: external_exports.string(),
   promptContext: external_exports.string(),
   truncated: external_exports.boolean()
@@ -14642,6 +14641,15 @@ function errorMessage(error51) {
   if (error51 instanceof Error) return error51.message;
   return String(error51);
 }
+function commandErrorText(error51) {
+  if (!error51 || typeof error51 !== "object") return errorMessage(error51);
+  const commandError = error51;
+  return [commandError.message, commandError.stderr, commandError.stdout].filter((value) => typeof value === "string").join("\n");
+}
+function isUnsupportedQueryFlag(error51) {
+  const text = commandErrorText(error51);
+  return /unknown (?:flag|shorthand flag).*?(?:query|q\b)|flag provided but not defined.*?(?:query|q\b)/i.test(text);
+}
 function cliEnvironment(command) {
   switch (basename(command.trim())) {
     case "tuple-staging":
@@ -14678,28 +14686,13 @@ function normalizeState(environment, raw) {
     updatedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
 }
-function formatTranscriptLine(record2) {
-  if (!record2 || typeof record2 !== "object") return null;
-  const row = record2;
-  if (!row.data) return null;
-  const text = row.data.text?.trim();
-  if (!text) return null;
-  const speaker = row.data.user_id === void 0 ? row.type ?? "Tuple" : `User ${row.data.user_id}`;
-  const localTime = row.time ? new Date(row.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-  const time3 = row.time ? `${localTime} | ${row.time}` : "";
-  return `[${time3}] ${speaker}: ${text}`;
-}
-function parseTranscript(output) {
-  const lines = [];
-  for (const rawLine of output.split("\n")) {
-    if (!rawLine.trim()) continue;
-    try {
-      const line = formatTranscriptLine(JSON.parse(rawLine));
-      if (line) lines.push(line);
-    } catch {
-    }
-  }
-  return lines;
+function boundTranscriptOutput(output) {
+  const fullTranscript = output.trim();
+  const truncated = fullTranscript.length > MAX_TRANSCRIPT_CHARS;
+  return {
+    transcript: truncated ? fullTranscript.slice(-MAX_TRANSCRIPT_CHARS) : fullTranscript,
+    truncated
+  };
 }
 function liveCallReferencePrompt(callId, since, until, command, task) {
   const taskBlock = `
@@ -14766,6 +14759,7 @@ async function plugin(bb) {
     updatedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
   const roomCache = /* @__PURE__ */ new Map();
+  const callQuerySupport = /* @__PURE__ */ new Map();
   let settingsGeneration = 0;
   let activeFollower = null;
   async function getCliCommand() {
@@ -14780,6 +14774,50 @@ async function plugin(bb) {
       maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024
     });
     return stdout;
+  }
+  async function runTupleText(command, args, options) {
+    const { stdout } = await execFileAsync(command, ["--format", "table", ...args], {
+      timeout: options?.timeout ?? 15e3,
+      maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024
+    });
+    return stdout;
+  }
+  async function supportsCallQuery(command) {
+    const cached2 = callQuerySupport.get(command);
+    if (cached2 !== void 0) return cached2;
+    const baseline = JSON.parse(
+      await runTuple(command, ["transcription", "list", "--limit", "1"])
+    );
+    if (!baseline.length) return true;
+    const probe = `bbtuplecapabilityprobe${process.pid}${Date.now()}`;
+    try {
+      const result = JSON.parse(
+        await runTuple(command, ["transcription", "list", "--query", probe, "--limit", "1"])
+      );
+      const supported = result.length === 0;
+      callQuerySupport.set(command, supported);
+      return supported;
+    } catch (error51) {
+      if (!isUnsupportedQueryFlag(error51)) throw error51;
+      callQuerySupport.set(command, false);
+      return false;
+    }
+  }
+  function roomInfo(room) {
+    return {
+      name: room?.name?.trim() || null,
+      kind: room?.kind ?? null,
+      joinUrl: room?.http_value?.trim() || null
+    };
+  }
+  async function resolveRoomInfo(environment, command, slug) {
+    const cacheKey = `${environment}:${slug}`;
+    const cached2 = roomCache.get(cacheKey);
+    if (cached2) return cached2;
+    const exact = JSON.parse(await runTuple(command, ["rooms", "get", slug]));
+    const resolved = roomInfo(exact);
+    roomCache.set(cacheKey, resolved);
+    return resolved;
   }
   function storedCall(call, command, match) {
     if (!call.call_id || !call.started_at) return null;
@@ -14802,20 +14840,7 @@ async function plugin(bb) {
     currentState = normalizeState(environment, raw);
     const roomSlug = currentState.call?.roomSlug;
     if (currentState.call && roomSlug) {
-      const cacheKey = `${environment}:${roomSlug}`;
-      let room = roomCache.get(cacheKey);
-      if (!room) {
-        const rooms = JSON.parse(
-          await runTuple(command, ["rooms", "list", "--limit", "-1"])
-        );
-        const match = rooms.find((candidate) => candidate.slug === roomSlug);
-        room = {
-          name: match?.name?.trim() || null,
-          kind: match?.kind ?? null,
-          joinUrl: match?.http_value ?? `${environment === "staging" ? "https://staging.tuple.app" : "https://tuple.app"}/c/${roomSlug}`
-        };
-        roomCache.set(cacheKey, room);
-      }
+      const room = await resolveRoomInfo(environment, command, roomSlug);
       currentState.call.roomName = room.name;
       currentState.call.roomKind = room.kind;
       currentState.call.joinUrl = room.joinUrl;
@@ -14851,11 +14876,14 @@ async function plugin(bb) {
     const personalRoom = JSON.parse(roomsOutput)[0] ?? null;
     const calls = JSON.parse(callsOutput);
     const history = JSON.parse(historyOutput);
-    const baseUrl = environment === "staging" ? "https://staging.tuple.app" : "https://tuple.app";
+    const roomInfoBySlug = /* @__PURE__ */ new Map();
+    for (const slug of new Set(calls.flatMap((call) => call.room?.slug ? [call.room.slug] : []))) {
+      roomInfoBySlug.set(slug, await resolveRoomInfo(environment, command, slug));
+    }
     return {
-      personalRoom: personalRoom?.slug ? {
+      personalRoom: personalRoom?.slug && personalRoom.http_value ? {
         slug: personalRoom.slug,
-        joinUrl: personalRoom.http_value ?? `${baseUrl}/c/${personalRoom.slug}`
+        joinUrl: personalRoom.http_value
       } : null,
       calls: calls.filter((call) => !call.current).map((call) => {
         const participants = (call.participants ?? []).map(
@@ -14870,7 +14898,7 @@ async function plugin(bb) {
           capacity: Math.max(0, call.capacity ?? participants.length),
           joinable: Boolean(call.joinable),
           room,
-          joinTarget: room ? `${baseUrl}/c/${room.slug}` : directTarget
+          joinTarget: room ? roomInfoBySlug.get(room.slug)?.joinUrl ?? null : directTarget
         };
       }),
       history: history.flatMap((call) => {
@@ -14891,6 +14919,26 @@ async function plugin(bb) {
   }
   async function searchHistory(query) {
     const command = await getCliCommand();
+    if (await supportsCallQuery(command)) {
+      try {
+        const history2 = JSON.parse(
+          await runTuple(command, ["transcription", "list", "--query", query, "--limit", "100"], {
+            timeout: 3e4,
+            maxBuffer: 4 * 1024 * 1024
+          })
+        );
+        if (history2.every((call) => call.match || storedCallMatchesQuery(call, query))) {
+          return history2.flatMap((call) => {
+            const normalized = storedCall(call, command, call.match);
+            return normalized ? [normalized] : [];
+          });
+        }
+        callQuerySupport.set(command, false);
+      } catch (error51) {
+        if (!isUnsupportedQueryFlag(error51)) throw error51;
+        callQuerySupport.set(command, false);
+      }
+    }
     const contentQuery = transcriptSearchQuery(query);
     const [historyOutput, searchOutput] = await Promise.all([
       runTuple(command, ["transcription", "list", "--limit", "-1"], { timeout: 3e4, maxBuffer: 16 * 1024 * 1024 }),
@@ -14962,7 +15010,7 @@ async function plugin(bb) {
     if (!state.call.transcribing) throw new Error("The active Tuple call is not being transcribed.");
     const since = new Date(Date.now() - minutes * 6e4).toISOString();
     const until = (/* @__PURE__ */ new Date()).toISOString();
-    const output = await runTuple(command, [
+    const output = await runTupleText(command, [
       "transcription",
       "show",
       "current",
@@ -14972,17 +15020,13 @@ async function plugin(bb) {
       until,
       "--without-chat"
     ]);
-    const segments = parseTranscript(output);
-    const fullTranscript = segments.join("\n");
-    const truncated = fullTranscript.length > MAX_TRANSCRIPT_CHARS;
-    const transcript = truncated ? fullTranscript.slice(-MAX_TRANSCRIPT_CHARS) : fullTranscript;
+    const { transcript, truncated } = boundTranscriptOutput(output);
     return {
       callId: state.call.callId,
       minutes,
       since,
       until,
       capturedAt: until,
-      segmentCount: segments.length,
       transcript,
       promptContext: liveCallReferencePrompt(state.call.callId, since, until, command),
       truncated
@@ -15065,6 +15109,7 @@ async function plugin(bb) {
   settings.onChange(() => {
     settingsGeneration += 1;
     roomCache.clear();
+    callQuerySupport.clear();
     activeFollower?.kill("SIGTERM");
     void refreshState().then(() => bb.realtime.publish("call-state", currentState));
   });
@@ -15084,10 +15129,10 @@ async function plugin(bb) {
   bb.log.info(`loaded for ${currentState.environment}; inCall=${currentState.inCall}`);
 }
 export {
+  boundTranscriptOutput,
   plugin as default,
   liveCallReferencePrompt,
   normalizeState,
-  parseTranscript,
   recordingReferencePrompt,
   rpcContract,
   storedCallMatchesQuery,

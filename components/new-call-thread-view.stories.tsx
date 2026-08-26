@@ -35,7 +35,6 @@ const snapshot: TranscriptSnapshot = {
   since: "2026-08-18T20:00:00.000Z",
   until: "2026-08-18T20:05:00.000Z",
   capturedAt: "2026-08-18T20:05:00.000Z",
-  segmentCount: 4,
   truncated: false,
   transcript: "[4:01 PM] Demo host: Let’s use the smaller launch.\n[4:02 PM] Example teammate: I’ll draft the customer follow-up.",
   promptContext: "Synthetic recent Tuple context.",
@@ -47,7 +46,7 @@ const scenarios = [
   { label: "Transcription off", state: { ...liveCall, call: { ...liveCall.call!, transcribing: false } }, snapshot: null, capturing: false },
   { label: "Captured", state: liveCall, snapshot, capturing: false },
   { label: "Recapturing", state: liveCall, snapshot, capturing: true },
-  { label: "Empty capture", state: liveCall, snapshot: { ...snapshot, segmentCount: 0, transcript: "" }, capturing: false },
+  { label: "Empty capture", state: liveCall, snapshot: { ...snapshot, transcript: "" }, capturing: false },
   { label: "Trimmed capture", state: liveCall, snapshot: { ...snapshot, truncated: true }, capturing: false },
 ];
 

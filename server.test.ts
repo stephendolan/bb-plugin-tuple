@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  boundTranscriptOutput,
   liveCallReferencePrompt,
   normalizeState,
-  parseTranscript,
   recordingReferencePrompt,
   storedCallMatchesQuery,
   transcriptSearchQuery,
 } from "./server";
 
-describe("parseTranscript", () => {
+describe("server helpers", () => {
   it("uses the CLI's name field for agent participants", () => {
     const state = normalizeState("staging", {
       in_call: true,
@@ -18,17 +18,18 @@ describe("parseTranscript", () => {
     expect(state.call?.participants).toEqual(["Sherlock"]);
   });
 
-  it("keeps speech records and ignores events, malformed lines, and blank text", () => {
-    const output = [
-      JSON.stringify({ type: "recording_started", time: "2026-08-18T20:00:00Z", data: { message: "started" } }),
-      JSON.stringify({ type: "transcription_finished", time: "2026-08-18T20:01:00Z", data: { text: " hello ", user_id: 42 } }),
-      "{partial",
-      JSON.stringify({ type: "transcription_finished", time: "2026-08-18T20:02:00Z", data: { text: "   ", user_id: 42 } }),
-    ].join("\n");
+  it("keeps the CLI's human transcript output opaque and bounded", () => {
+    const output = "  [4:01 PM] Sherlock: hello\n\n[4:02 PM] Stephen: ship it  \n";
+    expect(boundTranscriptOutput(output)).toEqual({
+      transcript: "[4:01 PM] Sherlock: hello\n\n[4:02 PM] Stephen: ship it",
+      truncated: false,
+    });
 
-    const transcript = parseTranscript(output);
-    expect(transcript).toEqual([expect.stringContaining("User 42: hello")]);
-    expect(transcript[0]).toContain("2026-08-18T20:01:00Z");
+    const longOutput = `old${"x".repeat(60_000)}new`;
+    const bounded = boundTranscriptOutput(longOutput);
+    expect(bounded.truncated).toBe(true);
+    expect(bounded.transcript).toHaveLength(60_000);
+    expect(bounded.transcript.endsWith("new")).toBe(true);
   });
 
   it("references a stored call without embedding transcript content", () => {
@@ -84,7 +85,7 @@ describe("parseTranscript", () => {
 
     expect(storedCallMatchesQuery(call, "launch sher")).toBe(true);
     expect(storedCallMatchesQuery(call, "ste sher")).toBe(true);
-    expect(storedCallMatchesQuery(call, "demo")).toBe(false);
+    expect(storedCallMatchesQuery(call, "retro")).toBe(false);
   });
 
   it("turns consumer search text into a safe trigram-compatible FTS query", () => {

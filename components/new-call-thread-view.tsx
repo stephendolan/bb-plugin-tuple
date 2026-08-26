@@ -74,7 +74,7 @@ export function NewCallThreadView({
             <div className={`${PANEL_SURFACE_CLASS} p-3`}>
               <div className="flex min-w-0 items-start gap-3">
                 <p className="text-muted-foreground min-w-0 flex-1 text-sm">
-                  {snapshot.segmentCount} speech segment{snapshot.segmentCount === 1 ? "" : "s"} · Last {snapshot.minutes} min
+                  Last {snapshot.minutes} min
                   {snapshot.truncated ? " · Oldest text trimmed" : ""}
                 </p>
                 <Button
