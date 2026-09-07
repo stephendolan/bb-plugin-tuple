@@ -1,4 +1,4 @@
-import type { CallState, TranscriptSnapshot } from "../server";
+import type { CallState, CaptureSnapshot } from "../server";
 import { NewCallThreadView } from "./new-call-thread-view";
 import { PreviewMatrix } from "./preview-gallery";
 import { RecentCallsSection, type StoredCall } from "./recent-calls-section";
@@ -17,7 +17,7 @@ const liveCall: CallState = {
   call: {
     callId: "call-story",
     muted: false,
-    transcribing: true,
+    capturing: true,
     roomSlug: "demo-room",
     roomName: "Demo room",
     roomKind: "personal",
@@ -29,7 +29,7 @@ const liveCall: CallState = {
   updatedAt: "2026-08-18T20:00:00.000Z",
 };
 
-const snapshot: TranscriptSnapshot = {
+const snapshot: CaptureSnapshot = {
   callId: "call-story",
   minutes: 5,
   since: "2026-08-18T20:00:00.000Z",
@@ -43,7 +43,7 @@ const snapshot: TranscriptSnapshot = {
 const scenarios = [
   { label: "Ready", state: liveCall, snapshot: null, capturing: false },
   { label: "Capturing", state: liveCall, snapshot: null, capturing: true },
-  { label: "Transcription off", state: { ...liveCall, call: { ...liveCall.call!, transcribing: false } }, snapshot: null, capturing: false },
+  { label: "Capture off", state: { ...liveCall, call: { ...liveCall.call!, capturing: false } }, snapshot: null, capturing: false },
   { label: "Captured", state: liveCall, snapshot, capturing: false },
   { label: "Recapturing", state: liveCall, snapshot, capturing: true },
   { label: "Empty capture", state: liveCall, snapshot: { ...snapshot, transcript: "" }, capturing: false },
@@ -88,7 +88,7 @@ export function StateMatrix() {
           capturing={scenario.capturing}
           onRetry={noop}
           onCopyJoinLink={noop}
-          onStartTranscription={noop}
+          onStartCapture={noop}
           onCapture={noop}
           newThreadComposer={
             <div className={`${PANEL_SURFACE_CLASS} p-3 text-sm text-muted-foreground`}>
@@ -119,7 +119,7 @@ export function WithRecentCalls() {
             capturing={false}
             onRetry={noop}
             onCopyJoinLink={noop}
-            onStartTranscription={noop}
+            onStartCapture={noop}
             onCapture={noop}
           />
           <RecentCallsSection

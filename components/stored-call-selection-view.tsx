@@ -96,7 +96,7 @@ export function StoredCallSelectionView({
           <div className="space-y-0.5">
             <h2 className={PANEL_SECTION_HEADING_CLASS}>New thread</h2>
             <p className="text-muted-foreground px-3 text-base text-pretty sm:text-sm">
-              The new thread will read this recording directly from Tuple.
+              The new thread will read this stored call directly from Tuple.
             </p>
           </div>
           {newThreadComposer}

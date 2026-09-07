@@ -17,7 +17,7 @@ const callStateSchema = z.object({
     .object({
       callId: z.string(),
       muted: z.boolean(),
-      transcribing: z.boolean(),
+      capturing: z.boolean(),
       roomSlug: z.string().nullable(),
       roomName: z.string().nullable(),
       roomKind: z.enum(["personal", "team"]).nullable(),
@@ -87,7 +87,7 @@ export const rpcContract = defineRpcContract({
     input: z.object({ target: z.string().trim().min(1), switchCurrent: z.boolean().default(false) }),
     output: z.object({ ok: z.literal(true) }),
   },
-  sendRecordingToThread: {
+  sendStoredCallToThread: {
     input: z.object({
       threadId: z.string().min(1),
       callId: z.string().min(1),
@@ -99,7 +99,7 @@ export const rpcContract = defineRpcContract({
     input: z.object({ minutes: z.number().int().min(1).max(30) }),
     output: transcriptSnapshotSchema,
   },
-  startTranscription: {
+  startCapture: {
     input: z.null(),
     output: callStateSchema,
   },
@@ -119,7 +119,7 @@ export const rpcContract = defineRpcContract({
 
 type Environment = z.infer<typeof environmentSchema>;
 export type CallState = z.infer<typeof callStateSchema>;
-export type TranscriptSnapshot = z.infer<typeof transcriptSnapshotSchema>;
+export type CaptureSnapshot = z.infer<typeof transcriptSnapshotSchema>;
 export type Launchpad = z.infer<typeof launchpadSchema>;
 
 const MAX_TRANSCRIPT_CHARS = 60_000;
@@ -192,19 +192,6 @@ function errorMessage(error: unknown): string {
   return String(error);
 }
 
-function commandErrorText(error: unknown) {
-  if (!error || typeof error !== "object") return errorMessage(error);
-  const commandError = error as { message?: unknown; stderr?: unknown; stdout?: unknown };
-  return [commandError.message, commandError.stderr, commandError.stdout]
-    .filter((value): value is string => typeof value === "string")
-    .join("\n");
-}
-
-function isUnsupportedQueryFlag(error: unknown) {
-  const text = commandErrorText(error);
-  return /unknown (?:flag|shorthand flag).*?(?:query|q\b)|flag provided but not defined.*?(?:query|q\b)/i.test(text);
-}
-
 function cliEnvironment(command: string): Environment {
   switch (basename(command.trim())) {
     case "tuple-staging": return "staging";
@@ -236,7 +223,7 @@ export function normalizeState(environment: Environment, raw: RawState): CallSta
       ? {
           callId: rawCall.call_id ?? "current",
           muted: Boolean(rawCall.muted),
-          transcribing: Boolean(rawCall.transcribing),
+          capturing: Boolean(rawCall.transcribing),
           roomSlug: rawCall.active_room_slug ?? null,
           roomName: null,
           roomKind: null,
@@ -269,7 +256,7 @@ export function liveCallReferencePrompt(callId: string, since: string, until: st
   ].join("\n");
 }
 
-export function recordingReferencePrompt(callId: string, command: string, task?: string) {
+export function storedCallReferencePrompt(callId: string, command: string, task?: string) {
   const taskBlock = `\n\nRename this thread to match the purpose below, then complete it:\n${task?.trim() ?? ""}`;
   return [
     `Use the stored Tuple call with ID ${callId} as context for this task.`,
@@ -311,7 +298,7 @@ export default async function plugin(bb: BbPluginApi) {
     },
     defaultMinutes: {
       type: "select",
-      label: "Default transcript window",
+      label: "Default capture window",
       options: ["1", "5", "10", "15"],
       default: "5",
     },
@@ -326,7 +313,6 @@ export default async function plugin(bb: BbPluginApi) {
     updatedAt: new Date().toISOString(),
   };
   const roomCache = new Map<string, RoomInfo>();
-  const callQuerySupport = new Map<string, boolean>();
   let settingsGeneration = 0;
   let activeFollower: ReturnType<typeof spawn> | null = null;
 
@@ -346,35 +332,11 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   async function runTupleText(command: string, args: string[], options?: { timeout?: number; maxBuffer?: number }) {
-    const { stdout } = await execFileAsync(command, ["--format", "table", ...args], {
+    const { stdout } = await execFileAsync(command, ["--format", "text", ...args], {
       timeout: options?.timeout ?? 15_000,
       maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024,
     });
     return stdout;
-  }
-
-  async function supportsCallQuery(command: string) {
-    const cached = callQuerySupport.get(command);
-    if (cached !== undefined) return cached;
-
-    const baseline = JSON.parse(
-      await runTuple(command, ["transcription", "list", "--limit", "1"]),
-    ) as unknown[];
-    if (!baseline.length) return true;
-
-    const probe = `bbtuplecapabilityprobe${process.pid}${Date.now()}`;
-    try {
-      const result = JSON.parse(
-        await runTuple(command, ["transcription", "list", "--query", probe, "--limit", "1"]),
-      ) as unknown[];
-      const supported = result.length === 0;
-      callQuerySupport.set(command, supported);
-      return supported;
-    } catch (error) {
-      if (!isUnsupportedQueryFlag(error)) throw error;
-      callQuerySupport.set(command, false);
-      return false;
-    }
   }
 
   function roomInfo(room: RawRoom | undefined): RoomInfo {
@@ -390,7 +352,7 @@ export default async function plugin(bb: BbPluginApi) {
     const cached = roomCache.get(cacheKey);
     if (cached) return cached;
 
-    const exact = JSON.parse(await runTuple(command, ["rooms", "get", slug])) as RawRoom;
+    const exact = JSON.parse(await runTuple(command, ["rooms", "show", slug])) as RawRoom;
     const resolved = roomInfo(exact);
     roomCache.set(cacheKey, resolved);
     return resolved;
@@ -408,7 +370,7 @@ export default async function plugin(bb: BbPluginApi) {
       participants: (call.participants ?? []).map((participant) =>
         participant.full_name?.trim() || participant.email?.trim() || "Tuple user",
       ),
-      promptContext: recordingReferencePrompt(call.call_id, command),
+      promptContext: storedCallReferencePrompt(call.call_id, command),
       ...(matchSnippet ? { matchSnippet } : {}),
       ...(match?.kind ? { matchKind: match.kind } : {}),
     };
@@ -451,7 +413,7 @@ export default async function plugin(bb: BbPluginApi) {
     const [roomsOutput, callsOutput, historyOutput] = await Promise.all([
       runTuple(command, ["rooms", "list", "--kind", "personal", "--members"]),
       runTuple(command, ["call", "list", "--limit", "6"]),
-      runTuple(command, ["transcription", "list", "--limit", "8"]),
+      runTuple(command, ["capture", "list", "--limit", "8"]),
     ]);
     const personalRoom = (JSON.parse(roomsOutput) as RawRoom[])[0] ?? null;
     const calls = JSON.parse(callsOutput) as RawOngoingCall[];
@@ -497,7 +459,7 @@ export default async function plugin(bb: BbPluginApi) {
   async function getRecentCalls() {
     const command = await getCliCommand();
     const history = JSON.parse(
-      await runTuple(command, ["transcription", "list", "--limit", "8"]),
+      await runTuple(command, ["capture", "list", "--limit", "8"]),
     ) as RawStoredCall[];
     return history.flatMap((call) => {
       const normalized = storedCall(call, command);
@@ -507,32 +469,11 @@ export default async function plugin(bb: BbPluginApi) {
 
   async function searchHistory(query: string) {
     const command = await getCliCommand();
-    if (await supportsCallQuery(command)) {
-      try {
-        const history = JSON.parse(
-          await runTuple(command, ["transcription", "list", "--query", query, "--limit", "100"], {
-            timeout: 30_000,
-            maxBuffer: 4 * 1024 * 1024,
-          }),
-        ) as RawStoredCall[];
-        if (history.every((call) => call.match || storedCallMatchesQuery(call, query))) {
-          return history.flatMap((call) => {
-            const normalized = storedCall(call, command, call.match);
-            return normalized ? [normalized] : [];
-          });
-        }
-        callQuerySupport.set(command, false);
-      } catch (error) {
-        if (!isUnsupportedQueryFlag(error)) throw error;
-        callQuerySupport.set(command, false);
-      }
-    }
-
     const contentQuery = transcriptSearchQuery(query);
     const [historyOutput, searchOutput] = await Promise.all([
-      runTuple(command, ["transcription", "list", "--limit", "-1"], { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 }),
+      runTuple(command, ["capture", "list", "--limit", "-1"], { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 }),
       contentQuery
-        ? runTuple(command, ["transcription", "search", contentQuery, "--limit", "100"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 })
+        ? runTuple(command, ["capture", "search", contentQuery, "--limit", "100"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 })
         : Promise.resolve("[]"),
     ]);
     const history = JSON.parse(historyOutput) as RawStoredCall[];
@@ -553,7 +494,7 @@ export default async function plugin(bb: BbPluginApi) {
     const environment = cliEnvironment(command);
     const child = spawn(
       command,
-      ["--format", "json", "state", "--follow"],
+      ["--format", "json", "state", "follow"],
       { stdio: ["ignore", "pipe", "pipe"] },
     );
     activeFollower = child;
@@ -600,22 +541,25 @@ export default async function plugin(bb: BbPluginApi) {
     }
   }
 
-  async function getSnapshot(minutes: number): Promise<TranscriptSnapshot> {
+  async function getSnapshot(minutes: number): Promise<CaptureSnapshot> {
     const command = await getCliCommand();
     const state = await refreshState();
     if (!state.inCall || !state.call) throw new Error(`No active ${state.environment} Tuple call.`);
-    if (!state.call.transcribing) throw new Error("The active Tuple call is not being transcribed.");
+    if (!state.call.capturing) throw new Error("Capture is off for the active Tuple call.");
     const since = new Date(Date.now() - minutes * 60_000).toISOString();
     const until = new Date().toISOString();
     const output = await runTupleText(command, [
-      "transcription",
+      "capture",
       "show",
       "current",
       "--since",
       since,
       "--until",
       until,
-      "--without-chat",
+      "--exclude",
+      "events,content",
+      "--timestamps",
+      "clock",
     ]);
     const { transcript, truncated } = boundTranscriptOutput(output);
     return {
@@ -644,21 +588,21 @@ export default async function plugin(bb: BbPluginApi) {
       await runTuple(command, ["call", "join", target, ...(switchCurrent ? ["--switch"] : [])]);
       return { ok: true } as const;
     },
-    sendRecordingToThread: async ({ threadId, callId, task }) => {
+    sendStoredCallToThread: async ({ threadId, callId, task }) => {
       const command = await getCliCommand();
       await bb.sdk.threads.send({
         threadId,
         mode: "auto",
-        input: [{ type: "text", text: recordingReferencePrompt(callId, command, task), mentions: [] }],
+        input: [{ type: "text", text: storedCallReferencePrompt(callId, command, task), mentions: [] }],
       });
       return { ok: true } as const;
     },
     getSnapshot: ({ minutes }) => getSnapshot(minutes),
-    startTranscription: async () => {
+    startCapture: async () => {
       const command = await getCliCommand();
       const state = await refreshState();
       if (!state.inCall) throw new Error(`No active ${state.environment} Tuple call.`);
-      await runTuple(command, ["transcription", "start"]);
+      await runTuple(command, ["capture", "start"]);
       return refreshState();
     },
     sendToThread: async ({ threadId, minutes, task }) => {
@@ -679,10 +623,10 @@ export default async function plugin(bb: BbPluginApi) {
 
   bb.cli.register({
     name: "tuple-call",
-    summary: "Inspect the current Tuple call and capture bounded transcript context",
+    summary: "Inspect the current Tuple call and capture bounded call context",
     commands: [
       { name: "status", summary: "Show current Tuple call state", usage: "bb tuple-call status" },
-      { name: "context", summary: "Print recent transcript context", usage: "bb tuple-call context [--minutes 5]" },
+      { name: "context", summary: "Print recent captured call context", usage: "bb tuple-call context [--minutes 5]" },
     ],
     async run(argv) {
       const command = argv[0] ?? "status";
@@ -706,7 +650,6 @@ export default async function plugin(bb: BbPluginApi) {
   settings.onChange(() => {
     settingsGeneration += 1;
     roomCache.clear();
-    callQuerySupport.clear();
     activeFollower?.kill("SIGTERM");
     void refreshState().then(() => bb.realtime.publish("call-state", currentState));
   });
