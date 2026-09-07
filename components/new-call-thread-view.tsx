@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { CallState, TranscriptSnapshot } from "../server";
+import type { CallState, CaptureSnapshot } from "../server";
 import { CallOverview } from "./thread-call-panel-view";
 import { Button } from "./ui/button";
 import { Icon } from "./ui/icon";
@@ -13,12 +13,12 @@ export interface NewCallThreadViewProps {
   state: CallState;
   loading: boolean;
   minutes: number;
-  snapshot: TranscriptSnapshot | null;
+  snapshot: CaptureSnapshot | null;
   capturing: boolean;
   newThreadComposer?: ReactNode;
   onRetry: () => void;
   onCopyJoinLink: () => void;
-  onStartTranscription: () => void;
+  onStartCapture: () => void;
   onCapture: () => void;
 }
 
@@ -31,7 +31,7 @@ export function NewCallThreadView({
   newThreadComposer,
   onRetry,
   onCopyJoinLink,
-  onStartTranscription,
+  onStartCapture,
   onCapture,
 }: NewCallThreadViewProps) {
   return (
@@ -41,18 +41,18 @@ export function NewCallThreadView({
         loading={loading}
         onRetry={onRetry}
         onCopyJoinLink={onCopyJoinLink}
-        onStartTranscription={onStartTranscription}
+        onStartCapture={onStartCapture}
       />
 
       {!snapshot ? (
-        state.call?.transcribing ? (
+        state.call?.capturing ? (
           <section className={PANEL_SECTION_CLASS}>
             <h2 className={PANEL_SECTION_HEADING_CLASS}>New thread</h2>
             <div className={`${PANEL_SURFACE_CLASS} flex flex-col items-start gap-4 p-3 @min-[26rem]:flex-row @min-[26rem]:items-center @min-[26rem]:justify-between`}>
               <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-balance">Start from this conversation</h3>
                 <p className="text-muted-foreground mt-0.5 max-w-[65ch] text-base text-pretty sm:text-sm">
-                  Review the recent transcript before starting the thread.
+                  Review the recent captured conversation before starting the thread.
                 </p>
               </div>
               <Button

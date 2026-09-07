@@ -25,7 +25,7 @@
     "bb",
     "tuple",
     "plugin",
-    "transcription"
+    "capture"
   ],
   "engines": {
     "bb": ">=0.38",

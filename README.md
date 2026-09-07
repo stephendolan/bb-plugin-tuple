@@ -10,9 +10,9 @@ compact reference to the relevant Tuple CLI guide and exact call or window.
 
 - A **Tuple** sidebar with your personal room, joinable calls, and searchable call history.
 - Full-history search by title, participant, transcript, and shared-screen content,
-  with matching excerpts shown before you choose a recording.
-- Live call and transcription status, with a shortcut to start transcription.
-- A new-task flow that lets you review a recent transcript before sending an
+  with matching excerpts shown before you choose a stored call.
+- Live call and Capture status, with a shortcut to start Capture.
+- A new-task flow that lets you review a recent captured conversation before sending an
   exact-window reference.
 - A compact editor shortcut that opens Tuple when idle and adds recent call
   context by reference when live.
@@ -80,7 +80,7 @@ npm run storybook
 The canvas covers every plugin-owned interface: the current-thread drawer,
 out-of-call launchpad, recorded-call selection, live-call new-thread capture,
 search results, and the compact sidebar and composer slots. Their loading, sending,
-transcription, capture, history, search, joining, empty, and CLI-unavailable variants
+Capture, history, search, joining, empty, and CLI-unavailable variants
 render at 280, 360, 480, and 600 pixels. Playwright checks every panel for horizontal
 overflow and keeps local macOS screenshot baselines:
 

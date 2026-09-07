@@ -3,7 +3,7 @@ import {
   boundTranscriptOutput,
   liveCallReferencePrompt,
   normalizeState,
-  recordingReferencePrompt,
+  storedCallReferencePrompt,
   storedCallMatchesQuery,
   transcriptSearchQuery,
 } from "./server";
@@ -33,7 +33,7 @@ describe("server helpers", () => {
   });
 
   it("references a stored call without embedding transcript content", () => {
-    const prompt = recordingReferencePrompt("call-123", "tuple-staging", "Find the decisions");
+    const prompt = storedCallReferencePrompt("call-123", "tuple-staging", "Find the decisions");
     expect(prompt.indexOf("Use the stored Tuple call")).toBeLessThan(prompt.indexOf("Rename this thread"));
     expect(prompt.indexOf("Rename this thread")).toBeLessThan(prompt.indexOf("Find the decisions"));
     expect(prompt).toContain("call-123");
@@ -46,7 +46,7 @@ describe("server helpers", () => {
   });
 
   it("leaves the purpose prompt at the end for the new-thread composer", () => {
-    const prompt = recordingReferencePrompt("call-123", "tuple-staging");
+    const prompt = storedCallReferencePrompt("call-123", "tuple-staging");
     expect(prompt).toMatch(/Rename this thread to match the purpose below, then complete it:\n$/);
   });
 

@@ -10,7 +10,7 @@ import {
   type NewThreadRequest,
 } from "@get-bb/plugin-sdk/app";
 import { toast } from "sonner";
-import type { CallState, Launchpad, TranscriptSnapshot, rpcContract } from "./server";
+import type { CallState, CaptureSnapshot, Launchpad, rpcContract } from "./server";
 import { ThreadCallPanelView } from "@/components/thread-call-panel-view";
 import { TupleLaunchpadView } from "@/components/tuple-launchpad-view";
 import { RecentCallsSection, type StoredCall } from "@/components/recent-calls-section";
@@ -44,18 +44,18 @@ function useCallState() {
     }
   }, [rpc]);
 
-  const startTranscription = useCallback(async () => {
+  const startCapture = useCallback(async () => {
     try {
-      setState(await rpc.call("startTranscription"));
-      toast.success("Transcription started.");
+      setState(await rpc.call("startCapture"));
+      toast.success("Capture started.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not start transcription.");
+      toast.error(error instanceof Error ? error.message : "Could not start Capture.");
     }
   }, [rpc]);
 
   useEffect(() => void refresh(), [refresh]);
   useRealtime("call-state", (next) => setState(next as CallState));
-  return { state, loading, refresh, startTranscription, rpc };
+  return { state, loading, refresh, startCapture, rpc };
 }
 
 function useTupleLaunchpad(enabled: boolean) {
@@ -251,7 +251,7 @@ function StoredCallSelection({
     if (!threadId || !task.trim()) return;
     setSending(true);
     try {
-      await rpc.call("sendRecordingToThread", { threadId, callId: recording.callId, task });
+      await rpc.call("sendStoredCallToThread", { threadId, callId: recording.callId, task });
       setTask("");
       toast.success("Sent the Tuple call to the current thread.");
     } catch (error) {
@@ -282,11 +282,11 @@ function StoredCallSelection({
 }
 
 function NewCallThread() {
-  const { state, loading, refresh, startTranscription, rpc } = useCallState();
+  const { state, loading, refresh, startCapture, rpc } = useCallState();
   const navigate = useBbNavigate();
   const { values } = useSettings();
   const minutes = Number(values?.defaultMinutes ?? "5");
-  const [snapshot, setSnapshot] = useState<TranscriptSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<CaptureSnapshot | null>(null);
   const [capturing, setCapturing] = useState(false);
   const [selectedRecording, setSelectedRecording] = useState<StoredCall | null>(null);
   const recentCallsEnabled = !loading && Boolean(state?.inCall) && !selectedRecording;
@@ -340,7 +340,7 @@ function NewCallThread() {
           capturing={capturing}
           onRetry={() => void refresh()}
           onCopyJoinLink={() => void copyCallJoinLink(state)}
-          onStartTranscription={() => void startTranscription()}
+          onStartCapture={() => void startCapture()}
           onCapture={() => void capture()}
           newThreadComposer={snapshot ? (
             <NewThreadComposer
@@ -369,7 +369,7 @@ function NewCallThread() {
 }
 
 function ThreadCallPanel({ threadId }: { threadId: string }) {
-  const { state, loading, refresh, startTranscription, rpc } = useCallState();
+  const { state, loading, refresh, startCapture, rpc } = useCallState();
   const { values } = useSettings();
   const minutes = Number(values?.defaultMinutes ?? "5");
   const [task, setTask] = useState("");
@@ -409,7 +409,7 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
       onSend={() => void send()}
       onRetry={() => void refresh()}
       onCopyJoinLink={() => void copyCallJoinLink(state)}
-      onStartTranscription={() => void startTranscription()}
+      onStartCapture={() => void startCapture()}
     />
   );
 }
@@ -424,7 +424,7 @@ function NavCallThread() {
 }
 
 function ComposerTupleAction() {
-  const { state, rpc, startTranscription } = useCallState();
+  const { state, rpc, startCapture } = useCallState();
   const composer = useComposer();
   const navigate = useBbNavigate();
   const { values } = useSettings();
@@ -439,8 +439,8 @@ function ComposerTupleAction() {
 
     setLoading(true);
     try {
-      if (!state?.call?.transcribing) {
-        await startTranscription();
+      if (!state?.call?.capturing) {
+        await startCapture();
         return;
       }
       const minutes = Number(values?.defaultMinutes ?? "5");

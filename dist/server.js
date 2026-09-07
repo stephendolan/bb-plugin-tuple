@@ -524,7 +524,7 @@ __export(core_exports2, {
   parse: () => parse,
   parseAsync: () => parseAsync,
   prettifyError: () => prettifyError,
-  process: () => process2,
+  process: () => process,
   regexes: () => regexes_exports,
   registry: () => registry,
   safeDecode: () => safeDecode,
@@ -11449,7 +11449,7 @@ function initializeContext(params) {
     external: params?.external ?? void 0
   };
 }
-function process2(schema, ctx, _params = { path: [], schemaPath: [] }) {
+function process(schema, ctx, _params = { path: [], schemaPath: [] }) {
   var _a3;
   const def = schema._zod.def;
   const seen = ctx.seen.get(schema);
@@ -11486,7 +11486,7 @@ function process2(schema, ctx, _params = { path: [], schemaPath: [] }) {
     if (parent) {
       if (!result.ref)
         result.ref = parent;
-      process2(parent, ctx, params);
+      process(parent, ctx, params);
       ctx.seen.get(parent).isParent = true;
     }
   }
@@ -11774,14 +11774,14 @@ function isTransforming(_schema, _ctx) {
 }
 var createToJSONSchemaMethod = (schema, processors = {}) => (params) => {
   const ctx = initializeContext({ ...params, processors });
-  process2(schema, ctx);
+  process(schema, ctx);
   extractDefs(ctx, schema);
   return finalize(ctx, schema);
 };
 var createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params) => {
   const { libraryOptions, target } = params ?? {};
   const ctx = initializeContext({ ...libraryOptions ?? {}, target, io, processors });
-  process2(schema, ctx);
+  process(schema, ctx);
   extractDefs(ctx, schema);
   return finalize(ctx, schema);
 };
@@ -12027,7 +12027,7 @@ var arrayProcessor = (schema, ctx, _json, params) => {
   if (typeof maximum === "number")
     json2.maxItems = maximum;
   json2.type = "array";
-  json2.items = process2(def.element, ctx, {
+  json2.items = process(def.element, ctx, {
     ...params,
     path: [...params.path, "items"]
   });
@@ -12039,7 +12039,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
   json2.properties = {};
   const shape = def.shape;
   for (const key in shape) {
-    json2.properties[key] = process2(shape[key], ctx, {
+    json2.properties[key] = process(shape[key], ctx, {
       ...params,
       path: [...params.path, "properties", key]
     });
@@ -12062,7 +12062,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
     if (ctx.io === "output")
       json2.additionalProperties = false;
   } else if (def.catchall) {
-    json2.additionalProperties = process2(def.catchall, ctx, {
+    json2.additionalProperties = process(def.catchall, ctx, {
       ...params,
       path: [...params.path, "additionalProperties"]
     });
@@ -12071,7 +12071,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
 var unionProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
   const isExclusive = def.inclusive === false;
-  const options = def.options.map((x, i) => process2(x, ctx, {
+  const options = def.options.map((x, i) => process(x, ctx, {
     ...params,
     path: [...params.path, isExclusive ? "oneOf" : "anyOf", i]
   }));
@@ -12083,11 +12083,11 @@ var unionProcessor = (schema, ctx, json2, params) => {
 };
 var intersectionProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  const a = process2(def.left, ctx, {
+  const a = process(def.left, ctx, {
     ...params,
     path: [...params.path, "allOf", 0]
   });
-  const b = process2(def.right, ctx, {
+  const b = process(def.right, ctx, {
     ...params,
     path: [...params.path, "allOf", 1]
   });
@@ -12104,11 +12104,11 @@ var tupleProcessor = (schema, ctx, _json, params) => {
   json2.type = "array";
   const prefixPath = ctx.target === "draft-2020-12" ? "prefixItems" : "items";
   const restPath = ctx.target === "draft-2020-12" ? "items" : ctx.target === "openapi-3.0" ? "items" : "additionalItems";
-  const prefixItems = def.items.map((x, i) => process2(x, ctx, {
+  const prefixItems = def.items.map((x, i) => process(x, ctx, {
     ...params,
     path: [...params.path, prefixPath, i]
   }));
-  const rest = def.rest ? process2(def.rest, ctx, {
+  const rest = def.rest ? process(def.rest, ctx, {
     ...params,
     path: [...params.path, restPath, ...ctx.target === "openapi-3.0" ? [def.items.length] : []]
   }) : null;
@@ -12148,7 +12148,7 @@ var recordProcessor = (schema, ctx, _json, params) => {
   const keyBag = keyType._zod.bag;
   const patterns = keyBag?.patterns;
   if (def.mode === "loose" && patterns && patterns.size > 0) {
-    const valueSchema = process2(def.valueType, ctx, {
+    const valueSchema = process(def.valueType, ctx, {
       ...params,
       path: [...params.path, "patternProperties", "*"]
     });
@@ -12158,12 +12158,12 @@ var recordProcessor = (schema, ctx, _json, params) => {
     }
   } else {
     if (ctx.target === "draft-07" || ctx.target === "draft-2020-12") {
-      json2.propertyNames = process2(def.keyType, ctx, {
+      json2.propertyNames = process(def.keyType, ctx, {
         ...params,
         path: [...params.path, "propertyNames"]
       });
     }
-    json2.additionalProperties = process2(def.valueType, ctx, {
+    json2.additionalProperties = process(def.valueType, ctx, {
       ...params,
       path: [...params.path, "additionalProperties"]
     });
@@ -12178,7 +12178,7 @@ var recordProcessor = (schema, ctx, _json, params) => {
 };
 var nullableProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  const inner = process2(def.innerType, ctx, params);
+  const inner = process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   if (ctx.target === "openapi-3.0") {
     seen.ref = def.innerType;
@@ -12189,20 +12189,20 @@ var nullableProcessor = (schema, ctx, json2, params) => {
 };
 var nonoptionalProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
 };
 var defaultProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   json2.default = JSON.parse(JSON.stringify(def.defaultValue));
 };
 var prefaultProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   if (ctx.io === "input")
@@ -12210,7 +12210,7 @@ var prefaultProcessor = (schema, ctx, json2, params) => {
 };
 var catchProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   let catchValue;
@@ -12225,32 +12225,32 @@ var pipeProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
   const inIsTransform = def.in._zod.traits.has("$ZodTransform");
   const innerType = ctx.io === "input" ? inIsTransform ? def.out : def.in : def.out;
-  process2(innerType, ctx, params);
+  process(innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = innerType;
 };
 var readonlyProcessor = (schema, ctx, json2, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
   json2.readOnly = true;
 };
 var promiseProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
 };
 var optionalProcessor = (schema, ctx, _json, params) => {
   const def = schema._zod.def;
-  process2(def.innerType, ctx, params);
+  process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = def.innerType;
 };
 var lazyProcessor = (schema, ctx, _json, params) => {
   const innerType = schema._zod.innerType;
-  process2(innerType, ctx, params);
+  process(innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = innerType;
 };
@@ -12302,7 +12302,7 @@ function toJSONSchema(input, params) {
     const defs = {};
     for (const entry of registry2._idmap.entries()) {
       const [_, schema] = entry;
-      process2(schema, ctx2);
+      process(schema, ctx2);
     }
     const schemas = {};
     const external = {
@@ -12325,7 +12325,7 @@ function toJSONSchema(input, params) {
     return { schemas };
   }
   const ctx = initializeContext({ ...params, processors: allProcessors });
-  process2(input, ctx);
+  process(input, ctx);
   extractDefs(ctx, input);
   return finalize(ctx, input);
 }
@@ -12383,7 +12383,7 @@ var JSONSchemaGenerator = class {
    * This must be called before emit().
    */
   process(schema, _params = { path: [], schemaPath: [] }) {
-    return process2(schema, this.ctx, _params);
+    return process(schema, this.ctx, _params);
   }
   /**
    * Emit the final JSON Schema after processing.
@@ -14541,7 +14541,7 @@ var callStateSchema = external_exports.object({
   call: external_exports.object({
     callId: external_exports.string(),
     muted: external_exports.boolean(),
-    transcribing: external_exports.boolean(),
+    capturing: external_exports.boolean(),
     roomSlug: external_exports.string().nullable(),
     roomName: external_exports.string().nullable(),
     roomKind: external_exports.enum(["personal", "team"]).nullable(),
@@ -14607,7 +14607,7 @@ var rpcContract = defineRpcContract({
     input: external_exports.object({ target: external_exports.string().trim().min(1), switchCurrent: external_exports.boolean().default(false) }),
     output: external_exports.object({ ok: external_exports.literal(true) })
   },
-  sendRecordingToThread: {
+  sendStoredCallToThread: {
     input: external_exports.object({
       threadId: external_exports.string().min(1),
       callId: external_exports.string().min(1),
@@ -14619,7 +14619,7 @@ var rpcContract = defineRpcContract({
     input: external_exports.object({ minutes: external_exports.number().int().min(1).max(30) }),
     output: transcriptSnapshotSchema
   },
-  startTranscription: {
+  startCapture: {
     input: external_exports.null(),
     output: callStateSchema
   },
@@ -14640,15 +14640,6 @@ var MAX_TRANSCRIPT_CHARS = 6e4;
 function errorMessage(error51) {
   if (error51 instanceof Error) return error51.message;
   return String(error51);
-}
-function commandErrorText(error51) {
-  if (!error51 || typeof error51 !== "object") return errorMessage(error51);
-  const commandError = error51;
-  return [commandError.message, commandError.stderr, commandError.stdout].filter((value) => typeof value === "string").join("\n");
-}
-function isUnsupportedQueryFlag(error51) {
-  const text = commandErrorText(error51);
-  return /unknown (?:flag|shorthand flag).*?(?:query|q\b)|flag provided but not defined.*?(?:query|q\b)/i.test(text);
 }
 function cliEnvironment(command) {
   switch (basename(command.trim())) {
@@ -14674,7 +14665,7 @@ function normalizeState(environment, raw) {
     call: rawCall ? {
       callId: rawCall.call_id ?? "current",
       muted: Boolean(rawCall.muted),
-      transcribing: Boolean(rawCall.transcribing),
+      capturing: Boolean(rawCall.transcribing),
       roomSlug: rawCall.active_room_slug ?? null,
       roomName: null,
       roomKind: null,
@@ -14706,7 +14697,7 @@ ${task?.trim() ?? ""}`;
     taskBlock
   ].join("\n");
 }
-function recordingReferencePrompt(callId, command, task) {
+function storedCallReferencePrompt(callId, command, task) {
   const taskBlock = `
 
 Rename this thread to match the purpose below, then complete it:
@@ -14745,7 +14736,7 @@ async function plugin(bb) {
     },
     defaultMinutes: {
       type: "select",
-      label: "Default transcript window",
+      label: "Default capture window",
       options: ["1", "5", "10", "15"],
       default: "5"
     }
@@ -14759,7 +14750,6 @@ async function plugin(bb) {
     updatedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
   const roomCache = /* @__PURE__ */ new Map();
-  const callQuerySupport = /* @__PURE__ */ new Map();
   let settingsGeneration = 0;
   let activeFollower = null;
   async function getCliCommand() {
@@ -14776,32 +14766,11 @@ async function plugin(bb) {
     return stdout;
   }
   async function runTupleText(command, args, options) {
-    const { stdout } = await execFileAsync(command, ["--format", "table", ...args], {
+    const { stdout } = await execFileAsync(command, ["--format", "text", ...args], {
       timeout: options?.timeout ?? 15e3,
       maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024
     });
     return stdout;
-  }
-  async function supportsCallQuery(command) {
-    const cached2 = callQuerySupport.get(command);
-    if (cached2 !== void 0) return cached2;
-    const baseline = JSON.parse(
-      await runTuple(command, ["transcription", "list", "--limit", "1"])
-    );
-    if (!baseline.length) return true;
-    const probe = `bbtuplecapabilityprobe${process.pid}${Date.now()}`;
-    try {
-      const result = JSON.parse(
-        await runTuple(command, ["transcription", "list", "--query", probe, "--limit", "1"])
-      );
-      const supported = result.length === 0;
-      callQuerySupport.set(command, supported);
-      return supported;
-    } catch (error51) {
-      if (!isUnsupportedQueryFlag(error51)) throw error51;
-      callQuerySupport.set(command, false);
-      return false;
-    }
   }
   function roomInfo(room) {
     return {
@@ -14814,7 +14783,7 @@ async function plugin(bb) {
     const cacheKey = `${environment}:${slug}`;
     const cached2 = roomCache.get(cacheKey);
     if (cached2) return cached2;
-    const exact = JSON.parse(await runTuple(command, ["rooms", "get", slug]));
+    const exact = JSON.parse(await runTuple(command, ["rooms", "show", slug]));
     const resolved = roomInfo(exact);
     roomCache.set(cacheKey, resolved);
     return resolved;
@@ -14831,7 +14800,7 @@ async function plugin(bb) {
       participants: (call.participants ?? []).map(
         (participant) => participant.full_name?.trim() || participant.email?.trim() || "Tuple user"
       ),
-      promptContext: recordingReferencePrompt(call.call_id, command),
+      promptContext: storedCallReferencePrompt(call.call_id, command),
       ...matchSnippet ? { matchSnippet } : {},
       ...match?.kind ? { matchKind: match.kind } : {}
     };
@@ -14871,7 +14840,7 @@ async function plugin(bb) {
     const [roomsOutput, callsOutput, historyOutput] = await Promise.all([
       runTuple(command, ["rooms", "list", "--kind", "personal", "--members"]),
       runTuple(command, ["call", "list", "--limit", "6"]),
-      runTuple(command, ["transcription", "list", "--limit", "8"])
+      runTuple(command, ["capture", "list", "--limit", "8"])
     ]);
     const personalRoom = JSON.parse(roomsOutput)[0] ?? null;
     const calls = JSON.parse(callsOutput);
@@ -14910,7 +14879,7 @@ async function plugin(bb) {
   async function getRecentCalls() {
     const command = await getCliCommand();
     const history = JSON.parse(
-      await runTuple(command, ["transcription", "list", "--limit", "8"])
+      await runTuple(command, ["capture", "list", "--limit", "8"])
     );
     return history.flatMap((call) => {
       const normalized = storedCall(call, command);
@@ -14919,30 +14888,10 @@ async function plugin(bb) {
   }
   async function searchHistory(query) {
     const command = await getCliCommand();
-    if (await supportsCallQuery(command)) {
-      try {
-        const history2 = JSON.parse(
-          await runTuple(command, ["transcription", "list", "--query", query, "--limit", "100"], {
-            timeout: 3e4,
-            maxBuffer: 4 * 1024 * 1024
-          })
-        );
-        if (history2.every((call) => call.match || storedCallMatchesQuery(call, query))) {
-          return history2.flatMap((call) => {
-            const normalized = storedCall(call, command, call.match);
-            return normalized ? [normalized] : [];
-          });
-        }
-        callQuerySupport.set(command, false);
-      } catch (error51) {
-        if (!isUnsupportedQueryFlag(error51)) throw error51;
-        callQuerySupport.set(command, false);
-      }
-    }
     const contentQuery = transcriptSearchQuery(query);
     const [historyOutput, searchOutput] = await Promise.all([
-      runTuple(command, ["transcription", "list", "--limit", "-1"], { timeout: 3e4, maxBuffer: 16 * 1024 * 1024 }),
-      contentQuery ? runTuple(command, ["transcription", "search", contentQuery, "--limit", "100"], { timeout: 3e4, maxBuffer: 4 * 1024 * 1024 }) : Promise.resolve("[]")
+      runTuple(command, ["capture", "list", "--limit", "-1"], { timeout: 3e4, maxBuffer: 16 * 1024 * 1024 }),
+      contentQuery ? runTuple(command, ["capture", "search", contentQuery, "--limit", "100"], { timeout: 3e4, maxBuffer: 4 * 1024 * 1024 }) : Promise.resolve("[]")
     ]);
     const history = JSON.parse(historyOutput);
     const hits = JSON.parse(searchOutput);
@@ -14959,7 +14908,7 @@ async function plugin(bb) {
     const environment = cliEnvironment(command);
     const child = spawn(
       command,
-      ["--format", "json", "state", "--follow"],
+      ["--format", "json", "state", "follow"],
       { stdio: ["ignore", "pipe", "pipe"] }
     );
     activeFollower = child;
@@ -15007,18 +14956,21 @@ async function plugin(bb) {
     const command = await getCliCommand();
     const state = await refreshState();
     if (!state.inCall || !state.call) throw new Error(`No active ${state.environment} Tuple call.`);
-    if (!state.call.transcribing) throw new Error("The active Tuple call is not being transcribed.");
+    if (!state.call.capturing) throw new Error("Capture is off for the active Tuple call.");
     const since = new Date(Date.now() - minutes * 6e4).toISOString();
     const until = (/* @__PURE__ */ new Date()).toISOString();
     const output = await runTupleText(command, [
-      "transcription",
+      "capture",
       "show",
       "current",
       "--since",
       since,
       "--until",
       until,
-      "--without-chat"
+      "--exclude",
+      "events,content",
+      "--timestamps",
+      "clock"
     ]);
     const { transcript, truncated } = boundTranscriptOutput(output);
     return {
@@ -15046,21 +14998,21 @@ async function plugin(bb) {
       await runTuple(command, ["call", "join", target, ...switchCurrent ? ["--switch"] : []]);
       return { ok: true };
     },
-    sendRecordingToThread: async ({ threadId, callId, task }) => {
+    sendStoredCallToThread: async ({ threadId, callId, task }) => {
       const command = await getCliCommand();
       await bb.sdk.threads.send({
         threadId,
         mode: "auto",
-        input: [{ type: "text", text: recordingReferencePrompt(callId, command, task), mentions: [] }]
+        input: [{ type: "text", text: storedCallReferencePrompt(callId, command, task), mentions: [] }]
       });
       return { ok: true };
     },
     getSnapshot: ({ minutes }) => getSnapshot(minutes),
-    startTranscription: async () => {
+    startCapture: async () => {
       const command = await getCliCommand();
       const state = await refreshState();
       if (!state.inCall) throw new Error(`No active ${state.environment} Tuple call.`);
-      await runTuple(command, ["transcription", "start"]);
+      await runTuple(command, ["capture", "start"]);
       return refreshState();
     },
     sendToThread: async ({ threadId, minutes, task }) => {
@@ -15080,10 +15032,10 @@ async function plugin(bb) {
   });
   bb.cli.register({
     name: "tuple-call",
-    summary: "Inspect the current Tuple call and capture bounded transcript context",
+    summary: "Inspect the current Tuple call and capture bounded call context",
     commands: [
       { name: "status", summary: "Show current Tuple call state", usage: "bb tuple-call status" },
-      { name: "context", summary: "Print recent transcript context", usage: "bb tuple-call context [--minutes 5]" }
+      { name: "context", summary: "Print recent captured call context", usage: "bb tuple-call context [--minutes 5]" }
     ],
     async run(argv) {
       const command = argv[0] ?? "status";
@@ -15109,7 +15061,6 @@ async function plugin(bb) {
   settings.onChange(() => {
     settingsGeneration += 1;
     roomCache.clear();
-    callQuerySupport.clear();
     activeFollower?.kill("SIGTERM");
     void refreshState().then(() => bb.realtime.publish("call-state", currentState));
   });
@@ -15133,9 +15084,9 @@ export {
   plugin as default,
   liveCallReferencePrompt,
   normalizeState,
-  recordingReferencePrompt,
   rpcContract,
   storedCallMatchesQuery,
+  storedCallReferencePrompt,
   transcriptSearchQuery
 };
 //# sourceMappingURL=server.js.map

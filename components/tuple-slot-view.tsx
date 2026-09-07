@@ -37,8 +37,8 @@ export function TupleSidebarAccessory({ state }: { state: CallState | null }) {
   if (!state?.inCall) return null;
   return (
     <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-      <span className={`size-1.5 shrink-0 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`} />
-      {state.call?.transcribing ? "Live" : "In call"}
+      <span className={`size-1.5 shrink-0 rounded-full ${state.call?.capturing ? "bg-emerald-500" : "bg-amber-400"}`} />
+      {state.call?.capturing ? "Live" : "In call"}
     </div>
   );
 }
@@ -58,9 +58,9 @@ export function TupleComposerActionButton({
 }) {
   const label = !state?.inCall
     ? "Open Tuple"
-    : state.call?.transcribing
+    : state.call?.capturing
       ? `Add the last ${minutes} minutes of this Tuple call to the draft`
-      : "Start Tuple transcription";
+      : "Start Tuple Capture";
 
   return (
     <button
