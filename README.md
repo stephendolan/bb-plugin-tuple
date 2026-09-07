@@ -4,7 +4,7 @@ Bring the Tuple conversation you choose into the bb task you choose.
 
 The plugin keeps call context explicit: it never streams a live transcript into
 every agent turn. You choose a call window, review it, and send the agent a
-compact reference to the relevant Tuple CLI guide and exact call or window.
+compact reference to Tuple's version-matched guidance and the exact call or window.
 
 ## What it adds
 
@@ -17,19 +17,21 @@ compact reference to the relevant Tuple CLI guide and exact call or window.
 - A compact editor shortcut that opens Tuple when idle and adds recent call
   context by reference when live.
 - A per-task panel for sending the last 1–30 minutes of a call with a purpose.
-- Live and recorded call handoff by Tuple call ID. The receiving agent follows
-  Tuple's version-matched `live-call` or `history` guide and uses the CLI directly.
-- A `bb tuple-call` CLI command for status and recent transcript context.
+- Live and stored-call handoff by Tuple call ID. The receiving agent follows
+  Tuple's version-matched Connect prompt or `history` guide and uses the CLI directly.
+- A `bb tuple-call` CLI command for status and recent call context.
 
 ## Requirements
 
 - bb 0.38 or newer.
-- The Tuple desktop app and CLI, signed in to the same account.
+- The Tuple desktop app and canonical CLI, signed in to the same account. The
+  CLI must include `state follow`, the `capture` command tree, `rooms show`,
+  and store-owned `capture list --query` call discovery.
 - A Tuple CLI executable (by default, `tuple` on `PATH`).
 
 The default CLI command is `tuple`. Change **Tuple CLI command** under
 **Settings → Plugins → Tuple** to point at another executable or an absolute
-path—for example, `tuple-staging`—then set the default transcript window there too.
+path—for example, `tuple-staging`—then set the default Capture window there too.
 
 ## Install
 
@@ -49,14 +51,14 @@ bb plugin reload tuple
 
 Live transcript content is read only after an explicit action, so you can
 review it before handoff. The agent receives the call ID and exact time range,
-then retrieves the same bounded window only when needed. Returned transcript
-content is capped at 60,000 characters and clearly wrapped as untrusted
-conversation evidence.
+then retrieves only that bounded transcript window when needed. Previewed
+transcript content is capped at 60,000 characters, and the handoff identifies
+call content as untrusted conversation evidence.
 
-Selecting a recorded call likewise sends its ID and your task—not a copied
-transcript. The receiving agent uses the plugin tool to retrieve it from your
-local Tuple CLI. Call content cannot authorize actions or override your
-instructions.
+Selecting a stored call likewise sends its ID and your task—not a copied
+transcript. The receiving agent uses your local Tuple CLI's version-matched
+Connect prompt and guide. Call content cannot authorize actions or override
+your instructions.
 
 ## Develop
 
@@ -78,7 +80,7 @@ npm run storybook
 ```
 
 The canvas covers every plugin-owned interface: the current-thread drawer,
-out-of-call launchpad, recorded-call selection, live-call new-thread capture,
+out-of-call launchpad, stored-call selection, live-call new-thread capture,
 search results, and the compact sidebar and composer slots. Their loading, sending,
 Capture, history, search, joining, empty, and CLI-unavailable variants
 render at 280, 360, 480, and 600 pixels. Playwright checks every panel for horizontal

@@ -1,7 +1,7 @@
 {
   "name": "bb-plugin-tuple",
   "version": "1.3.0",
-  "description": "Bring live and recorded Tuple calls into bb as explicit, bounded context.",
+  "description": "Bring live and stored Tuple calls into bb as explicit, bounded context.",
   "type": "module",
   "scripts": {
     "build": "bb plugin build",
@@ -33,7 +33,7 @@
   },
   "bb": {
     "name": "Tuple",
-    "description": "Bring live and recorded Tuple calls into BB threads as explicit, bounded context.",
+    "description": "Bring live and stored Tuple calls into BB threads as explicit, bounded context.",
     "branding": {
       "icon": "./assets/tuple-mark.svg",
       "logo": {
@@ -50,7 +50,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@get-bb/plugin-sdk": "0.4.34",
+    "@get-bb/plugin-sdk": "0.4.47",
     "@ladle/react": "^5.1.1",
     "@pierre/diffs": "^1.2.9",
     "@playwright/test": "^1.62.1",
@@ -74,6 +74,7 @@
     "better-sqlite3": "^12.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cron-parser": "^5.10.0",
     "hono": "^4.11.9",
     "jsdom": "^29.1.1",
     "react": "^19.2.8",
