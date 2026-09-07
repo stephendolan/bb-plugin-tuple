@@ -54,7 +54,7 @@ export function StoredCallSelectionView({
       </Button>
 
       <div className={PANEL_SECTION_CLASS}>
-        <h2 className={PANEL_SECTION_HEADING_CLASS}>Recorded call</h2>
+        <h2 className={PANEL_SECTION_HEADING_CLASS}>Stored call</h2>
         <div className={`${PANEL_SURFACE_CLASS} p-3`}>
           <div className="min-w-0 @min-[26rem]:grid @min-[26rem]:grid-cols-[minmax(0,1fr)_8.75rem] @min-[26rem]:gap-x-3">
             <h1 className="truncate text-sm font-semibold">{storedCallTitle(recording)}</h1>
@@ -88,7 +88,7 @@ export function StoredCallSelectionView({
           </div>
           <Button type="submit" className="w-full pr-3 pl-2" disabled={!task.trim() || sending}>
             <Icon name={sending ? "Spinner" : "Sent"} className={`size-4 shrink-0 ${sending ? "animate-spin" : ""}`} aria-hidden="true" />
-            {sending ? "Sending…" : "Send recorded call"}
+            {sending ? "Sending…" : "Send stored call"}
           </Button>
         </form>
       ) : (
@@ -96,7 +96,7 @@ export function StoredCallSelectionView({
           <div className="space-y-0.5">
             <h2 className={PANEL_SECTION_HEADING_CLASS}>New thread</h2>
             <p className="text-muted-foreground px-3 text-base text-pretty sm:text-sm">
-              The new thread will read this recording directly from Tuple.
+              The new thread will read this stored call directly from Tuple.
             </p>
           </div>
           {newThreadComposer}

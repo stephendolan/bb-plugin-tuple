@@ -38,8 +38,8 @@ const richLaunchpad: Launchpad = {
     },
     {
       callId: "recording-2",
-      title: "Solo transcription test",
-      summary: "A short solo recording used to exercise transcription capture.",
+      title: "Solo Capture test",
+      summary: "A short solo call used to exercise Capture.",
       startedAt: `${now}T16:35:00.000Z`,
       endedAt: `${now}T16:48:00.000Z`,
       participants: ["Demo host"],
@@ -122,7 +122,7 @@ export function StateMatrix() {
     <PreviewMatrix
       testId="launchpad-matrix"
       title="Tuple out-of-call state matrix"
-      description="The room launcher, active calls, and recording history rendered together at every supported drawer width."
+      description="The room launcher, active calls, and stored call history rendered together at every supported drawer width."
       scenarios={scenarios}
       autoHeight
       render={(scenario) => (

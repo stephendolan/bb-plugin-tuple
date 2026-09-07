@@ -21,7 +21,7 @@ function callDescription(state: CallState | null) {
   } else {
     company = `With ${participantCount} others`;
   }
-  return `${call.transcribing ? "Transcribing" : "Transcription is off"} · ${company}`;
+  return `${call.capturing ? "Capturing" : "Capture is off"} · ${company}`;
 }
 
 export interface CallOverviewProps {
@@ -29,7 +29,7 @@ export interface CallOverviewProps {
   loading: boolean;
   onRetry: () => void;
   onCopyJoinLink: () => void;
-  onStartTranscription?: () => void;
+  onStartCapture?: () => void;
   quiet?: boolean;
 }
 
@@ -38,7 +38,7 @@ export function CallOverview({
   loading,
   onRetry,
   onCopyJoinLink,
-  onStartTranscription,
+  onStartCapture,
   quiet = false,
 }: CallOverviewProps) {
   const title = loading
@@ -85,10 +85,10 @@ export function CallOverview({
                   <span className="sr-only @min-[17rem]:not-sr-only">Copy link</span>
                 </Button>
               ) : null}
-              {!quiet && !state.call.transcribing && onStartTranscription ? (
-                <Button type="button" size="sm" className="pr-2.5 pl-1.5" onClick={onStartTranscription}>
+              {!quiet && !state.call.capturing && onStartCapture ? (
+                <Button type="button" size="sm" className="pr-2.5 pl-1.5" onClick={onStartCapture}>
                   <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
-                  Start transcription
+                  Start Capture
                 </Button>
               ) : null}
             </div>
@@ -97,7 +97,7 @@ export function CallOverview({
         <div className="text-muted-foreground flex min-w-0 items-start gap-1.5 text-base sm:text-sm">
           {state?.inCall ? (
             <span className="flex h-lh shrink-0 items-center" aria-hidden="true">
-              <span className={`size-1.5 rounded-full ${state.call?.transcribing ? "bg-emerald-500" : "bg-amber-400"}`} />
+              <span className={`size-1.5 rounded-full ${state.call?.capturing ? "bg-emerald-500" : "bg-amber-400"}`} />
             </span>
           ) : null}
           <p className="min-w-0 text-pretty">
@@ -121,7 +121,7 @@ export interface ThreadCallComposerCopy {
 export const currentThreadCallComposerCopy: ThreadCallComposerCopy = {
   label: "Ask the current thread to",
   placeholder: "Summarize decisions and suggest next steps",
-  action: "Send {minutes} min of transcript",
+  action: "Send {minutes} min of call context",
 };
 
 export interface ThreadCallPanelViewProps {
@@ -136,7 +136,7 @@ export interface ThreadCallPanelViewProps {
   onSend: () => void;
   onRetry: () => void;
   onCopyJoinLink: () => void;
-  onStartTranscription: () => void;
+  onStartCapture: () => void;
 }
 
 export function ThreadCallPanelView({
@@ -151,7 +151,7 @@ export function ThreadCallPanelView({
   onSend,
   onRetry,
   onCopyJoinLink,
-  onStartTranscription,
+  onStartCapture,
 }: ThreadCallPanelViewProps) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -167,14 +167,14 @@ export function ThreadCallPanelView({
         onCopyJoinLink={onCopyJoinLink}
         quiet
       />
-      {!state.call?.transcribing ? (
+      {!state.call?.capturing ? (
         <Button
           type="button"
           className="w-full pr-3 pl-2"
-          onClick={onStartTranscription}
+          onClick={onStartCapture}
         >
           <Icon name="Mic" className="size-4 shrink-0" aria-hidden="true" />
-          Start transcription
+          Start Capture
         </Button>
       ) : (
         <form className="space-y-3" onSubmit={submit}>

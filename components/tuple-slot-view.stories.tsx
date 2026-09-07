@@ -15,7 +15,7 @@ const liveCall: CallState = {
   call: {
     callId: "call-story",
     muted: false,
-    transcribing: true,
+    capturing: true,
     roomSlug: "demo-room",
     roomName: "Demo room",
     roomKind: "personal",
@@ -29,8 +29,8 @@ const liveCall: CallState = {
 
 const states = [
   { label: "Idle", state: null, loading: false },
-  { label: "Transcribing", state: liveCall, loading: false },
-  { label: "Transcription off", state: { ...liveCall, call: { ...liveCall.call!, transcribing: false } }, loading: false },
+  { label: "Capturing", state: liveCall, loading: false },
+  { label: "Capture off", state: { ...liveCall, call: { ...liveCall.call!, capturing: false } }, loading: false },
   { label: "Working", state: liveCall, loading: true },
 ];
 

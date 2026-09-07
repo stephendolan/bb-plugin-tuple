@@ -10,7 +10,7 @@ const liveState = {
   call: {
     callId: "call-1",
     muted: false,
-    transcribing: true,
+    capturing: true,
     roomSlug: "demo-room",
     roomName: null,
     roomKind: "personal" as const,
@@ -91,7 +91,7 @@ describe("Tuple Call app", () => {
     live.lifecycle.unmount();
   });
 
-  it("starts transcription when the live composer action needs it", async () => {
+  it("starts Capture when the live composer action needs it", async () => {
     const app = await loadPluginApp(() => import("./app"));
     const action = app.composerCustomizations[0]!.actions![0]!;
     const slot = renderSlot(
@@ -102,20 +102,20 @@ describe("Tuple Call app", () => {
         rpc: {
           getState: () => ({
             ...liveState,
-            call: { ...liveState.call, transcribing: false },
+            call: { ...liveState.call, capturing: false },
           }),
-          startTranscription: () => liveState,
+          startCapture: () => liveState,
         },
       },
     );
 
-    fireEvent.click(await slot.findByRole("button", { name: "Start Tuple transcription" }));
+    fireEvent.click(await slot.findByRole("button", { name: "Start Tuple Capture" }));
     await slot.findByRole("button", {
       name: "Add the last 5 minutes of this Tuple call to the draft",
     });
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual([
       "getState",
-      "startTranscription",
+      "startCapture",
     ]);
     slot.lifecycle.unmount();
   });
@@ -152,7 +152,7 @@ describe("Tuple Call app", () => {
     );
 
     await slot.findByText("Current call");
-    await slot.findByText("Transcribing · Personal room · Staging");
+    await slot.findByText("Capturing · Personal room · Staging");
     fireEvent.click(await slot.findByRole("button", { name: "Use last 5 min" }));
     await slot.findByText("[04:00 PM] User 42: ship it");
     expect(slot.getByTestId("bb-new-thread-composer").getAttribute("data-default-project-id")).toBe("");
@@ -199,7 +199,7 @@ describe("Tuple Call app", () => {
       target: { value: "architecture" },
     });
     fireEvent.click(await slot.findByRole("button", { name: /Older architecture review/ }));
-    await slot.findByText("The new thread will read this recording directly from Tuple.");
+    await slot.findByText("The new thread will read this stored call directly from Tuple.");
     fireEvent.click(await slot.findByRole("button", { name: "Recent calls" }));
     await slot.findByText("Current call");
     await slot.findByText("Older architecture review");
@@ -220,11 +220,11 @@ describe("Tuple Call app", () => {
     );
 
     await slot.findByText("Current call");
-    await slot.findByText("Transcribing · Personal room");
+    await slot.findByText("Capturing · Personal room");
     const copyLink = await slot.findByRole("button", { name: "Copy link" });
     expect(copyLink.querySelector('[data-icon="Link"]')).toBeTruthy();
     await slot.findByLabelText("Ask the current thread to");
-    await slot.findByRole("button", { name: "Send 5 min of transcript" });
+    await slot.findByRole("button", { name: "Send 5 min of call context" });
     expect(slot.queryByText("Your Tuple call is live")).toBeNull();
     slot.lifecycle.unmount();
   });
@@ -287,7 +287,7 @@ describe("Tuple Call app", () => {
     await waitFor(() => expect(slot.inspection.rpcCalls.some((call) => call.method === "joinTuple")).toBe(true));
     expect(writeText).toHaveBeenCalledWith("https://staging.tuple.app/c/demo-room");
     fireEvent.click(slot.getByRole("button", { name: /Morgan Lee & Casey Chen/ }));
-    await slot.findByText("The new thread will read this recording directly from Tuple.");
+    await slot.findByText("The new thread will read this stored call directly from Tuple.");
     slot.lifecycle.unmount();
   });
 
@@ -339,11 +339,11 @@ describe("Tuple Call app", () => {
     slot.lifecycle.unmount();
   });
 
-  it("offers transcription as the recovery action when a call is live but not recording", async () => {
+  it("offers Capture as the recovery action when a call is live but not being captured", async () => {
     const app = await loadPluginApp(() => import("./app"));
-    const transcriptionOff = {
+    const captureOff = {
       ...liveState,
-      call: { ...liveState.call, transcribing: false },
+      call: { ...liveState.call, capturing: false },
     };
     const slot = renderSlot(
       app.navPanels[0]!,
@@ -352,25 +352,25 @@ describe("Tuple Call app", () => {
         context: { projectId: "project-1", threadId: null },
         settings: { environment: "staging", defaultMinutes: "5" },
         rpc: {
-          getState: () => transcriptionOff,
+          getState: () => captureOff,
           getRecentCalls: () => [],
-          startTranscription: () => liveState,
+          startCapture: () => liveState,
         },
       },
     );
 
-    await slot.findByText("Transcription is off · Personal room · Staging");
-    fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
-    await slot.findByText("Transcribing · Personal room · Staging");
-    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "startTranscription"]);
+    await slot.findByText("Capture is off · Personal room · Staging");
+    fireEvent.click(await slot.findByRole("button", { name: "Start Capture" }));
+    await slot.findByText("Capturing · Personal room · Staging");
+    expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual(["getState", "getRecentCalls", "startCapture"]);
     slot.lifecycle.unmount();
   });
 
-  it("reduces the idle-transcription thread drawer to one recovery action", async () => {
+  it("reduces the capture-off thread drawer to one recovery action", async () => {
     const app = await loadPluginApp(() => import("./app"));
-    const transcriptionOff = {
+    const captureOff = {
       ...liveState,
-      call: { ...liveState.call, transcribing: false },
+      call: { ...liveState.call, capturing: false },
     };
     const slot = renderSlot(
       app.threadPanelActions[0]!,
@@ -378,20 +378,20 @@ describe("Tuple Call app", () => {
       {
         settings: { environment: "staging", defaultMinutes: "5" },
         rpc: {
-          getState: () => transcriptionOff,
-          startTranscription: () => liveState,
+          getState: () => captureOff,
+          startCapture: () => liveState,
         },
       },
     );
 
-    await slot.findByText("Transcription is off · Personal room");
+    await slot.findByText("Capture is off · Personal room");
     expect(slot.queryByLabelText("Ask the current thread to")).toBeNull();
-    expect(slot.queryByRole("button", { name: "Send 5 min of transcript" })).toBeNull();
-    fireEvent.click(await slot.findByRole("button", { name: "Start transcription" }));
+    expect(slot.queryByRole("button", { name: "Send 5 min of call context" })).toBeNull();
+    fireEvent.click(await slot.findByRole("button", { name: "Start Capture" }));
     await slot.findByLabelText("Ask the current thread to");
     expect(slot.inspection.rpcCalls.map((call) => call.method)).toEqual([
       "getState",
-      "startTranscription",
+      "startCapture",
     ]);
     slot.lifecycle.unmount();
   });

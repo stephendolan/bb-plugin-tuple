@@ -13,7 +13,7 @@ import {
 export type StoredCall = Launchpad["history"][number];
 
 export function storedCallTitle(call: StoredCall) {
-  return call.title || call.participants.join(" & ") || "Recorded Tuple call";
+  return call.title || call.participants.join(" & ") || "Stored Tuple call";
 }
 
 export function storedCallTime(call: StoredCall) {

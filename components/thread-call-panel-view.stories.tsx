@@ -19,7 +19,7 @@ const liveCall: CallState = {
   call: {
     callId: "call-story",
     muted: false,
-    transcribing: true,
+    capturing: true,
     roomSlug: "personal-room",
     roomName: "Demo room",
     roomKind: "personal",
@@ -69,7 +69,7 @@ function Preview({
       onSend={noop}
       onRetry={noop}
       onCopyJoinLink={noop}
-      onStartTranscription={noop}
+      onStartCapture={noop}
     />
   );
 }
@@ -78,7 +78,7 @@ const scenarios = [
   { label: "Live · empty", state: liveCall },
   { label: "Live · filled", state: liveCall, initialTask: "Capture the decision and draft the follow-up." },
   { label: "Sending", state: liveCall, initialTask: "Summarize the decision.", sending: true },
-  { label: "Transcription off", state: { ...liveCall, call: { ...liveCall.call!, transcribing: false } } },
+  { label: "Capture off", state: { ...liveCall, call: { ...liveCall.call!, capturing: false } } },
   { label: "Long identity", state: longIdentityCall },
   { label: "No join link", state: { ...liveCall, call: { ...liveCall.call!, joinUrl: null } } },
 ] satisfies Array<{
