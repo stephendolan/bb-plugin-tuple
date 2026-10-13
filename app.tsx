@@ -16,7 +16,7 @@ import { TupleLaunchpadView } from "@/components/tuple-launchpad-view";
 import { RecentCallsSection, type StoredCall } from "@/components/recent-calls-section";
 import { StoredCallSelectionView } from "@/components/stored-call-selection-view";
 import { NewCallThreadView } from "@/components/new-call-thread-view";
-import { TupleComposerActionButton, TupleSidebarAccessory } from "@/components/tuple-slot-view";
+import { TupleComposerActionButton } from "@/components/tuple-slot-view";
 
 async function copyCallJoinLink(state: CallState | null) {
   const joinUrl = state?.call?.joinUrl;
@@ -414,11 +414,6 @@ function ThreadCallPanel({ threadId }: { threadId: string }) {
   );
 }
 
-function SidebarAccessory() {
-  const { state } = useCallState();
-  return <TupleSidebarAccessory state={state} />;
-}
-
 function NavCallThread() {
   return <NewCallThread />;
 }
@@ -472,7 +467,6 @@ export default definePluginApp((app) => {
     icon: "VideoCamera",
     path: "call",
     component: NavCallThread,
-    experimental_sidebarAccessory: SidebarAccessory,
   });
   app.slots.threadPanelAction({
     id: "call",

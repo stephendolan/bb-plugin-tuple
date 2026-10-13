@@ -33,16 +33,6 @@ export function TupleStatusIcon({
   );
 }
 
-export function TupleSidebarAccessory({ state }: { state: CallState | null }) {
-  if (!state?.inCall) return null;
-  return (
-    <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-      <span className={`size-1.5 shrink-0 rounded-full ${state.call?.capturing ? "bg-emerald-500" : "bg-amber-400"}`} />
-      {state.call?.capturing ? "Live" : "In call"}
-    </div>
-  );
-}
-
 export function TupleComposerActionButton({
   state,
   loading,

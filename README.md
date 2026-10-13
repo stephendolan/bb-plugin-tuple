@@ -86,7 +86,7 @@ npm run storybook
 
 The canvas covers every plugin-owned interface: the current-thread drawer,
 out-of-call launchpad, recorded-call selection, live-call new-thread capture,
-search results, and the compact sidebar and composer slots. Their loading, sending,
+search results, and the compact composer slot. Their loading, sending,
 Capture, history, search, joining, empty, and CLI-unavailable variants
 render at 280, 360, 480, and 600 pixels. Playwright checks every panel for horizontal
 overflow and keeps local macOS screenshot baselines:

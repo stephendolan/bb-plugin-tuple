@@ -1,6 +1,6 @@
 import type { CallState } from "../server";
 import { PreviewGallery, PreviewPanel } from "./preview-gallery";
-import { TupleComposerActionButton, TupleSidebarAccessory } from "./tuple-slot-view";
+import { TupleComposerActionButton } from "./tuple-slot-view";
 
 export default {
   title: "Tuple/Compact slots",
@@ -39,7 +39,7 @@ export function StateMatrix() {
     <PreviewGallery
       testId="compact-slot-matrix"
       title="Tuple compact slot states"
-      description="The composer action and sidebar accessory in every visible call state."
+      description="The composer action in every visible call state."
     >
       <div className="tuple-copy-options">
         {states.map(({ label, state, loading }) => (
@@ -56,7 +56,6 @@ export function StateMatrix() {
                 />
                 <span className="text-muted-foreground text-sm">Composer</span>
               </div>
-              <TupleSidebarAccessory state={state} />
             </PreviewPanel>
           </section>
         ))}
