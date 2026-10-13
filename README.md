@@ -23,9 +23,16 @@ compact reference to the relevant Tuple CLI guide and exact call or window.
 
 ## Requirements
 
-- bb 0.38 or newer.
-- The Tuple desktop app and CLI, signed in to the same account.
+- bb 0.45 or newer.
+- The Tuple desktop app and CLI, signed in to the same account, on a machine
+  connected to bb.
 - A Tuple CLI executable (by default, `tuple` on `PATH`).
+
+The plugin runs the Tuple CLI on the machine named by **Tuple machine** under
+**Settings → Plugins → Tuple**. Leave it blank when Tuple runs on the machine
+that runs the bb server; otherwise enter that machine's name or ID from
+**Settings → Machines**—for example, `Mac Mini`. Agents that receive a call run
+the Tuple CLI themselves, so their threads need it on their own machine.
 
 The default CLI command is `tuple`. Change **Tuple CLI command** under
 **Settings → Plugins → Tuple** to point at another executable or an absolute

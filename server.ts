@@ -1,14 +1,13 @@
-import { execFile, spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { basename } from "node:path";
-import { promisify } from "node:util";
 import {
   defineRpcContract,
   type BbPluginApi,
   type NewThreadRequest,
 } from "@get-bb/plugin-sdk";
 import { z } from "zod";
+import { hostContract, hostSignals, MAX_CLI_OUTPUT_BYTES } from "./host-contract";
 
-const execFileAsync = promisify(execFile);
 const environmentSchema = z.enum(["staging", "prod", "dev"]);
 const callStateSchema = z.object({
   environment: environmentSchema,
@@ -122,7 +121,13 @@ export type CallState = z.infer<typeof callStateSchema>;
 export type CaptureSnapshot = z.infer<typeof transcriptSnapshotSchema>;
 export type Launchpad = z.infer<typeof launchpadSchema>;
 
+type Machine = { id: string; name: string };
+type TupleCli = { command: string; environment: Environment; machine: Machine };
+type Follow = { id: string; cli: TupleCli; controller: AbortController; processing: Promise<void> };
+
 const MAX_TRANSCRIPT_CHARS = 60_000;
+const HOST_CALL_GRACE_MS = 5_000;
+const FOLLOW_DURATION_MS = 25 * 60_000;
 
 type RawState = {
   in_call?: boolean;
@@ -190,6 +195,10 @@ type RoomInfo = {
 function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   return String(error);
+}
+
+function machineError(cli: TupleCli, error: unknown) {
+  return new Error(`${cli.machine.name}: ${errorMessage(error)}`);
 }
 
 function cliEnvironment(command: string): Environment {
@@ -288,6 +297,24 @@ export function transcriptSearchQuery(query: string) {
   return terms.map((term) => `"${term.replaceAll('"', '""')}"`).join(" ");
 }
 
+export function selectMachine(machines: readonly Machine[], selector: string, serverMachineId: string | null): Machine {
+  const wanted = selector.trim();
+  if (!wanted) {
+    const server = machines.find((machine) => machine.id === serverMachineId);
+    if (!server) throw new Error("Set Tuple machine to the machine that runs Tuple.");
+    return server;
+  }
+
+  const byId = machines.find((machine) => machine.id === wanted);
+  if (byId) return byId;
+  const byName = machines.filter((machine) => machine.name.toLocaleLowerCase() === wanted.toLocaleLowerCase());
+  if (byName.length === 1) return byName[0];
+  if (byName.length > 1) throw new Error(`More than one machine is named "${wanted}". Set Tuple machine to its ID.`);
+  throw new Error(
+    `No machine is named "${wanted}". Set Tuple machine to one of: ${machines.map((machine) => machine.name).join(", ")}.`,
+  );
+}
+
 export default async function plugin(bb: BbPluginApi) {
   const settings = bb.settings.define({
     cliCommand: {
@@ -295,6 +322,12 @@ export default async function plugin(bb: BbPluginApi) {
       label: "Tuple CLI command",
       description: "Executable name or absolute path. Use tuple-staging for Tuple staging.",
       default: "tuple",
+    },
+    machine: {
+      type: "string",
+      label: "Tuple machine",
+      description: "Name or ID of the bb machine that runs the Tuple app. Leave blank to use the machine running the bb server.",
+      default: "",
     },
     defaultMinutes: {
       type: "select",
@@ -313,8 +346,8 @@ export default async function plugin(bb: BbPluginApi) {
     updatedAt: new Date().toISOString(),
   };
   const roomCache = new Map<string, RoomInfo>();
-  let settingsGeneration = 0;
-  let activeFollower: ReturnType<typeof spawn> | null = null;
+  const host = bb.hosts.experimental_client({ contract: hostContract, experimental_signals: hostSignals });
+  let activeFollow: Follow | null = null;
 
   async function getCliCommand(): Promise<string> {
     const { cliCommand } = await settings.get();
@@ -323,20 +356,41 @@ export default async function plugin(bb: BbPluginApi) {
     return command;
   }
 
-  async function runTuple(command: string, args: string[], options?: { timeout?: number; maxBuffer?: number }) {
-    const { stdout } = await execFileAsync(command, ["--format", "json", ...args], {
-      timeout: options?.timeout ?? 15_000,
-      maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024,
-    });
-    return stdout;
+  async function getCli(): Promise<TupleCli> {
+    const command = await getCliCommand();
+    const [{ machine }, machines, { primaryHostId }] = await Promise.all([
+      settings.get(),
+      bb.sdk.hosts.list({ type: "persistent" }),
+      bb.sdk.system.config(),
+    ]);
+    return {
+      command,
+      environment: cliEnvironment(command),
+      machine: selectMachine(machines, machine, primaryHostId),
+    };
   }
 
-  async function runTupleText(command: string, args: string[], options?: { timeout?: number; maxBuffer?: number }) {
-    const { stdout } = await execFileAsync(command, ["--format", "text", ...args], {
-      timeout: options?.timeout ?? 15_000,
-      maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024,
-    });
-    return stdout;
+  async function runTuple(
+    cli: TupleCli,
+    args: string[],
+    options?: { format?: "json" | "text"; timeout?: number; maxBuffer?: number },
+  ) {
+    const timeoutMs = options?.timeout ?? 15_000;
+    try {
+      const { stdout } = await host.call(
+        "run",
+        {
+          command: cli.command,
+          args: ["--format", options?.format ?? "json", ...args],
+          timeoutMs,
+          maxBuffer: options?.maxBuffer ?? 2 * 1024 * 1024,
+        },
+        { hostId: cli.machine.id, timeoutMs: timeoutMs + HOST_CALL_GRACE_MS },
+      );
+      return stdout;
+    } catch (error) {
+      throw machineError(cli, error);
+    }
   }
 
   function roomInfo(room: RawRoom | undefined): RoomInfo {
@@ -347,12 +401,12 @@ export default async function plugin(bb: BbPluginApi) {
     };
   }
 
-  async function resolveRoomInfo(environment: Environment, command: string, slug: string) {
-    const cacheKey = `${environment}:${slug}`;
+  async function resolveRoomInfo(cli: TupleCli, slug: string) {
+    const cacheKey = `${cli.environment}:${slug}`;
     const cached = roomCache.get(cacheKey);
     if (cached) return cached;
 
-    const exact = JSON.parse(await runTuple(command, ["rooms", "show", slug])) as RawRoom;
+    const exact = JSON.parse(await runTuple(cli, ["rooms", "show", slug])) as RawRoom;
     const resolved = roomInfo(exact);
     roomCache.set(cacheKey, resolved);
     return resolved;
@@ -376,11 +430,11 @@ export default async function plugin(bb: BbPluginApi) {
     };
   }
 
-  async function applyRawState(environment: Environment, command: string, raw: RawState): Promise<CallState> {
-    currentState = normalizeState(environment, raw);
+  async function applyRawState(cli: TupleCli, raw: RawState): Promise<CallState> {
+    currentState = normalizeState(cli.environment, raw);
     const roomSlug = currentState.call?.roomSlug;
     if (currentState.call && roomSlug) {
-      const room = await resolveRoomInfo(environment, command, roomSlug);
+      const room = await resolveRoomInfo(cli, roomSlug);
       currentState.call.roomName = room.name;
       currentState.call.roomKind = room.kind;
       currentState.call.joinUrl = room.joinUrl;
@@ -389,11 +443,10 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   async function refreshState(): Promise<CallState> {
-    const command = await getCliCommand();
-    const environment = cliEnvironment(command);
+    const environment = cliEnvironment(await getCliCommand());
     try {
-      const output = await runTuple(command, ["state"]);
-      await applyRawState(environment, command, JSON.parse(output) as RawState);
+      const cli = await getCli();
+      await applyRawState(cli, JSON.parse(await runTuple(cli, ["state"])) as RawState);
     } catch (error) {
       currentState = {
         environment,
@@ -408,19 +461,18 @@ export default async function plugin(bb: BbPluginApi) {
   }
 
   async function getLaunchpad(): Promise<Launchpad> {
-    const command = await getCliCommand();
-    const environment = cliEnvironment(command);
+    const cli = await getCli();
     const [roomsOutput, callsOutput, historyOutput] = await Promise.all([
-      runTuple(command, ["rooms", "list", "--kind", "personal", "--members"]),
-      runTuple(command, ["call", "list", "--limit", "6"]),
-      runTuple(command, ["capture", "list", "--limit", "8"]),
+      runTuple(cli, ["rooms", "list", "--kind", "personal", "--members"]),
+      runTuple(cli, ["call", "list", "--limit", "6"]),
+      runTuple(cli, ["capture", "list", "--limit", "8"]),
     ]);
     const personalRoom = (JSON.parse(roomsOutput) as RawRoom[])[0] ?? null;
     const calls = JSON.parse(callsOutput) as RawOngoingCall[];
     const history = JSON.parse(historyOutput) as RawStoredCall[];
     const roomInfoBySlug = new Map<string, RoomInfo>();
     for (const slug of new Set(calls.flatMap((call) => call.room?.slug ? [call.room.slug] : []))) {
-      roomInfoBySlug.set(slug, await resolveRoomInfo(environment, command, slug));
+      roomInfoBySlug.set(slug, await resolveRoomInfo(cli, slug));
     }
     return {
       personalRoom: personalRoom?.slug && personalRoom.http_value
@@ -450,30 +502,30 @@ export default async function plugin(bb: BbPluginApi) {
           };
         }),
       history: history.flatMap((call) => {
-        const normalized = storedCall(call, command);
+        const normalized = storedCall(call, cli.command);
         return normalized ? [normalized] : [];
       }),
     };
   }
 
   async function getRecentCalls() {
-    const command = await getCliCommand();
+    const cli = await getCli();
     const history = JSON.parse(
-      await runTuple(command, ["capture", "list", "--limit", "8"]),
+      await runTuple(cli, ["capture", "list", "--limit", "8"]),
     ) as RawStoredCall[];
     return history.flatMap((call) => {
-      const normalized = storedCall(call, command);
+      const normalized = storedCall(call, cli.command);
       return normalized ? [normalized] : [];
     });
   }
 
   async function searchHistory(query: string) {
-    const command = await getCliCommand();
+    const cli = await getCli();
     const contentQuery = transcriptSearchQuery(query);
     const [historyOutput, searchOutput] = await Promise.all([
-      runTuple(command, ["capture", "list", "--limit", "-1"], { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 }),
+      runTuple(cli, ["capture", "list", "--limit", "-1"], { timeout: 30_000, maxBuffer: MAX_CLI_OUTPUT_BYTES }),
       contentQuery
-        ? runTuple(command, ["capture", "search", contentQuery, "--limit", "100"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 })
+        ? runTuple(cli, ["capture", "search", contentQuery, "--limit", "100"], { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 })
         : Promise.resolve("[]"),
     ]);
     const history = JSON.parse(historyOutput) as RawStoredCall[];
@@ -485,70 +537,49 @@ export default async function plugin(bb: BbPluginApi) {
     return history
       .filter((call) => storedCallMatchesQuery(call, query) || Boolean(call.call_id && firstHitByCall.has(call.call_id)))
       .flatMap((call) => {
-        const normalized = storedCall(call, command, call.call_id ? firstHitByCall.get(call.call_id) : undefined);
+        const normalized = storedCall(call, cli.command, call.call_id ? firstHitByCall.get(call.call_id) : undefined);
         return normalized ? [normalized] : [];
       });
   }
 
-  async function followState(command: string, signal: AbortSignal) {
-    const environment = cliEnvironment(command);
-    const child = spawn(
-      command,
-      ["--format", "json", "state", "follow"],
-      { stdio: ["ignore", "pipe", "pipe"] },
-    );
-    activeFollower = child;
-    let stdout = "";
-    let stderr = "";
-    let processing = Promise.resolve();
-
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (chunk: string) => {
-      stdout += chunk;
-      const lines = stdout.split("\n");
-      stdout = lines.pop() ?? "";
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        processing = processing.then(async () => {
-          const previous = JSON.stringify({ ...currentState, updatedAt: null });
-          await applyRawState(environment, command, JSON.parse(line) as RawState);
-          const next = JSON.stringify({ ...currentState, updatedAt: null });
-          if (next !== previous) bb.realtime.publish("call-state", currentState);
-        });
-      }
+  host.experimental_onSignal("state", ({ payload }) => {
+    const follow = activeFollow;
+    if (follow?.id !== payload.followId) return;
+    follow.processing = follow.processing.then(async () => {
+      const previous = JSON.stringify({ ...currentState, updatedAt: null });
+      await applyRawState(follow.cli, JSON.parse(payload.line) as RawState);
+      const next = JSON.stringify({ ...currentState, updatedAt: null });
+      if (next !== previous) bb.realtime.publish("call-state", currentState);
     });
-    child.stderr.on("data", (chunk: string) => {
-      stderr = `${stderr}${chunk}`.slice(-4_000);
-    });
+    follow.processing.catch(() => follow.controller.abort());
+  });
 
-    const stop = () => child.kill("SIGTERM");
-    signal.addEventListener("abort", stop, { once: true });
-    let exit: { code: number | null; signal: NodeJS.Signals | null };
+  async function followState(cli: TupleCli, signal: AbortSignal) {
+    const follow: Follow = { id: randomUUID(), cli, controller: new AbortController(), processing: Promise.resolve() };
+    activeFollow = follow;
+    const followSignal = AbortSignal.any([signal, follow.controller.signal]);
+    let ended: "expired" | "exited" | null = null;
     try {
-      exit = await new Promise((resolve, reject) => {
-        child.once("error", reject);
-        child.once("exit", (code, exitSignal) => resolve({ code, signal: exitSignal }));
-      });
-    } finally {
-      signal.removeEventListener("abort", stop);
-      if (activeFollower === child) activeFollower = null;
+      ({ ended } = await host.call(
+        "followState",
+        { command: cli.command, followId: follow.id, durationMs: FOLLOW_DURATION_MS },
+        { hostId: cli.machine.id, signal: followSignal, timeoutMs: FOLLOW_DURATION_MS + HOST_CALL_GRACE_MS },
+      ));
+    } catch (error) {
+      if (!followSignal.aborted) throw machineError(cli, error);
     }
-    await processing;
-    if (signal.aborted) return;
-    if (exit.code !== 0 && exit.signal !== "SIGTERM") {
-      throw new Error(stderr.trim() || `Tuple state follower exited with code ${exit.code}`);
-    }
+    await follow.processing;
+    if (ended === "exited") throw new Error("Tuple state follower stopped unexpectedly");
   }
 
   async function getSnapshot(minutes: number): Promise<CaptureSnapshot> {
-    const command = await getCliCommand();
+    const cli = await getCli();
     const state = await refreshState();
     if (!state.inCall || !state.call) throw new Error(`No active ${state.environment} Tuple call.`);
     if (!state.call.capturing) throw new Error("Capture is off for the active Tuple call.");
     const since = new Date(Date.now() - minutes * 60_000).toISOString();
     const until = new Date().toISOString();
-    const output = await runTupleText(command, [
+    const output = await runTuple(cli, [
       "capture",
       "show",
       "current",
@@ -560,7 +591,7 @@ export default async function plugin(bb: BbPluginApi) {
       "events,content",
       "--timestamps",
       "clock",
-    ]);
+    ], { format: "text" });
     const { transcript, truncated } = boundTranscriptOutput(output);
     return {
       callId: state.call.callId,
@@ -569,7 +600,7 @@ export default async function plugin(bb: BbPluginApi) {
       until,
       capturedAt: until,
       transcript,
-      promptContext: liveCallReferencePrompt(state.call.callId, since, until, command),
+      promptContext: liveCallReferencePrompt(state.call.callId, since, until, cli.command),
       truncated,
     };
   }
@@ -580,12 +611,12 @@ export default async function plugin(bb: BbPluginApi) {
     getRecentCalls: () => getRecentCalls(),
     searchHistory: ({ query }) => searchHistory(query),
     joinTuple: async ({ target, switchCurrent }) => {
-      const command = await getCliCommand();
+      const cli = await getCli();
       const state = await refreshState();
       if (state.inCall && !switchCurrent) {
         throw new Error("You are already in a Tuple call.");
       }
-      await runTuple(command, ["call", "join", target, ...(switchCurrent ? ["--switch"] : [])]);
+      await runTuple(cli, ["call", "join", target, ...(switchCurrent ? ["--switch"] : [])]);
       return { ok: true } as const;
     },
     sendStoredCallToThread: async ({ threadId, callId, task }) => {
@@ -599,10 +630,10 @@ export default async function plugin(bb: BbPluginApi) {
     },
     getSnapshot: ({ minutes }) => getSnapshot(minutes),
     startCapture: async () => {
-      const command = await getCliCommand();
+      const cli = await getCli();
       const state = await refreshState();
       if (!state.inCall) throw new Error(`No active ${state.environment} Tuple call.`);
-      await runTuple(command, ["capture", "start"]);
+      await runTuple(cli, ["capture", "start"]);
       return refreshState();
     },
     sendToThread: async ({ threadId, minutes, task }) => {
@@ -648,25 +679,16 @@ export default async function plugin(bb: BbPluginApi) {
   });
 
   settings.onChange(() => {
-    settingsGeneration += 1;
     roomCache.clear();
-    activeFollower?.kill("SIGTERM");
+    activeFollow?.controller.abort();
     void refreshState().then(() => bb.realtime.publish("call-state", currentState));
   });
 
   bb.background.service("call-state", {
     async start(signal) {
       while (!signal.aborted) {
-        const generation = settingsGeneration;
-        const command = await getCliCommand();
-        await followState(command, signal);
-        if (!signal.aborted && generation === settingsGeneration) {
-          throw new Error("Tuple state follower stopped unexpectedly");
-        }
+        await followState(await getCli(), signal);
       }
     },
   });
-
-  await refreshState();
-  bb.log.info(`loaded for ${currentState.environment}; inCall=${currentState.inCall}`);
 }

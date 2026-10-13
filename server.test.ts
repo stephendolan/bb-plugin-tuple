@@ -1,8 +1,10 @@
-import { describe, expect, it } from "vitest";
-import {
+import { createFakePluginHost, makeHostResponse } from "@get-bb/plugin-sdk/testing";
+import { describe, expect, it, vi } from "vitest";
+import plugin, {
   boundTranscriptOutput,
   liveCallReferencePrompt,
   normalizeState,
+  selectMachine,
   storedCallReferencePrompt,
   storedCallMatchesQuery,
   transcriptSearchQuery,
@@ -92,5 +94,146 @@ describe("server helpers", () => {
     expect(transcriptSearchQuery("a launch demo")).toBe('"launch" "demo"');
     expect(transcriptSearchQuery('say "hello"')).toBe('"say" """hello"""');
     expect(transcriptSearchQuery("a to")).toBeNull();
+  });
+});
+
+const machines = [
+  { id: "host_server", name: "Homeserver" },
+  { id: "host_mac", name: "Mac Mini" },
+];
+
+describe("selectMachine", () => {
+  it("defaults to the machine running the bb server", () => {
+    expect(selectMachine(machines, "", "host_server")).toEqual(machines[0]);
+  });
+
+  it("finds a machine by ID or case-insensitive name", () => {
+    expect(selectMachine(machines, "host_mac", "host_server")).toEqual(machines[1]);
+    expect(selectMachine(machines, "  mac mini ", "host_server")).toEqual(machines[1]);
+  });
+
+  it("names the available machines when none match", () => {
+    expect(() => selectMachine(machines, "Laptop", "host_server")).toThrow(
+      'No machine is named "Laptop". Set Tuple machine to one of: Homeserver, Mac Mini.',
+    );
+  });
+
+  it("asks for an ID when several machines share a name", () => {
+    expect(() => selectMachine([...machines, { id: "host_mac_2", name: "mac mini" }], "Mac Mini", null)).toThrow(
+      'More than one machine is named "Mac Mini". Set Tuple machine to its ID.',
+    );
+  });
+
+  it("asks for a machine when the server's machine is unknown", () => {
+    expect(() => selectMachine(machines, "", null)).toThrow("Set Tuple machine to the machine that runs Tuple.");
+  });
+});
+
+type HostCall = { method: string; input: unknown; hostId: string; signal?: AbortSignal };
+
+function respondLikeTuple(call: HostCall) {
+  if (call.method === "followState") {
+    return new Promise((_, reject) => {
+      call.signal?.addEventListener("abort", () => reject(new Error("cancelled")), { once: true });
+    });
+  }
+  const { args } = call.input as { args: string[] };
+  return { stdout: args.includes("state") ? JSON.stringify({ in_call: false }) : "[]" };
+}
+
+async function loadPlugin(options: { settings?: Record<string, string>; respond?: (call: HostCall) => unknown } = {}) {
+  const { bb, harness } = createFakePluginHost({
+    pluginId: "tuple",
+    settings: options.settings,
+    sdk: {
+      hosts: {
+        list: async (args?: { type?: string }) =>
+          args?.type === "persistent" ? machines.map((machine) => makeHostResponse(machine)) : [],
+      },
+      system: { config: async () => ({ primaryHostId: "host_server" }) },
+    },
+    experimental_callHostRpc: options.respond ?? respondLikeTuple,
+  });
+  await plugin(bb);
+  return harness;
+}
+
+describe("Tuple machine", () => {
+  it("runs the Tuple CLI on the configured machine", async () => {
+    const harness = await loadPlugin({ settings: { machine: "Mac Mini" } });
+
+    await harness.callRpc("getLaunchpad");
+
+    expect(harness.experimental_hostRpcCalls.map(({ hostId, input }) => [hostId, (input as { args: string[] }).args])).toEqual([
+      ["host_mac", ["--format", "json", "rooms", "list", "--kind", "personal", "--members"]],
+      ["host_mac", ["--format", "json", "call", "list", "--limit", "6"]],
+      ["host_mac", ["--format", "json", "capture", "list", "--limit", "8"]],
+    ]);
+  });
+
+  it("uses the bb server's machine by default", async () => {
+    const harness = await loadPlugin();
+
+    await harness.callRpc("getRecentCalls");
+
+    expect(harness.experimental_hostRpcCalls.map(({ hostId }) => hostId)).toEqual(["host_server"]);
+  });
+
+  it("names the machine when the Tuple CLI fails there", async () => {
+    const harness = await loadPlugin({
+      respond: () => {
+        throw new Error('Tuple CLI "tuple" was not found on PATH.');
+      },
+    });
+
+    await expect(harness.callRpc("getRecentCalls")).rejects.toThrow('Homeserver: Tuple CLI "tuple" was not found on PATH.');
+    await expect(harness.callRpc("getState")).resolves.toMatchObject({
+      inCall: false,
+      error: 'Homeserver: Tuple CLI "tuple" was not found on PATH.',
+    });
+  });
+
+  it("publishes live call state followed on the Tuple machine", async () => {
+    const harness = await loadPlugin({ settings: { machine: "Mac Mini" } });
+    const service = harness.runService("call-state");
+    const follow = await vi.waitFor(() => {
+      const call = harness.experimental_hostRpcCalls.find(({ method }) => method === "followState");
+      if (!call) throw new Error("follower not started");
+      return call;
+    });
+    const { followId } = follow.input as { followId: string };
+
+    await harness.experimental_emitHostSignal("host_mac", "state", {
+      followId: "stale-follow",
+      line: JSON.stringify({ in_call: true, call: { call_id: "stale-call" } }),
+    });
+    await harness.experimental_emitHostSignal("host_mac", "state", {
+      followId,
+      line: JSON.stringify({ in_call: true, call: { call_id: "call-1", participants: [{ name: "Sherlock" }] } }),
+    });
+
+    await vi.waitFor(() => expect(harness.realtimeSignals).toHaveLength(1));
+    expect(follow.hostId).toBe("host_mac");
+    expect(harness.realtimeSignals[0]).toMatchObject({
+      channel: "call-state",
+      payload: { inCall: true, call: { callId: "call-1", participants: ["Sherlock"] } },
+    });
+
+    service.controller.abort();
+    await service.done;
+  });
+
+  it("moves the follower when Tuple machine changes", async () => {
+    const harness = await loadPlugin({ settings: { machine: "Mac Mini" } });
+    const service = harness.runService("call-state");
+    const followedMachines = () =>
+      harness.experimental_hostRpcCalls.filter(({ method }) => method === "followState").map(({ hostId }) => hostId);
+    await vi.waitFor(() => expect(followedMachines()).toEqual(["host_mac"]));
+
+    await harness.setSettings({ machine: "Homeserver" });
+
+    await vi.waitFor(() => expect(followedMachines()).toEqual(["host_mac", "host_server"]));
+    service.controller.abort();
+    await service.done;
   });
 });

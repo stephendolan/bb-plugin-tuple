@@ -445,7 +445,7 @@ function ComposerTupleAction() {
       }
       const minutes = Number(values?.defaultMinutes ?? "5");
       const snapshot = await rpc.call("getSnapshot", { minutes });
-      composer.updateText((current) => `${current}${current ? "\n\n" : ""}${snapshot.promptContext}`);
+      composer.insert(snapshot.promptContext, { at: "end", block: true });
       composer.focus();
       toast.success("Added recent Tuple context to your draft.");
     } catch (error) {
